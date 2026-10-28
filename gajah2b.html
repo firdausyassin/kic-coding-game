@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 2B: Gajah & Logik Berat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="tema-permainan tema-balak">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Terminal Logik Berat</h2>
+                <button class="btn-info" onclick="bukaInfo()">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p>Gajah pintar perlu memindahkan dua batang balak gergasi ke atas lori. Jumlah berat sasaran ialah <strong>500 KG</strong>.</p>
+            <p style="color: #f1c40f;">Tulis operasi matematik (tambah) berat balak pertama dan kedua di dalam parameter.</p>
+            <p>Format: <code>gajah.angkat(balak1 + balak2)</code></p>
+            
+            <input type="text" id="arahanInput" placeholder="Contoh: gajah.angkat(200 + 300)" onkeydown="if(event.key === 'Enter') laksanaArahanGajah()">
+            <button onclick="laksanaArahanGajah()">ANGKAT BALAK! 🪵</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas">
+                Sistem hidraulik gajah sedia. Menunggu formula berat...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: white; text-align: center; margin-top:0;">Tapak Perindustrian TVET</h2>
+            
+            <div id="ruangAnimasi">
+                <div class="teks-status" id="teksAnimasi" style="color: white; position: absolute; top: 15px; width: 100%; text-align: center; z-index: 10;">
+                    Status: Menunggu input berat muatan balak...
+                </div>
+                
+                <div id="tapak-timbang"></div>
+                
+                <div id="gajah">
+                    <div id="dialogGajah" class="awan-dialog" style="bottom: 90px; left: 10px;"></div>
+                    <span>🐘</span>
+                </div>
+                
+                <div id="kumpulan-balak">🪵🪵</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal kandungan-info" style="max-width: 500px; background-color: #1a252f; border: 2px solid #e67e22; box-shadow: 0 0 20px #e67e22;">
+            <h2 style="color: #e67e22;">🪵 Panduan Parameter Matematik</h2>
+            <p style="color: #ecf0f1;">Komputer boleh mengira terus di dalam kurungan! Terdapat dua balak seberat <strong>200 KG</strong> dan <strong>300 KG</strong>.</p>
+            <p style="color: #ecf0f1;">Jangan taip 500 terus. Kita nak ajar komputer buat operasi tambah di dalam fungsi.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+                <p style="margin: 0; color: #f1c40f; font-weight: bold;">Taip Kod Formula Ini:</p>
+                <code style="color: #00ff66; font-size: 16px;">gajah.angkat(200 + 300)</code>
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%;">SAYA FAHAM, JOM CUBA!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal">
+            <div class="ikon-menang">🐘</div>
+            <h2>Kuasa Maksimum!</h2>
+            <p>Tahniah! Anda berjaya mengajar gajah menggunakan logik matematik pengiraan parameter.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-gajah2b.js"></script>
+</body>
+</html>

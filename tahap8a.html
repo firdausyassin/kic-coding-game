@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 8A: Kilang Robotik Cyber</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .tema-cyberpunk {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* PLATFORM ROBOT */
+        #platform {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 40px;
+            background: #2c3e50; border: 4px solid #00f3ff; border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5), inset 0 0 10px rgba(0, 243, 255, 0.5);
+            z-index: 5;
+        }
+
+        /* ROBOT CYBER */
+        #robot-utama {
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+            font-size: 150px; z-index: 10; margin: 0; line-height: 1;
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
+            opacity: 0.3; /* Gelap pada awalnya */
+            transition: opacity 1s, filter 1s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .robot-aktif { 
+            opacity: 1 !important; 
+            filter: drop-shadow(0 0 25px rgba(0, 255, 136, 0.6)) !important; 
+            transform: translateX(-50%) scale(1.1) !important;
+        }
+
+        /* HOLOGRAM ID KAD */
+        #hologram-id {
+            position: absolute; bottom: 220px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 180px; background: rgba(0, 20, 30, 0.85);
+            border: 2px solid #00ff88; border-radius: 10px;
+            padding: 15px; color: #00ff88; font-family: monospace;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            z-index: 15; text-align: left;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .tunjuk-hologram { transform: translateX(-50%) scale(1) !important; }
+        .holo-baris { margin: 5px 0; font-size: 14px; border-bottom: 1px dashed rgba(0, 255, 136, 0.3); padding-bottom: 3px; }
+        .holo-label { color: #bdc3c7; font-size: 10px; display: block; }
+
+        /* DIALOG ROBOT AI */
+        .awan-dialog {
+            position: absolute; top: 30px; left: 65%; 
+            width: 260px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: scale(0); transform-origin: bottom left;
+            background: rgba(15, 25, 40, 0.95) !important; color: #00f3ff !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3) !important; white-space: normal !important; 
+            word-wrap: break-word !important; text-align: left !important; 
+            border: 2px solid #00f3ff !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; bottom: -12px; left: 15px;
+            border-width: 8px; border-style: solid; border-color: #00f3ff transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: scale(1) translateY(-10px) !important; }
+        
+        /* EFEK LASER SCANNER */
+        #laser-scan {
+            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: #00f3ff; box-shadow: 0 0 15px #00f3ff, 0 0 30px #00f3ff;
+            z-index: 20; opacity: 0; pointer-events: none;
+        }
+        @keyframes scanKamera { 0% { top: 0; opacity: 1; } 50% { opacity: 0.5; } 100% { top: 100%; opacity: 0; } }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Memori<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 8A)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Bina profil untuk Robot ini! Cipta pembolehubah (variable) untuk merekodkan <strong>nama</strong> dan <strong>umur</strong> ke dalam sistem memorinya.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #00f3ff;">
+                <strong>Pengisytiharan Pembolehubah Asas:</strong><br>
+                <code>nama = "Teks"</code><br>
+                <code>umur = Angka</code><br><br>
+                <strong style="color: #00f3ff;">Contoh Kod (Dua baris):</strong><br>
+                <code>nama = "Mecha"</code><br>
+                <code>umur = 5</code><br>
+                <span style="color: #bdc3c7; font-size: 11px;">(Pastikan teks nama diletakkan di dalam pengikat kata <code>" "</code>)</span>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip kod pembolehubah nama dan umur di sini..." spellcheck="false" style="width: 100%; height: 100px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanTahap8a()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00f3ff, #0984e3); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);">SUNTIK MEMORI 🧬</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00f3ff; padding: 10px; font-size: 13px;">
+                Casis robot dikesan. Memori masih kosong. Sila masukkan data.
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Bilik Imbasan Cyber</h2>
+            
+            <div id="ruangAnimasi" class="tema-cyberpunk">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(15,25,40,0.9); color: #00f3ff; border: 2px solid #00f3ff; font-size: 14px;">
+                    Sistem: Menunggu data profil pengguna...
+                </div>
+                
+                <div id="dialogSistem" class="awan-dialog"></div>
+                <div id="laser-scan"></div>
+                
+                <div id="hologram-id">
+                    <div style="text-align: center; border-bottom: 2px solid #00ff88; margin-bottom: 10px; padding-bottom: 5px;"><strong>ID. KAD ROBOTIK</strong></div>
+                    <div class="holo-baris"><span class="holo-label">NAMA PENGENALAN</span><span id="paparan-nama">---</span></div>
+                    <div class="holo-baris"><span class="holo-label">USIA SISTEM (TAHUN)</span><span id="paparan-umur">---</span></div>
+                    <div class="holo-baris"><span class="holo-label">STATUS</span><span style="color: #fff;">AKTIF</span></div>
+                </div>
+
+                <div id="robot-utama">🤖</div>
+                <div id="platform"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN DAN KEMENANGAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #00f3ff; box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);">
+            <h2 style="color: #00f3ff;">🧬 Pembolehubah (Variables)</h2>
+            <p style="color: #ecf0f1; font-size: 15px;">Pembolehubah adalah seperti "bekas" yang kita gunakan untuk menyimpan maklumat di dalam memori komputer.</p>
+            
+            <div style="background: rgba(0, 243, 255, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #00f3ff;">
+                <strong>Dua Jenis Data Asas:</strong><br><br>
+                <strong>1. Teks (String):</strong> Mesti diletakkan di dalam pengikat kata (<code>" "</code>).<br>
+                Contoh: <code>nama = "Rex"</code><br><br>
+                <strong>2. Nombor (Integer):</strong> Tidak perlu pengikat kata.<br>
+                Contoh: <code>umur = 8</code><br><br>
+                Gabungkan kedua-dua baris kod ini di dalam terminal untuk menghidupkan robot dengan identitinya yang tersendiri!
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00f3ff; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">🤖🧬</div>
+            <h2 style="color: #2ecc71;">Memori Disuntik!</h2>
+            <p style="color: #ecf0f1;">Terbaik! Anda telah berjaya menggunakan konsep Pembolehubah (Variable) seperti dalam Python dan JavaScript untuk menyimpan data nama dan umur ke dalam sistem.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #000; font-weight: bold;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap8a.js"></script>
+</body>
+</html>

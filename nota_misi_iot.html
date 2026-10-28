@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Sumber Digital K.I.C - Misi I.O.T</title>
+    <style>
+        /* 🔥 ASAS TEMA KELAS MAYA 🔥 */
+        body { margin: 0; padding: 0; background: #050a15; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        
+        .latar-kelas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1a2a40 0%, #02050a 100%); z-index: 1; }
+        .grid-maya { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(241, 196, 15, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(241, 196, 15, 0.05) 1px, transparent 1px); background-size: 40px 40px; z-index: 2; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+
+        /* 🔥 TERMINAL SKRIN SCROLL 🔥 */
+        .kanvas-terminal { position: relative; z-index: 10; width: 92%; max-width: 1100px; height: 92vh; margin: 4vh auto; background: rgba(15, 15, 20, 0.85); border: 2px solid #f1c40f; border-radius: 15px; box-shadow: 0 0 30px rgba(241, 196, 15, 0.2), inset 0 0 20px rgba(0,0,0,0.8); overflow-y: auto; overflow-x: hidden; padding: 30px; backdrop-filter: blur(10px); scroll-behavior: smooth; }
+        
+        .kanvas-terminal::-webkit-scrollbar { width: 8px; }
+        .kanvas-terminal::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+        .kanvas-terminal::-webkit-scrollbar-thumb { background: #f1c40f; border-radius: 10px; box-shadow: 0 0 10px #f1c40f; }
+
+        /* 🔥 HEADER TERMINAL 🔥 */
+        .header-nota { text-align: center; border-bottom: 2px dashed #f1c40f; padding-bottom: 20px; margin-bottom: 40px; position: relative; }
+        .header-nota h1 { color: #f1c40f; margin: 0; font-size: 34px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(241, 196, 15, 0.5); }
+        .btn-kembali { position: absolute; top: 0; left: 0; background: #e74c3c; color: white; border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 0 10px rgba(231, 76, 60, 0.5); z-index: 50; }
+        .btn-kembali:hover { background: #c0392b; transform: scale(1.05); }
+
+        /* 🔥 STRUKTUR MIND-MAP KRONOLOGI 🔥 */
+        .garis-masa { position: relative; width: 100%; margin: 0 auto; padding-bottom: 50px;}
+        .garis-masa::after { content: ''; position: absolute; width: 4px; background: rgba(241, 196, 15, 0.4); top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 5px; }
+
+        .nod-nota { padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box; margin-bottom: 60px; opacity: 0; animation: masukAtas 0.8s forwards; }
+        .nod-kiri { left: 0; text-align: right; }
+        .nod-kanan { left: 50%; text-align: left; }
+
+        .nod-nota::after { content: ''; position: absolute; width: 22px; height: 22px; right: -11px; background-color: #f1c40f; border: 4px solid #1a2a40; top: 30px; border-radius: 50%; z-index: 1; box-shadow: 0 0 15px #f1c40f; }
+        .nod-kanan::after { left: -11px; background-color: #3498db; box-shadow: 0 0 15px #3498db; }
+
+        /* Kotak Teks */
+        .kotak-info { padding: 25px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; border: 1px solid #f39c12; position: relative; transition: 0.3s; backdrop-filter: blur(5px); }
+        .kotak-info:hover { background: rgba(255, 255, 255, 0.08); border-color: #f1c40f; box-shadow: 0 0 25px rgba(241, 196, 15, 0.2); transform: translateY(-5px); }
+        .kotak-info h3 { margin-top: 0; color: #f1c40f; font-size: 21px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; letter-spacing: 1px;}
+        .nod-kanan .kotak-info h3 { color: #3498db; }
+        .kotak-info p { font-size: 14px; color: #d2dae2; line-height: 1.6; margin-bottom: 10px;}
+        .kotak-info strong { color: #00ff66; }
+        
+        .senarai-contoh { font-size: 13px; color: #bdc3c7; text-align: left; background: rgba(0,0,0,0.4); padding: 12px 25px; border-radius: 8px; border-left: 3px solid #f1c40f; margin-bottom: 15px; list-style-type: none; }
+        .senarai-contoh li { margin-bottom: 12px; line-height: 1.5; }
+        code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #f1c40f; font-family: monospace; font-size: 14px;}
+
+        /* 🔥 HIGHLIGHT KOD KHAS 🔥 */
+        .kod-highlight {
+            background: rgba(241, 196, 15, 0.1);
+            border-left: 4px solid #f1c40f !important;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-top: 15px !important;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.1);
+        }
+        .kod-highlight strong { color: #f1c40f !important; }
+
+        /* 🔥 KELAS KARAKTER ANIMASI 🔥 */
+        .karakter-container { display: flex; align-items: flex-end; gap: 15px; margin-top: 20px; position: relative; z-index: 5;}
+        .k-kiri { justify-content: flex-end; }
+        .k-kanan { justify-content: flex-start; }
+        
+        .img-karakter { height: 180px; width: auto; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); }
+        .img-bot { height: 130px; width: auto; animation: floatBot 2.5s ease-in-out infinite alternate; filter: drop-shadow(0 0 20px rgba(0, 255, 102, 0.3)); }
+        
+        .dialog-bubble { background: rgba(241, 196, 15, 0.1); border: 1px dashed #f1c40f; padding: 12px 18px; border-radius: 15px; font-size: 13px; color: #fff; max-width: 280px; text-align: left; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .k-kiri .dialog-bubble { border-bottom-right-radius: 0; }
+        .k-kanan .dialog-bubble { border-bottom-left-radius: 0; }
+        
+        /* TEMA BUBBLE MENGIKUT WATAK */
+        .bubble-faiq { border-color: #00ff66; background: rgba(0, 255, 102, 0.1); }
+        .bubble-bot { border-color: #3498db; background: rgba(52, 152, 219, 0.1); }
+        .dialog-amaran { border-color: #ff4757; background: rgba(255, 71, 87, 0.15); }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes floatBot { 0% { transform: translateY(0px) rotate(-3deg); } 100% { transform: translateY(-20px) rotate(3deg); } }
+        @keyframes masukAtas { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media screen and (max-width: 768px) {
+            .garis-masa::after { left: 20px; }
+            .nod-nota { width: 100%; padding-left: 50px; padding-right: 0; text-align: left; }
+            .nod-kanan { left: 0; }
+            .nod-kiri::after, .nod-kanan::after { left: 10px; }
+            .karakter-container { justify-content: flex-start !important; flex-direction: row-reverse; }
+            .k-kiri .dialog-bubble { border-bottom-left-radius: 0; border-bottom-right-radius: 15px; }
+            .header-nota h1 { font-size: 24px; margin-top: 50px;}
+            .btn-kembali { position: relative; display: block; margin: 0 auto 20px auto; width: max-content; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="latar-kelas"></div>
+    <div class="grid-maya"></div>
+
+    <div class="kanvas-terminal">
+        <button class="btn-kembali" onclick="window.location.href='index.html'">◀ KEMBALI KEPADA MENU</button>
+        
+        <div class="header-nota">
+            <h1>Makmal I.O.T (Zon 5)</h1>
+            <p style="color: #bdc3c7; font-size: 14px; letter-spacing: 1px; margin-top: 5px;">THE MASTER PIECE: EVOLUSI MENCIPTA ROBOT PINTAR</p>
+        </div>
+
+        <div class="garis-masa">
+
+            <!-- TAHAP 1 -->
+            <div class="nod-nota nod-kiri" style="animation-delay: 0.1s;">
+                <div class="kotak-info">
+                    <h3>TAHAP 1: Membina "Otot" Fizikal (Output Asas)</h3>
+                    <p>Bayangkan mesin anda seperti bayi yang baru lahir. Langkah pertama adalah mengajarnya cara bergerak, bercakap dan berkomunikasi menggunakan tenaga elektrik (Teks & Nombor).</p>
+                    <ul class="senarai-contoh">
+                        <li>💡 <strong>Misi 1.1A (Lampu LED):</strong> Mengawal cahaya! Ini adalah "Mata Berkelip" sistem anda.</li>
+                        <li>🔊 <strong>Misi 1.1B (Active Buzzer):</strong> Membina "Mulut" untuk mesin menjerit. Menghasilkan frekuensi amaran.</li>
+                        <li>🔢 <strong>Misi 1.1C (Paparan 7-Segment):</strong> Skrin komunikasi mini. Mesin kini boleh bercakap dengan anda melalui cetakan angka 0-9.</li>
+                    </ul>
+
+                    <ul class="senarai-contoh">
+                        <li class="kod-highlight">💻 <strong>Dari Kod Ke Realiti:</strong> Apabila koding menulis <code>lampu.nyala()</code> atau <code>amaran.bunyi()</code>, elektrik akan dipam ke komponen. Inilah magis menukarkan ayat di skrin menjadi pergerakan alam nyata!</li>
+                    </ul>
+
+                    <div class="karakter-container k-kiri">
+                        <div class="dialog-bubble">
+                            <strong>Uncle Mat:</strong> "Ini adalah komponen Output. Output bermaksud komponen ini menunggu arahan dari komputer untuk MENGELUARKAN reaksi (cahaya/bunyi) ke dunia luar!"
+                        </div>
+                        <img src="assets/picture/uncle_fakta.png" class="img-karakter" alt="Uncle Mat Fakta">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAHAP 2 -->
+            <div class="nod-nota nod-kanan" style="animation-delay: 0.3s;">
+                <div class="kotak-info" style="border-color: #3498db;">
+                    <h3 style="color: #3498db;">TAHAP 2: Deria Sentuh & Lihat (Input Digital 1/0)</h3>
+                    <p>Mesin yang hebat mesti pandai merasa keadaan sekelilingnya! Komponen "Input Digital" sangat tegas; ia hanya memahami 2 keadaan: <strong>"YA (Ada/1)"</strong> atau <strong>"TIDAK (Tiada/0)"</strong>.</p>
+                    <ul class="senarai-contoh" style="border-left-color: #3498db;">
+                        <li>🔘 <strong>Misi 2.1A (Suis Butang):</strong> Sama seperti loceng rumah. (YA = Ditekan | TIDAK = Dilepaskan).</li>
+                        <li>🔄 <strong>Misi 2.1B (Suis Condong / Tilt):</strong> Deria graviti! Kesan jika kotak simpanan diterbalikkan pencuri.</li>
+                        <li>👁️ <strong>Misi 2.1C (Penderia Inframerah / IR):</strong> Mata ghaib robot. Jika ada orang lalu memotong pancaran lasernya, status berubah kepada 1!</li>
+                        
+                        <li class="kod-highlight" style="border-left-color: #3498db !important; background: rgba(52, 152, 219, 0.1);">💻 <strong>Logik Syarat (If/Else):</strong> <code>if (suis == DITEKAN) { lampu.nyala(); }</code> <br>Sistem kini pandai membuat keputusan. Ia takkan buka lampu selagi jari anda belum menekan butang!</li>
+                    </ul>
+
+                    <div class="karakter-container k-kanan">
+                        <img src="assets/picture/faiq_idea.png" class="img-karakter" alt="Faiq Idea">
+                        <div class="dialog-bubble bubble-faiq">
+                            <strong>Faiq:</strong> "Aha! Macam *game controller* saya kat rumah la ni kan? Tekan butang 'X' (Input 1), barulah hero dalam *game* melompat (Output)!"
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAHAP 3 -->
+            <div class="nod-nota nod-kiri" style="animation-delay: 0.5s;">
+                <div class="kotak-info">
+                    <h3>TAHAP 3: Deria Halus (Input Analog)</h3>
+                    <p>Dunia sebenar bukan sekadar Hitam dan Putih. Ia ada kelabu! "Input Analog" membolehkan sistem merasa bacaan yang berbeza-beza secara terperinci (daripada skala 0 hingga 4095).</p>
+                    <ul class="senarai-contoh">
+                        <li>🎛️ <strong>Misi 3.1A (Tombol Potentiometer):</strong> Pengawal laras! Ibarat memulas volume radio, kelajuan lampu kelip boleh dilaras mengikut pusingan tangan.</li>
+                        <li>☀️ <strong>Misi 3.1B (LDR - Peka Cahaya):</strong> Menyukat kecerahan matahari. Boleh kesan waktu Subuh, Zohor, atau Maghrib!</li>
+                        <li>🌡️ <strong>Misi 3.1C (Thermistor):</strong> Menyukat suhu persekitaran (Sejuk, Suam, Panas, Menggelegak).</li>
+                    </ul>
+
+                    <ul class="senarai-contoh">
+                        <li class="kod-highlight">💻 <strong>Syarat Perbandingan (< , >):</strong> <code>if (cahaya < 100) { pasang_lampu_jalan(); }</code> <br> Di sini sistem jadi super-pintar. Mesin sentiasa memantau bacaan cahaya langit. Sebaik sahaja langit mendung dan nilai cahaya JATUH (kurang dari 100), lampu jalan menyala automatik!</li>
+                    </ul>
+
+                    <div class="karakter-container k-kiri">
+                        <div class="dialog-bubble bubble-bot">
+                            <strong>Bot Pintar:</strong> "Bip! Inilah perbezaan Digital dan Analog. Digital cuma tahu 'Gelap' atau 'Terang'. Analog pula tahu perbezaan 'Sedikit Gelap', 'Sederhana' dan 'Silau'!"
+                        </div>
+                        <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAHAP 4 -->
+            <div class="nod-nota nod-kanan" style="animation-delay: 0.7s;">
+                <div class="kotak-info" style="border-color: #3498db;">
+                    <h3 style="color: #3498db;">TAHAP 4: Deria Pakar (Modul Kompleks & Variables)</h3>
+                    <p>Inilah tahap "Sains Alam Sekitar". Anda menggunakan cip canggih yang direka khas untuk merekod data yang sangat terperinci dan menyimpannya di dalam <strong>Pembolehubah (Variables)</strong> untuk dikaji!</p>
+                    <ul class="senarai-contoh" style="border-left-color: #3498db;">
+                        <li>🌧️ <strong>Misi 4.1A (DHT11):</strong> Pakar cuaca mini. Ia menjejaki tahap kepanasan haba dan kelembapan udara.</li>
+                        <li>🌱 <strong>Misi 4.1B (Kelembapan Tanah):</strong> Duri besi yang dicucuk ke pasu. Ia tahu bila pokok bunga anda dah 'dahaga' nak minum air!</li>
+                        <li>🌊 <strong>Misi 4.1C (Paras Air):</strong> Penderia yang memberi amaran jika sungai mula naik mendadak (Sistem Amaran Banjir).</li>
+                        <li>🗣️ <strong>Misi 4.1D (Penderia Bunyi):</strong> Telinga robot! Ia menangkap getaran akustik (Contoh: Tepuk tangan untuk tutup lampu bilik).</li>
+                    </ul>
+
+                    <ul class="senarai-contoh" style="border-left-color: #3498db;">
+                        <li class="kod-highlight" style="border-left-color: #3498db !important; background: rgba(52, 152, 219, 0.1);">💻 <strong>Dari Kod Ke Realiti:</strong> <code>let tanah = baca_sensor_tanah(); if (tanah == KERING) { pam_air.buka(); }</code> <br> Ini adalah rahsia <em>Smart Agriculture</em> (Pertanian Pintar). Peladang tak perlu turun kebun siram air lagi!</li>
+                    </ul>
+
+                    <div class="karakter-container k-kanan">
+                        <img src="assets/picture/uncle_tablet.png" class="img-karakter" alt="Uncle Mat Tablet">
+                        <div class="dialog-bubble">
+                            <strong>Uncle Mat:</strong> "Hebat kan? Dengan penderia-penderia ini, kita sebenarnya mencipta teknologi alat bantu manusia yang boleh menyelamatkan nyawa dan tenaga masa depan!"
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAHAP 5 (GRAND MASTERPIECE) -->
+            <div class="nod-nota nod-kiri" style="animation-delay: 0.9s;">
+                <div class="kotak-info" style="border-color: #e74c3c; background: rgba(231, 76, 60, 0.05);">
+                    <h3 style="color: #ff4757; font-size: 24px; text-transform: uppercase;">TAHAP 5: The Grand Masterpiece 🏆</h3>
+                    <p>Ujian Akhir (Final Boss)! Tiba masanya untuk menggabungkan kesemua <strong>Deria (Input)</strong> dan <strong>Otot (Output)</strong> yang anda pelajari ke dalam sebuah sistem berantai yang dipanggil <strong>Sistem Penggera Bilik Kebal Pintar</strong>.</p>
+                    
+                    <ul class="senarai-contoh" style="border-left-color: #e74c3c; background: rgba(0,0,0,0.5);">
+                        <li><strong>Modul 5.1 (Mega Gabungan):</strong> Litar ini memakan masa, kepakaran, dan fokus yang tinggi. Anda akan memasang <strong>IR Sensor, Buzzer, RGB LED, dan Butang Suis</strong> serentak dalam satu papan roti (Breadboard)!</li>
+                    </ul>
+
+                    <ul class="senarai-contoh" style="border-left-color: #e74c3c;">
+                        <li class="kod-highlight" style="border-left-color: #ff4757 !important; background: rgba(231, 76, 60, 0.1);">💻 <strong>Evolusi Rantaian Koding Sistem Keselamatan:</strong></li>
+                    </ul>
+                    <pre style="background:rgba(0,0,0,0.7); padding:15px; border-radius:8px; border: 1px dashed #e74c3c; color:#ff9f43; font-size: 13px; line-height: 1.6; font-family: monospace; overflow-x: auto;">
+Langkah 1: Jika (Pencuri langgar laser IR) {
+   Langkah 2: Buzzer berbunyi bising! (Bip Bip Bip!)
+   Langkah 3: Lampu RGB bertukar Merah!
+   Langkah 4: Kunci memori! Siren takkan mati walaupun pencuri lari!
+}
+
+Langkah 5: Melainkan... Jika (Pemilik sah menekan Butang Rahsia) {
+   Langkah 6: Matikan siren. Lampu RGB bertukar Hijau. Sistem kembali normal.
+}
+                    </pre>
+
+                    <div class="karakter-container k-kiri">
+                        <div class="dialog-bubble dialog-amaran">
+                            <strong>TAHNIAH JURUTERA MUDA!</strong> "Anda berjaya! Anda telah berubah dari sekadar bermain huruf di komputer (Zon 1) kepada membina sebuah Sistem I.O.T yang berfungsi di dunia nyata!"
+                        </div>
+                        <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar Tamat" style="filter: drop-shadow(0 0 25px red);">
+                    </div>
+                </div>
+            </div>
+
+        </div> 
+    </div> 
+</body>
+</html>

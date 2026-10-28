@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 2F: Bacaan Muka Jam</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA BILIK DARJAH */
+        .tema-sekolah {
+            background: linear-gradient(to bottom, #fdf5e6 0%, #faebd7 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* LANTAI KELAS */
+        #lantai-kelas {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100px;
+            background: #cd853f; border-top: 5px solid #8b4513;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.2); z-index: 1;
+        }
+
+        /* PAPAN HITAM (Latar Belakang) */
+        #papan-hitam {
+            position: absolute; top: 15%; left: 5%; width: 45%; height: 220px;
+            background: #2e4a3d; border: 8px solid #8b4513; border-radius: 5px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.3), inset 0 0 20px rgba(0,0,0,0.5);
+            z-index: 2; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: rgba(255,255,255,0.8); font-family: monospace; font-size: 20px; text-align: center;
+        }
+
+        /* ========================================================
+           🔥 JAM DINDING ANALOG (100% CSS) 🔥
+           ======================================================== */
+        #jam-dinding {
+            position: absolute; top: 15%; right: 15%; width: 220px; height: 220px;
+            background: #ffffff; border: 12px solid #34495e; border-radius: 50%;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.4), inset 0 0 15px rgba(0,0,0,0.2);
+            z-index: 5;
+        }
+
+        /* Titik Tengah Jam */
+        #titik-tengah {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 16px; height: 16px; background: #e74c3c; border-radius: 50%;
+            z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Jarum Jam (Pendek & Tebal) */
+        #jarum-jam {
+            position: absolute; bottom: 50%; left: calc(50% - 4px);
+            width: 8px; height: 60px; background: #2c3e50; border-radius: 4px;
+            transform-origin: bottom center; /* Pusing dari pangkal bawah */
+            transform: rotate(0deg); /* Kedudukan mula: Pukul 12 */
+            transition: transform 1.5s cubic-bezier(0.4, 2.5, 0.3, 0.8); /* Efek melantun sikit macam jam rosak */
+            z-index: 7;
+        }
+
+        /* Jarum Minit (Panjang & Kurus, Warna Merah) */
+        #jarum-minit {
+            position: absolute; bottom: 50%; left: calc(50% - 3px);
+            width: 6px; height: 85px; background: #e74c3c; border-radius: 3px;
+            transform-origin: bottom center;
+            transform: rotate(0deg); /* Kedudukan mula: minit 00 */
+            transition: transform 1.2s cubic-bezier(0.4, 2.5, 0.3, 0.8);
+            z-index: 8;
+        }
+
+        /* Nombor Penanda Jam (3, 6, 9, 12 untuk rujukan visual) */
+        .penanda { position: absolute; font-weight: bold; font-size: 18px; color: #333; }
+        #tanda-12 { top: 5px; left: 50%; transform: translateX(-50%); }
+        #tanda-3 { top: 50%; right: 10px; transform: translateY(-50%); }
+        #tanda-6 { bottom: 5px; left: 50%; transform: translateX(-50%); }
+        #tanda-9 { top: 50%; left: 10px; transform: translateY(-50%); }
+
+        /* DEKORASI MEJA GURU */
+        #meja-guru { position: absolute; bottom: 85px; left: 20%; font-size: 120px; z-index: 6; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4)); line-height: 1;}
+        #buku-meja { position: absolute; bottom: 160px; left: 23%; font-size: 50px; z-index: 7; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); line-height: 1;}
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Matematik<br><span style="font-size: 16px; color: #3498db;">(Misi 2F - Zon 1)</span></h2>
+                
+                <!-- BUTANG PANDUAN DAN MENU -->
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Waktu pulang sekolah adalah pada pukul <strong>Tiga Setengah (3:30)</strong>.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Tetapkan jarum jam dan jarum minit menggunakan dua parameter angka!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Dua Parameter Angka:</strong><br>
+                <span style="color: #fff;">objek.tindakan(jam, minit)</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Arahan Diperlukan:</strong><br>
+                <span style="color: #fff;">jam.set( ? , ? )</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod masa di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap2f()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap2f()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">TETAPKAN MASA ⏰</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Masa kini: 12:00. Menunggu input bacaan masa...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-sekolah">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 30;">
+                    Status: Jam menunjukkan pukul 12.
+                </div>
+                
+                <div id="lantai-kelas"></div>
+                
+                <!-- PAPAN HITAM -->
+                <div id="papan-hitam">
+                    WAKTU TAMAT SEKOLAH:<br><br>
+                    <span style="color: #f1c40f; font-size: 30px;">3:30</span>
+                </div>
+
+                <!-- DEKORASI GURU -->
+                <div id="meja-guru">🪑</div>
+                <div id="buku-meja">📚</div>
+
+                <!-- JAM DINDING ANALOG CSS -->
+                <div id="jam-dinding">
+                    <div id="tanda-12" class="penanda">12</div>
+                    <div id="tanda-3" class="penanda">3</div>
+                    <div id="tanda-6" class="penanda">6</div>
+                    <div id="tanda-9" class="penanda">9</div>
+                    
+                    <div id="jarum-jam"></div>
+                    <div id="jarum-minit"></div>
+                    <div id="titik-tengah"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">⏰⏳</div>
+            <h2>Panduan Parameter Angka Berganda</h2>
+            <p style="text-align: left;">Sistem jam ini memerlukan <strong>DUA nilai angka</strong> sekaligus! Nilai pertama mewakili jarum jam, dan nilai kedua mewakili jarum minit.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Cara Membaca Arahan:</strong><br><br>
+                1. <strong>Tiga Setengah</strong> bermaksud pukul 3 dan 30 minit (3:30).<br>
+                2. Jangan masukkan tanda noktah bertindih <code>:</code> ke dalam kurungan parameter.<br>
+                3. Guna tanda koma <code>,</code> untuk memisahkan jam dan minit. Memandangkan keduanya angka, tanda petik <strong>TIDAK PERLU</strong> digunakan.<br>
+                ✅ Betul: <code>jam.set(3, 30)</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🔔🏃‍♂️</div>
+            <h2 style="color: #0be881;">Kringgg! Waktu Balik!</h2>
+            <p>Tahniah! Anda berjaya mengawal dua jarum serentak menggunakan logik dwi-parameter berangka.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🕰️❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Masa Salah!</h2>
+            <p id="pesan-kalah">Jarum jam menunjukkan waktu yang salah. Anda belum boleh pulang.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script src="script-tahap2f.js"></script>
+</body>
+</html>

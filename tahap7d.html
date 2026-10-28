@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 7D: Kilang Kargo Berkembar</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .tema-kilang-maju {
+            background: linear-gradient(to bottom, #2c3e50 0%, #0f171e 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* LORI 1 & LORI 2 (Tayar jejak tali sawat dengan sempurna) */
+        .lori-gred-industri {
+            position: absolute; left: 120%; font-size: 110px; z-index: 20; line-height: 1; margin: 0;
+            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.5));
+            transition: left 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        #lori1 { bottom: 100px; } /* Diturunkan supaya jejak Sawat 1 */
+        #lori2 { bottom: 25px; }
+
+        /* TALI SAWAT BERKEMBAR */
+        .sawat-industri {
+            position: absolute; left: 0; width: 100%; height: 50px;
+            background: #57606f; border-top: 6px solid #747d8c; z-index: 10;
+            overflow: hidden; box-shadow: inset 0 10px 10px rgba(0,0,0,0.3);
+        }
+        #sawat1 { bottom: 65px; }
+        #sawat2 { bottom: -10px; }
+        
+        .garis-sawat {
+            position: absolute; top: 0; width: 200%; height: 100%;
+            background: repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(0,0,0,0.3) 30px, rgba(0,0,0,0.3) 40px);
+            animation: gerakSawat 2s linear infinite;
+        }
+        @keyframes gerakSawat { 0% { transform: translateX(0); } 100% { transform: translateX(-40px); } }
+
+        /* KOTAK KARGO */
+        .kotak-kargo {
+            position: absolute; font-size: 40px; line-height: 1; margin: 0;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
+            z-index: 15; opacity: 1;
+            /* Transition mutlak untuk kawalan penuh melalui JS Event Listener */
+            transition: left 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        bottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        opacity 0.4s ease-in;
+        }
+
+        /* DIALOG ROBOT AI (ANTI-BOCOR KEKAL) */
+        .awan-dialog {
+            position: absolute; top: 40px; left: 50%; 
+            width: 260px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: translateX(-50%) scale(0); transform-origin: top center;
+            background: rgba(255, 255, 255, 0.95) !important; color: #2c3e50 !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important; white-space: normal !important; 
+            word-wrap: break-word !important; text-align: center !important; 
+            border: 3px solid #2ecc71 !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; bottom: -12px; left: 50%; margin-left: -8px;
+            border-width: 9px; border-style: solid; border-color: #2ecc71 transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) translateY(10px) !important; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Berkembar<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 7D)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Lori perlukan baki kargo yang tepat. Selesaikan operasi tambah dan tolak serentak untuk memuatkan kedua-dua kenderaan!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #2ecc71;">
+                <strong>Sistem Kargo Pintar Gred Perindustrian:</strong><br>
+                <code>sistem.kira(Asal + Tambah - Buang)</code><br><br>
+                <strong style="color: #2ecc71;">Contoh Arahan:</strong><br>
+                Jika Asal: 2, Tambah: 3, Buang: 1, taipkan:<br>
+                <code>sistem.kira(2+3-1)</code><br><br>
+                <span style="color: #bdc3c7; font-size: 11px;">Sistem keselamatan Event Listener aktif: Lori hanya bertolak selepas kargo disahkan.</span>
+            </div>
+            
+            <!-- TEXTAREA DIBESARKAN SEDIKIT -->
+            <textarea id="arahanInput" placeholder="Taip kod pengiraan kargo berkembar..." spellcheck="false" style="width: 100%; height: 80px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanTahap7d()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #2ecc71, #27ae60); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);">PANGGIL LOGISTIK 🤖</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #2ecc71; padding: 10px; font-size: 13px;">
+                Logistik sedia. Memantau berat muatan lori 1 dan lori 2...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Hab Logistik Berkembar</h2>
+            
+            <div id="ruangAnimasi" class="tema-kilang-maju">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.9); color: #2c3e50; border: 2px solid #2ecc71; font-size: 14px;">
+                    Menunggu pengiraan sistem kargo...
+                </div>
+                
+                <div id="dialogSistem" class="awan-dialog"></div>
+                
+                <!-- Lori 1 & 2 -->
+                <div id="lori1" class="lori-gred-industri">🚛</div>
+                <div id="lori2" class="lori-gred-industri">🚚</div>
+                
+                <!-- Kontainer Zarah Kotak -->
+                <div id="container-kargo-fizikal" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index:15;"></div>
+
+                <!-- Tali Sawat 1 & 2 -->
+                <div id="sawat1" class="sawat-industri"><div class="garis-sawat"></div></div>
+                <div id="sawat2" class="sawat-industri"><div class="garis-sawat"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN DAN KEMENANGAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #fff; border: 2px solid #2ecc71; box-shadow: 0 0 25px rgba(46, 204, 113, 0.3);">
+            <h2 style="color: #27ae60;">🛠️ Sistem Kalibrasi Kargo Berkembar</h2>
+            <p style="color: #34495e; font-size: 15px;">Misi ini memerlukan kawalan logik mutlak yang menggabungkan operasi penambahan (+) dan penolakan (-) untuk dua buah kenderaan serentak.</p>
+            
+            <div style="background: #e8f8f5; padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #333; border-left: 4px solid #2ecc71;">
+                <strong>Cara Menggunakan Formula Gabungan:</strong><br><br>
+                Lihat jumlah tugasan pada bar status di atas skrin kanan. Ia akan memaparkan 3 maklumat penting:<br>
+                1. Kargo <strong>Asal</strong> (Sedia ada di tali sawat)<br>
+                2. Kargo <strong>Tambah</strong> (Kargo baru yang akan dijana)<br>
+                3. Kargo <strong>Buang</strong> (Kargo rosak yang perlu disingkirkan)<br><br>
+                Sebagai contoh, jika status skrin menyatakan: <i>(Asal: 2, Tambah: 3, Buang: 1)</i><br>
+                Maka anda perlu menaip kod ini ke dalam terminal:<br>
+                <code>sistem.kira(2 + 3 - 1)</code> atau <code>sistem.kira(2+3-1)</code>
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #2ecc71; color: #fff;">AKTIFKAN SISTEM PINTAR</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #fff; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">🚚🚛📦</div>
+            <h2 style="color: #27ae60;">Protokol Logistik Sempurna!</h2>
+            <p style="color: #34495e;">Tahniah! Anda berjaya mengawal sistem kargo berkembar tanpa sebarang kecacatan "race condition". Isyarat logik telah disahkan dan disalurkan dengan selamat!</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #fff;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap7d.js"></script>
+</body>
+</html>

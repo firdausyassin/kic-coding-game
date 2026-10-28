@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 2A: Penalti Else-If</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="tema-permainan tema-stadium">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Terminal Sukan Pintar</h2>
+                <button class="btn-info" onclick="bukaInfo()">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p>Penjaga gol bersedia! Gunakan logik <strong>Else If</strong> untuk menewaskan pergerakannya:</p>
+            <p style="color: #f1c40f;">
+               1. Jika keeper ke "kiri", rembat ke kanan.<br>
+               2. Jika keeper ke "kanan", rembat ke kiri.
+            </p>
+            <p>Contoh Sintaks:<br> <code>if(keeper=="kiri"){rembat.kanan()} else if(keeper=="kanan"){rembat.kiri()}</code></p>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod penuh di sini..." onkeydown="if(event.key === 'Enter') laksanaArahanBola()">
+            <button onclick="laksanaArahanBola()">TENDANG!</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas">
+                Pengadil meniup wisel. Sedia untuk mengambil sepakan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: white; text-align: center; margin-top:0;">Kanvas Stadium</h2>
+            
+            <div id="ruangAnimasi">
+                <div class="teks-status" id="teksAnimasi" style="color: white; position: absolute; top: 10px; width: 100%; text-align: center; z-index: 30; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+                    Status: Penjaga gol sedang fokus...
+                </div>
+                
+                <div id="kawasan-penalti">
+                    <div id="tiang-gol">
+                        <div id="jaring"></div>
+                    </div>
+                    
+                    <div id="keeper">
+                        <div id="dialogKeeper" class="awan-dialog" style="bottom: 80px; left: -50px; font-size: 14px;"></div>
+                        <span id="ikonKeeper">🧤</span>
+                    </div>
+                    
+                    <div id="bola">⚽</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal kandungan-info" style="max-width: 550px; background-color: #1a252f; border: 2px solid #2ecc71; box-shadow: 0 0 20px #2ecc71;">
+            <h2 style="color: #2ecc71;">🧠 Panduan Logik Else If</h2>
+            <p style="color: #ecf0f1;">Kali ini kita ada 2 syarat yang perlu disemak menggunakan <code>else if</code> (Jika Tidak, Jika...). Tulis kod di bawah:</p>
+            
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f1c40f;">
+                <code style="color: #f1c40f; font-size: 14px;">if (keeper == "kiri") {<br>&nbsp;&nbsp;rembat.kanan()<br>} else if (keeper == "kanan") {<br>&nbsp;&nbsp;rembat.kiri()<br>}</code>
+            </div>
+            
+            <p style="font-size: 14px; color: #bdc3c7;">Tip: Ruang kosong (space) tidak penting, yang penting ialah ejaan dan kurungan { } yang betul!</p>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 10px; width: 100%;">OKAY, SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal">
+            <div class="ikon-menang">🏆</div>
+            <h2>GOLLL!!!</h2>
+            <p>Tembakan padu! Anda berjaya menguasai percabangan logik 'Else If'.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-bola2a.js"></script>
+</body>
+</html>

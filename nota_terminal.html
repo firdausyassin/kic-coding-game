@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kronologi Algoritma K.I.C</title>
+    <style>
+        /* 🔥 ASAS TEMA KELAS MAYA 🔥 */
+        body { 
+            background-color: #030508; 
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #fff; overflow: hidden;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        
+        .latar-kelas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1a2a40 0%, #02050a 100%); z-index: 1; }
+        .grid-maya { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 85, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 85, 255, 0.05) 1px, transparent 1px); background-size: 40px 40px; z-index: 2; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+
+        /* 🔥 TERMINAL SKRIN SCROLL (SAIZ DISERAGAMKAN 100% SAMA DENGAN KAMUS) 🔥 */
+        .kanvas-terminal { 
+            position: relative; z-index: 10; 
+            background: rgba(10, 15, 30, 0.95); border: 2px solid #0055ff; border-radius: 15px; 
+            box-shadow: 0 0 30px rgba(0, 85, 255, 0.3), inset 0 0 20px rgba(0,0,0,0.8); 
+            width: 92%; max-width: 1100px; height: 92vh; margin: 4vh auto; 
+            overflow-y: auto; overflow-x: hidden; backdrop-filter: blur(10px); scroll-behavior: smooth; 
+        }
+        
+        .kanvas-terminal::-webkit-scrollbar { width: 8px; }
+        .kanvas-terminal::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+        .kanvas-terminal::-webkit-scrollbar-thumb { background: #0055ff; border-radius: 10px; box-shadow: 0 0 10px #0055ff; }
+
+        /* 🔥 HEADER TERMINAL 🔥 */
+        .header-nota { text-align: center; border-bottom: 2px dashed #0055ff; padding: 40px 30px 20px 30px; margin-bottom: 40px; position: relative; }
+        .header-nota h1 { color: #4da6ff; margin: 0; font-size: 34px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(0, 85, 255, 0.6); }
+        .btn-kembali { position: absolute; top: 20px; left: 20px; background: #e74c3c; color: white; border: none; padding: 10px 18px; border-radius: 5px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; box-shadow: 0 0 10px rgba(231, 76, 60, 0.5); z-index: 50; }
+        .btn-kembali:hover { background: #c0392b; transform: scale(1.05); }
+
+        /* 🔥 RUANG KANDUNGAN PADDING (MENYAMAI KAMUS) 🔥 */
+        .ruang-kandungan { padding: 0 40px 40px 40px; position: relative; }
+
+        /* 🔥 STRUKTUR MIND-MAP KRONOLOGI 🔥 */
+        .garis-masa { position: relative; width: 100%; margin: 0 auto; padding-bottom: 50px;}
+        .garis-masa::after { content: ''; position: absolute; width: 4px; background: rgba(0, 85, 255, 0.4); top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 5px; }
+
+        .nod-nota { padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box; margin-bottom: 60px; opacity: 0; animation: masukAtas 0.8s forwards; }
+        .nod-kiri { left: 0; text-align: right; }
+        .nod-kanan { left: 50%; text-align: left; }
+
+        /* Titik penyambung */
+        .nod-nota::after { content: ''; position: absolute; width: 22px; height: 22px; right: -11px; background-color: #00f3ff; border: 4px solid #1a2a40; top: 30px; border-radius: 50%; z-index: 1; box-shadow: 0 0 15px #00f3ff; }
+        .nod-kanan::after { left: -11px; background-color: #00ff66; box-shadow: 0 0 15px #00ff66; }
+
+        /* 🔥 FIX ALIGNMENT KOTAK TEKS 🔥 */
+        .kotak-info { padding: 25px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; border: 1px solid #34495e; position: relative; transition: 0.3s; backdrop-filter: blur(5px); text-align: left; } /* Ditambah text-align: left */
+        .kotak-info:hover { background: rgba(255, 255, 255, 0.08); border-color: #0055ff; box-shadow: 0 0 25px rgba(0, 85, 255, 0.3); transform: translateY(-5px); }
+        .kotak-info h3 { margin-top: 0; color: #4da6ff; font-size: 21px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; letter-spacing: 1px; text-align: left;} /* Ditambah text-align: left */
+        .nod-kanan .kotak-info h3 { color: #00ff66; text-align: left;}
+        .kotak-info > p { font-size: 14px; color: #d2dae2; line-height: 1.6; margin-bottom: 10px; text-align: left;} /* Ditambah text-align: left */
+        .kotak-info strong { color: #f1c40f; }
+        
+        .senarai-contoh { font-size: 13px; color: #bdc3c7; text-align: left; background: rgba(0,0,0,0.4); padding: 12px 25px; border-radius: 8px; border-left: 3px solid #3498db; margin-bottom: 15px; }
+        .senarai-contoh li { margin-bottom: 12px; line-height: 1.5; }
+        code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #00ff66; font-family: monospace; font-size: 14px;}
+
+        /* 🔥 HIGHLIGHT KOD KHAS 🔥 */
+        .kod-highlight {
+            background: rgba(0, 255, 102, 0.1);
+            border-left: 4px solid #00ff66 !important;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-top: 15px !important;
+            box-shadow: 0 4px 15px rgba(0, 255, 102, 0.1);
+        }
+        .kod-highlight strong { color: #00ff66 !important; }
+
+        /* 🔥 CSS TAMBAHAN UNTUK GAYA PENERANGAN AI 🔥 */
+        .blok-penerangan { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; margin-bottom: 20px;}
+        .sub-kotak { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .kotak-penerangan-info { background: rgba(0,0,0,0.5); border-radius: 8px; padding: 20px; border-left: 4px solid; text-align: left;}
+        .kotak-dunia { border-left-color: #f1c40f; }
+        .kotak-komputer { border-left-color: #00f3ff; }
+        .kotak-penerangan-info h5 { margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .kotak-dunia h5 { color: #f1c40f; }
+        .kotak-komputer h5 { color: #00ff66; }
+        .kotak-penerangan-info p { margin: 0 0 10px 0; font-size: 13px; color: #d2dae2; line-height: 1.6; }
+        .kotak-penerangan-info p:last-child { margin-bottom: 0; }
+        
+        /* 🔥 FIX: BUANG WARNA KUNING DALAM KOTAK PENERANGAN AI 🔥 */
+        .kotak-penerangan-info strong { color: #d2dae2; font-weight: normal; }
+
+        .label-contoh { display: inline-block; background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #00f3ff; }
+        .kotak-kod-bawah { text-align: left; background: #050a15; border: 1px dashed rgba(0, 85, 255, 0.4); padding: 20px; border-radius: 8px; margin-top: 15px; margin-bottom: 20px; font-family: monospace; font-size: 14px; overflow-x: auto; color: #ecf0f1; box-shadow: inset 0 0 10px #000; }
+        .k-hijau { color: #2ecc71; } .k-biru { color: #3498db; } .k-oren { color: #e67e22; } .k-merah { color: #e74c3c; } .k-kelabu { color: #7f8c8d; }
+
+        /* 🔥 KELAS KARAKTER ANIMASI 🔥 */
+        .karakter-container { display: flex; align-items: flex-end; gap: 15px; margin-top: 20px; position: relative; z-index: 5;}
+        .k-kiri { justify-content: flex-end; }
+        .k-kanan { justify-content: flex-start; }
+        
+        .img-karakter { height: 180px; width: auto; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); }
+        .img-bot { height: 130px; width: auto; animation: floatBot 2.5s ease-in-out infinite alternate; filter: drop-shadow(0 0 20px rgba(0, 255, 102, 0.3)); }
+        
+        .dialog-bubble { background: rgba(0, 85, 255, 0.1); border: 1px dashed #4da6ff; padding: 12px 18px; border-radius: 15px; font-size: 13px; color: #fff; max-width: 280px; text-align: left; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .k-kiri .dialog-bubble { border-bottom-right-radius: 0; }
+        .k-kanan .dialog-bubble { border-bottom-left-radius: 0; }
+        
+        /* TEMA BUBBLE MENGIKUT WATAK */
+        .bubble-faiq { border-color: #f1c40f; background: rgba(241, 196, 15, 0.1); }
+        .bubble-bot { border-color: #00ff66; background: rgba(0, 255, 102, 0.1); }
+        .bubble-amaran { border-color: #e74c3c; background: rgba(231, 76, 60, 0.15); }
+        .bubble-amaran strong { color: #ff5e57; }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes floatBot { 0% { transform: translateY(0px) rotate(-3deg); } 100% { transform: translateY(-20px) rotate(3deg); } }
+        @keyframes masukAtas { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media screen and (max-width: 768px) {
+            .garis-masa::after { left: 20px; }
+            .nod-nota { width: 100%; padding-left: 50px; padding-right: 0; text-align: left; }
+            .nod-kanan { left: 0; }
+            .nod-kiri::after, .nod-kanan::after { left: 10px; }
+            .karakter-container { justify-content: flex-start !important; flex-direction: row-reverse; }
+            .k-kiri .dialog-bubble { border-bottom-left-radius: 0; border-bottom-right-radius: 15px; }
+            .header-nota h1 { font-size: 24px; margin-top: 50px;}
+            .btn-kembali { position: relative; display: block; margin: 0 auto 20px auto; width: max-content; }
+            .sub-kotak { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="latar-kelas"></div>
+    <div class="grid-maya"></div>
+
+    <div class="kanvas-terminal">
+        <button class="btn-kembali" onclick="window.location.href='index.html'">◀ KEMBALI KEPADA MENU</button>
+        
+        <div class="header-nota">
+            <h1>KRONOLOGI ALGORITMA</h1>
+            <p style="color: #bdc3c7; font-size: 14px; letter-spacing: 1px; margin-top: 5px;">DARI ASAS SINTAKS KE ERA I.O.T (Nota Zon 1 & 2)</p>
+        </div>
+
+        <div class="ruang-kandungan">
+            <div class="garis-masa">
+
+                <!-- BAB 1 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 0.1s;">
+                    <div class="kotak-info">
+                        <h3>BAB 1: Bahasa Pengaturcaraan</h3>
+                        <p>Komputer adalah sebuah mesin yang sangat pantas, tetapi lurus bendul! Ia tidak boleh berfikir sendiri. Setiap pergerakan, keputusan, dan perkiraan perlulah diajar satu-persatu melalui bahasa yang dipanggil <strong>Pengekodan (Koding)</strong>.</p>
+                        
+                        <ul class="senarai-contoh">
+                            <li class="kod-highlight">💻 <strong>Bagaimana Kod Bekerja:</strong> Apabila kita menaip arahan <code>cetak("Hello!");</code>, memori mesin akan membaca arahan tersebut dan terus memaparkan teks di skrin. Ia hanya patuh pada arahan yang dieja dengan betul.</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Bayangkan kamu sedang menulis resipi masakan. Kamu perlu letakkan sukatan yang tepat dan mengikut urutan. Salah eja satu bahan, kek takkan jadi langsung.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Kad tebuk (Punch Card) pada mesin kilang lama. Mesin akan bergerak mengikut lubang yang ditebuk secara terperinci. Tiada lubang, mesin tidak bergerak.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Bila kamu memasukkan kod rahsia (cheat code) dalam game. Kamu mesti tekan Atas, Bawah, Kiri, Kanan dengan tepat. Salah tekan satu butang, nyawa tambahan takkan masuk.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Aku ni mesin yang sangat pantas, tapi aku tak pandai meneka niat kau. Kalau kau suruh aku cetak sesuatu, kau kena eja betul-betul. Kurang satu kurungan atau tertinggal titik pun aku akan panik, beri amaran error, dan terus matikan sistem!"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Arahan asas menyuruh mesin bercakap di skrin</span><br>
+                            <span class="k-biru">cetak</span>(<span class="k-hijau">"Sistem K.I.C dimulakan!"</span>);
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble">
+                                <strong>Uncle Mat:</strong> "Sama seperti kita menulis resipi masakan. Salah satu sukat, kek tak jadi. Salah eja satu baris kod, sistem akan ralat (error)!"
+                            </div>
+                            <img src="assets/picture/uncle_fakta.png" class="img-karakter" alt="Uncle Mat Fakta">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 2 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 0.3s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00ff66;">BAB 2: Rentetan Teks (String)</h3>
+                        <p>Apabila kita ingin sistem membaca nama, jenis objek, atau sifat berasaskan huruf, kita mesti membalut teks tersebut di dalam <strong>Tanda Petik (" ")</strong>. Format ini dipanggil <strong>String</strong>.</p>
+                        <ul class="senarai-contoh">
+                            <li>💬 <strong>Fungsi Dalam Koding:</strong> Komputer mengecam identiti sasaran seperti <code>imbas("haiwan")</code> atau memanggil objek <code>sasaran("monyet")</code>.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Bayangkan tag nama pada beg sekolah atau kod <em>Barcode</em> pada barang di pasar raya. Tanpanya, juruwang tak tahu apa benda yang diimbas.</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>bunyikan_suara("Kucing");</code> <br> Komputer akan faham "Kucing" adalah sejenis teks dan mencari fail audio meow. Tapi, jika kita lupa tanda petik dan taip <code>bunyikan_suara(Kucing);</code>, komputer akan panik kerana ia menyangka Kucing itu adalah sebuah formula pelik!</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Bila mengisi borang nama sekolah, kamu tulis ejaan huruf (A-Z) seperti "Ahmad". Perkataan ejaan begini dipanggil data String.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Pada resit juruwang, nama barang seperti "Roti Gardenia" adalah String. Ia hanya untuk paparan rekod nama, bukannya untuk mesin buat kira-kira darab bahagi.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Nama watak hero kamu, contohnya "Super Faiq". Game tidak mendarabkan atau menolak nama hero kamu, ia hanya menyimpannya sebagai tajuk identiti berformat String.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Bila kau letak pengikat kata pada sesuatu ayat, aku anggap itu lukisan teks biasa. Aku cuma perlu pegang dan tayang sahaja teks tersebut di skrin."</p>
+                                    <p>"Tapi ingat, kalau kau lupa letak pengikat kata, otak aku akan anggap kau tengah hantar formula matematik rumit yang aku tak pernah belajar. Terus aku mogok!"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Penggunaan format rentetan teks (String)</span><br>
+                            <span class="k-biru">String</span> nama_pemain = <span class="k-hijau">"Ahmad Faiq"</span>;<br>
+                            <span class="k-oren">papar_skrin</span>(nama_pemain);
+                        </div>
+                        
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/faiq_tablet.png" class="img-karakter" alt="Faiq Menaip">
+                            <div class="dialog-bubble bubble-faiq">
+                                <strong>Faiq:</strong> "Oh! Kalau saya lupa letak tanda petik (" ") pada perkataan, komputer akan anggap huruf tu sebagai formula matematik pelik!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 3 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 0.5s;">
+                    <div class="kotak-info">
+                        <h3>BAB 3: Parameter Berangka (Integer)</h3>
+                        <p>Apabila arahan kita melibatkan kiraan kuantiti, ukuran, peratusan, atau masa kelajuan, ia dikenali sebagai <strong>Integer (Nombor Bulat)</strong>. Ia ditulis secara terus <strong>tanpa tanda petik</strong> supaya cip pemproses boleh melakukan operasi matematik ke atasnya.</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #3498db;">
+                            <li>🔢 <strong>Fungsi Dalam Koding:</strong> Mengawal nilai mutlak seperti <code>masa(60)</code> saat, menetapkan takat sukat air, atau menentukan darjah putaran jarum jam.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Sama seperti butang di dalam lif atau set pemasa (timer) ketuhar mikro. Anda hanya perlukan digit angka untuk memulakan jentera tersebut.</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>pusing_motor(90);</code> <br> Nombor 90 ini akan dihantar terus ke komponen litar. Motor fizikal itu akan faham untuk bergerak tepat 90 darjah. Kita tidak perlu mengeja "sembilan puluh".</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Ketika beratur di kantin sekolah, jika kamu beli 3 biji karipap, "3" itu adalah Integer. Cikgu kantin guna nombor tu untuk kira baki duit kamu.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Mesin penimbang berat. Ia membaca tekanan kaki dan memaparkan nombor berat badan. Nombor tersebut di dalam sistemnya dipanggil data berformat Integer.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Bar nyawa (HP) karakter. Kalau nyawa asal 100, kena serang tolak 20, tinggal 80. Pengiraan tolak tambah ini wajib menggunakan format Integer.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Bila kau letak nombor yang berdiri sendiri tanpa sebarang pengikat kata, otak aku akan bersiap sedia. Aku tahu ini adalah maklumat angka."</p>
+                                    <p>"Nombor Integer bermaksud kau nak suruh aku sama ada buat matematik kira-kira, tambah kelajuan kipas motor, atau tolak markah pemain!"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Mengisytiharkan memori berangka nombor</span><br>
+                            <span class="k-biru">int</span> nyawa_zombi = <span class="k-oren">100</span>;<br>
+                            nyawa_zombi = nyawa_zombi - <span class="k-oren">25</span>; <span class="k-kelabu">// Zombi ditembak, tinggal 75</span>
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble bubble-bot">
+                                <strong>Bot Pintar:</strong> "Bip! Bop! Nombor '5' adalah Integer tulen. Tetapi angka yang dipakaikan petik seperti '5' akan bertukar darjat menjadi String (Teks)!"
+                            </div>
+                            <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 4 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 0.7s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00ff66;">BAB 4: Logik Visual (Teks + Nombor)</h3>
+                        <p>Alam simulasi menjadi lebih kompleks apabila kita perlu menggerakkan entiti tertentu <strong>(String)</strong> ke suatu lokasi bernombor <strong>(Integer)</strong> di atas garisan grid <strong>(Paksi X dan Y)</strong>.</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #9b59b6;">
+                            <li>🎯 <strong>Fungsi Dalam Koding:</strong> Menyebut nama subjek, dan memberikan arahan lompatan atau penerbangan berdasarkan jarak kiraan grid.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Sistem Pemetaan satelit (GPS). Satelit memerlukan nama destinasi yang dicari (String: "Kuala Lumpur") dan jarak pemanduan (Integer: 100km) untuk memandu arah anda dengan tepat.</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>hantar_drone("Klinik", 500);</code> <br> Ini adalah gabungan mantap. Komputer membaca teks <code>"Klinik"</code> untuk mengenal pasti lokasi di dalam peta (String), dan menggunakan nombor <code>500</code> (Integer) untuk menetapkan kelajuan putaran kipas drone tersebut.</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Ketika ayah pos bungkusan. Ayah tulis nama penerima "Ali" (String) dan bayar kos pos bernilai RM10 (Integer). Posmen gabungkan dua maklumat ini untuk selesai tugas.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Mesin layan diri menerima kod pilihan "Coke" (String) dan perlukan wang sebanyak 200 sen (Integer) sebelum melepaskan tin minuman ke bawah.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Dalam game catur digital. Pemain arahkan buah catur "Kuda" (String) untuk melompat sejauh 3 tapak ke hadapan (Integer).</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Aku ni sangat taat. Bila kau bagi gabungan ini, otak aku proses: Siapa yang kena bertindak? (String), dan berapa banyak kuasa/jarak yang aku patut bekalkan? (Integer)."</p>
+                                    <p>"Dengan kombinasi ni, aku boleh buat kawalan pergerakan spesifik untuk setiap objek yang berbeza dalam skrin pada masa yang sama."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Gabungan String dan Integer untuk arahan pergerakan</span><br>
+                            <span class="k-oren">gerak_objek</span>(<span class="k-hijau">"Sang_Kancil"</span>, <span class="k-oren">5</span>); <span class="k-kelabu">// Kancil lompat 5 tapak</span>
+                        </div>
+
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/faiq_idea.png" class="img-karakter" alt="Faiq Idea">
+                            <div class="dialog-bubble bubble-faiq">
+                                <strong>Faiq:</strong> "Aha! Maknanya saya kena sebut nama objek dulu, barulah saya boleh masukkan nombor parameter untuk selamatkan karakter dalam game!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 5 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 0.9s;">
+                    <div class="kotak-info">
+                        <h3>BAB 5: Enjin Penyelesaian Kognitif (BODMAS)</h3>
+                        <p>Pengekodan tidak lari daripada <em>Problem Solving</em>. Mesin digunakan untuk memproses data berantai dengan pantas menggunakan simbol sains dan matematik <strong>(+, -, *, /)</strong>. Ia mengikut hukum BODMAS (Kurungan dahulu, kemudian Bahagi/Darab, akhir sekali Tambah/Tolak).</p>
+                        
+                        <ul class="senarai-contoh">
+                            <li>🧮 <strong>Fungsi Dalam Koding:</strong> Mengarahkan komputer mengira kerangka formula untuk luas isipadu gudang maya, kelajuan cahaya, atau memecahkan kod keselamatan.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Sistem kalkulator tersembunyi di dalam mesin juruwang (Cashier) yang memotong peratus diskaun dan menambah cukai jualan dalam sekelip mata.</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>harga_bayar = 10 - (10 * 0.2);</code> <br> Komputer akan selesaikan nombor di dalam kurungan dahulu (10 darab 0.2 = 2), kemudian barulah ia melakukan proses tolak (10 tolak 2). Hasilnya, sistem terus memaparkan harga RM8 di skrin dengan kelajuan kilat!</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Ketika menukar duit belanja. Ayah beri RM10, harga nasi RM2, air RM1. Kamu secara automatik mengira RM10 - (RM2 + RM1) untuk mengetahui baki RM7.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Sistem pengira cukai automatik. Ia perlu darabkan harga asal dengan 0.06% cukai dahulu, kemudian baru ditambah semula ke dalam harga resit akhir.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Ketika hero mempunyai perisai. Sistem koding game perlu mendarabkan kesan hentakan musuh dengan penahan perisai sebelum menolak terus markah dari HP sebenar hero.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Beri aku sejuta formula Matematik yang bercampur tambah, tolak dan bahagi. Aku takkan pening, sebab kod asas aku memang dah dikunci untuk ikut hukum BODMAS antarabangsa."</p>
+                                    <p>"Aku akan cari nombor yang berada di dalam kurungan '()' dahulu untuk diselesaikan, tak kira la panjang mana pun barisan ayat kod kau tu!"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Pengiraan kerosakan (Damage) RPG bertindih</span><br>
+                            <span class="k-biru">int</span> kerosakan = kuasa_musuh - (kuasa_musuh * pertahanan_perisai);<br>
+                            baki_nyawa = baki_nyawa - kerosakan;
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble bubble-faiq">
+                                <strong>Faiq:</strong> "Oh, patutlah operasi darab dan tolak ni penting! Semua pergerakan simulasi alam sekitar maya dalam modul ni sebenarnya bergerak atas kira-kira formula nombor."
+                            </div>
+                            <img src="assets/picture/faiq_pandai.png" class="img-karakter" alt="Faiq Bangga">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 6 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 1.1s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00ff66;">BAB 6: Pengurusan Memori (Variables)</h3>
+                        <p>Komputer akan lupa data lamanya jika tidak disimpan. Oleh itu, kita mencipta sebuah laci ingatan maya yang dipanggil <strong>Pembolehubah (Variable)</strong>. Kita isytiharkannya dengan arahan seperti <code>let nama_kotak = 10;</code> untuk menyimpan data penting.</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #f1c40f;">
+                            <li>📥 <strong>Fungsi Dalam Koding:</strong> Mengawal nilai yang sentiasa berubah-ubah seperti markah perlawanan, suhu didih cecair, atau nyawa (HP) karakter ketika diserang.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Aplikasi Buku Kenalan <em>Smartphone</em>. Anda tak perlu hafal 10 digit nombor kawan anda (Integer), anda hanya *save* ia di bawah kotak nama (Variable) "Ahmad".</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>let nyawa_hero = 3;</code> <br> Apabila karakter terkena panahan musuh, koding akan menjalankan formula automatik <code>nyawa_hero = nyawa_hero - 1;</code>. Laci memori tadi akan memadam nombor 3 dan menyimpan nombor 2 secara diam-diam!</li>
+                        </ul>
+                        
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Cikgu melabelkan satu bakul sebagai 'Markah Ali'. Di awal tahun bakul tu ada kertas markah 50. Hujung tahun cikgu ganti dengan markah 90. Bakul kekal sama, isinya berubah.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Skrin papan hijau di pusat letak kereta. Komputer letak nama kotak tu 'Parking_Kosong'. Bila kereta masuk, tolak 1. Kereta keluar, tambah 1. Nombornya asyik bertukar-tukar setiap saat.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Sistem memori yang sentiasa pegang nombor tertinggi (High Score) pemain. Apabila pemain memecah rekod, kotak High Score akan dipadam dan digantikan terus dengan nombor terbaru.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Variable ni ibarat 'kotak magik' yang aku cipta. Syaratnya, kotak ni cuma boleh pegang satu maklumat sahaja. Kalau kau lempar nombor baru masuk, nombor yang lama aku terus buang ke dalam tong sampah!"</p>
+                                    <p>"Bila kau isytihar <code>int markah = 50;</code>, aku tempah satu laci. Bila kau tulis <code>markah = 90;</code> kemudian hari, aku cuma tayang nilai paling terkini iaitu 90."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Mewujudkan memori 'baki_kosong' dan mengemaskini nilainya</span><br>
+                            <span class="k-biru">int</span> baki_kosong = <span class="k-oren">100</span>; <span class="k-kelabu">// Loker asal ada 100</span><br>
+                            baki_kosong = baki_kosong - <span class="k-oren">1</span>; <span class="k-kelabu">// Kereta masuk, sistem tolak 1 jadi 99</span>
+                        </div>
+
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/uncle_tablet.png" class="img-karakter" alt="Uncle Mat Tablet">
+                            <div class="dialog-bubble">
+                                <strong>Uncle Mat:</strong> "Paling menarik, nilai Variable ini boleh ditulis ganti (Overwrite) pada bila-bila masa di dalam koding sekiranya status misi berubah!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 7 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 1.3s;">
+                    <div class="kotak-info">
+                        <h3>BAB 7: Kitaran Tanpa Henti (Loop)</h3>
+                        <p>Mengapa tulis kod baris demi baris sebanyak 100 kali jika komputer boleh lakukannya secara automatik? <strong>Loop (For/While)</strong> mengarahkan sistem mengulangi corak arahan yang sama sehingga had kitaran dicapai.</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #ff4e50;">
+                            <li>🔄 <strong>Fungsi Dalam Koding:</strong> Mencetak susunan batu bata dengan pantas, pusingan planet mengelilingi paksi, atau simulasi kitaran biologi alam berterusan.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Tali sawat (Conveyor belt) di kilang pembuatan yang tidak berhenti menghantar tayar setiap 5 saat selagi suis utama tidak dimatikan.</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>ulangi(100) { buat_bata(); }</code> <br> Daripada cikgu perlu menaip arahan buat bata sebanyak 100 baris ke bawah, blok kod gelung ini akan mengarahkan mesin mengulang kerja yang sama sebanyak 100 kali berturut-turut dalam masa satu saat tanpa letih!</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Cikgu suruh murid lari pusing padang sebanyak 5 pusingan. Murid akan mengira pusingan 1,2,3,4,5. Selepas genap kiraan 5, murid akan berhenti lari secara automatik.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Pengelap cermin (Wiper) kereta. Mesinnya disetkan kod <em>While Loop</em>. Cermin disapu berulang kali SELAGI pemandu tidak tutup butang kawalan.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Dalam game lumba kereta, selagi kau pegang butang 'Forward' (While Loop), enjin tayar terus putar berpusing tak berhenti.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Sistem aku ni macam kaset rosak bila masuk blok Loop. Aku akan ulang baca arahan yang sama berpuluh ribu kali sesaat tanpa merungut penat."</p>
+                                    <p>"Tapi, bila syarat tu dah tercapai (contoh genap angka 100 kali cetakan), baru aku akan hentikan gelung tersebut dan terus baca fail kod ke garisan bawah."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Memaksa sistem mengulang proses pemanasan 5 kali</span><br>
+                            <span class="k-biru">for</span> (<span class="k-biru">int</span> i = 0; i < <span class="k-oren">5</span>; i++) {<br>
+                            &nbsp;&nbsp;<span class="k-oren">panaskan_reaktor</span>();<br>
+                            }
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble bubble-bot">
+                                <strong>Bot Pintar:</strong> "Awas! Jangan biarkan kod Loop berjalan tanpa menetapkan nilai penghujung (Infinite Loop). Ia akan menyebabkan RAM komputer bekerja terlalu kuat dan sistem akan tergendala!"
+                            </div>
+                            <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar Amaran">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 8 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 1.5s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00ff66;">BAB 8: Logik Perbandingan (<, >, ==, !=)</h3>
+                        <p>Ini adalah kunci kepada proses tapisan data. Komputer dikehendaki menimbang berat dua buah nilai dan membandingkannya menggunakan simbol seperti <strong>Lebih Besar (>)</strong>, <strong>Lebih Kecil (<)</strong>, <strong>Setara (==)</strong>, atau Tidak Setara (!=).</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #3498db;">
+                            <li>⚖️ <strong>Fungsi Dalam Koding:</strong> Menyemak had berat kenderaan di palang tol timbang, atau membandingkan ketumpatan batu berbanding cecair untuk menentukan ia tenggelam atau timbul.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Had sekatan di pintu masuk Taman Tema. Hanya pengunjung kanak-kanak yang bersaiz `Tinggi > 120cm` sahaja yang gantry akan lepaskan untuk menaiki *Rollercoaster*!</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>(tinggi_murid > 120)</code> <br> Simbol <code>></code> (Lebih besar) ini bertindak sebagai penapis. JIKA sensor kamera membaca tinggi murid 121cm, jawapannya adalah BENAR (True). Kalau tinggi 119cm, komputer kata PALSU (False) dan palang takkan terbuka!</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Ketika guru menyemak markah. Jika peratus melebihi (>) 50%, murid itu Lulus. Jika peratus di bawah (<) 50%, murid itu Gagal.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Sistem timbang lori JPJ. Jika berat muatan lori disahkan 'Lebih Besar' (>) dari muatan maksimum yang dibenarkan, lori akan disaman dan ditahan.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Bila periksa status 'Game Over'. Komputer akan sentiasa membandingkan adakah Nyawa Hero == 0 (Setara dengan Sifar). Selagi ia belum sifar, game berterusan.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Aku ni jadi tukang penimbang keadilan. Bila kau letak simbol <code>></code> atau <code>==</code>, aku cuma akan keluarkan satu je jawapan: Ya (Betul) atau Tidak (Salah)."</p>
+                                    <p>"Hati-hati dengan simbol <code>==</code>. Kalau kau letak satu '=' itu bermaksud kau nak masukkan data. Kalau kau letak dua '==' baru aku faham kau sedang menyoal perbandingan!"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Penggunaan logik bandingan berat</span><br>
+                            <span class="k-biru">if</span> (berat_lori > <span class="k-oren">15000</span>) {<br>
+                            &nbsp;&nbsp;<span class="k-oren">tahan_kenderaan</span>();<br>
+                            }
+                        </div>
+
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/faiq_kanta.png" class="img-karakter" alt="Faiq Kanta">
+                            <div class="dialog-bubble bubble-faiq">
+                                <strong>Faiq:</strong> "Oh, maknanya saya kena jadi detektif perhatikan betul-betul nilai dua belah pihak. Kalau saya salah letak simbol terbalik, sistem akan benarkan benda yang salah masuk!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 9 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 1.7s;">
+                    <div class="kotak-info">
+                        <h3>BAB 9: Matriks Keputusan Tunggal (If)</h3>
+                        <p>Gabungan logik perbandingan membawa kepada tindakan pintar pertama komputer: <strong>Syarat (Condition)</strong>. JIKA sesuatu status dikesan berlaku secara sah, maka laksanakan blok skrip arahan ini.</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #00ff66;">
+                            <li>🚦 <strong>Fungsi Dalam Koding:</strong> JIKA (If) naga elemen melepaskan api dikesan, arahkan pembolehubah karakter untuk melompat mengelak.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Penderia hujan di cermin kenderaan moden. JIKA (If) sensor mengesan taburan air hujan di cermin, <em>Wiper</em> automatik akan mula bergerak membuang air.</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>if (suhu_bilik > 35) { pasang_kipas(); }</code> <br> Penderia akan berdiam diri dan memantau suhu 24 jam. Sebaik sahaja nombor mencecah 36, blok arahan <code>pasang_kipas()</code> di dalam kurungan tersebut akan terus diaktifkan secara mengejut (Trigger).</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p><strong>JIKA (If)</strong> nampak cikgu lalu, murid automatik akan diam. (Tindakan berlaku atas satu syarat pemerhatian persekitaran).</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Pintu automatik pasar raya. <strong>JIKA (If)</strong> sensor nampak pelanggan menghampiri ruang cermin, enjin akan menarik pintu ke tepi. Mesin tak peduli bila orang takde.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Sistem bonus. <strong>JIKA (If)</strong> hero berjaya kumpul lebih dari 10,000 markah, skrin akan paparkan lencana 'Achievement Unlocked'.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Aku akan sentiasa berjaga. Kalau syarat dalam kurungan tu BENAR, aku akan segera terjun masuk bilik arahan dan laksanakan kerja (buka pintu, buka kipas)."</p>
+                                    <p>"Tapi kalau syarat tu SALAH (contoh, hero tak sampai 10k markah), aku tutup sebelah mata, biarkan je blok tu berlalu dan buat kerja lain di bawah."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Penggunaan blok keputusan (If)</span><br>
+                            <span class="k-biru">if</span> (skor_markah > <span class="k-oren">10000</span>) {<br>
+                            &nbsp;&nbsp;<span class="k-oren">buka_pintu_bonus</span>();<br>
+                            }
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble">
+                                <strong>Uncle Mat:</strong> "Asas kecerdasan automasi bermula di sini. Komputer kini bukan lagi sekadar mesin taip kosong, ia bertindak dan berubah berdasarkan situasi persekitarannya!"
+                            </div>
+                            <img src="assets/picture/uncle_fakta.png" class="img-karakter" alt="Uncle Mat Fakta">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 10 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 1.9s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00ff66;">BAB 10: Keputusan Bersarang (If-Else & Nested)</h3>
+                        <p>Sistem hidupan sebenar mempunyai pelbagai cabang keputusan. <strong>JIKA (If)</strong> syarat dipenuhi jalankan pelan A. <strong>SEBALIKNYA (Else)</strong> jika tidak, jalankan pelan B. Boleh juga wujud lapisan syarat di dalam syarat lain (Nested If).</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #bc13fe;">
+                            <li>🔀 <strong>Fungsi Dalam Koding:</strong> Mengawal hidraulik pemunggahan. JIKA barang adalah berat, hantar ke zon merah. JIKA (Else-If) sederhana, zon kuning. SEBALIKNYA (Else) hantar ke zon hijau.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Mesin Minuman Layan Diri (Vending Machine). JIKA wang dimasukkan cukup, lepaskan tin minuman. SEBALIKNYA JIKA tidak cukup, cetak notis "Baki Tidak Mencukupi" dan tendang syiling keluar semula.</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>if (syiling == 2) { keluar_air(); } else { pulang_duit(); }</code> <br> Sistem tidak akan pening. Jika duit cukup, air keluar. Jika pelanggan memasukkan daun atau duit tak cukup, koding akan menolak arahan pertama dan melompat ke blok 'else' untuk memuntahkan barang itu semula.</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p><strong>JIKA (If)</strong> awan mendung, kamu bawa payung ke sekolah. <strong>KALAU TIDAK (Else)</strong> mendung, kamu cuma simpan payung di rumah.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Sistem palang tiket automatik. <strong>JIKA (If)</strong> baki e-wallet pelanggan cukup, mesin akan angkat palang. <strong>KALAU TIDAK (Else)</strong>, mesin arah palang terus tertutup dan menjeritkan bunyi penggera ralat!</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Waktu pemeriksaan inventori karakter. JIKA hero ada kunci emas, buka pintu istana. KALAU TIDAK ada kunci, paparkan amaran 'Sila cari di tingkat 1'.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Sifat aku lurus bendul. Aku periksa syarat utama tu dulu. Kalau syarat tu BENAR, aku jalankan arahan di bilik <em>If</em>. Dan aku senyap."</p>
+                                    <p>"Tapi, kalau syarat awal tu SALAH, aku tak mati akal. Aku tinggalkan bilik <em>If</em> dan lompat terjun terus ke bilik <em>Else</em> untuk tindakan pelan sokongan alternatif (Plan B)!"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Kawalan cabang keselamatan bersyarat</span><br>
+                            <span class="k-biru">if</span> (baki_duit >= <span class="k-oren">50</span>) {<br>
+                            &nbsp;&nbsp;<span class="k-oren">lulus_pembelian</span>();<br>
+                            } <span class="k-biru">else</span> {<br>
+                            &nbsp;&nbsp;<span class="k-oren">tendang_kad_keluar</span>();<br>
+                            }
+                        </div>
+
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/faiq_buntu.png" class="img-karakter" alt="Faiq Pening">
+                            <div class="dialog-bubble bubble-faiq">
+                                <strong>Faiq:</strong> "Peningnya! Banyak sangat syarat bertindih-tindih. Kalau saya tersilap tutup kurungan syarat (brackets), habislah rantaian keputusan robot penjaga pintu galaksi tu nanti!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 11 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 2.1s;">
+                    <div class="kotak-info">
+                        <h3>BAB 11: Gerbang Logik Boolean (AND / OR)</h3>
+                        <p>Bila melibatkan isu keselamatan, keputusan menuntut lebih dari satu pertimbangan. Syarat <strong>AND (&&)</strong> bermaksud kedua-dua syarat kiri dan kanan WAJIB dipenuhi serentak. Syarat <strong>OR (||)</strong> pula membenarkan kelulusan asalkan salah satu syarat sahaja dipenuhi.</p>
+                        
+                        <ul class="senarai-contoh">
+                            <li>🔐 <strong>Fungsi Dalam Koding:</strong> Kata laluan peribadi perlu ditaip dengan betul BESERTA pengesahan cap jari untuk meluluskan status log masuk terminal.</li>
+                            <li>🌍 <strong>Analogi Dunia Sebenar:</strong> Peti keselamatan wang di Bank Pusat. Ia mengunci dari dua sisi. Pintu hanya terkuak JIKA (Kunci Pengurus diputar) AND (Kunci Penyelia diputar) pada waktu yang serentak!</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>if (cap_jari == "Betul" && password == 1234)</code> <br> Disebabkan wujudnya simbol <code>&&</code>, penggodam tidak boleh menipu mesin. Walaupun dia tahu password 1234, tetapi jika cap jarinya salah, sistem keselamatan tetap akan menolaknya!</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Syarat memandu ayah. Ayah cuma benarkan bawa kereta JIKA ada lesen memandu (AND) hujan tidak lebat.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Mesin Basuh Pintar. Ia hanya akan memulakan pusaran mencuci JIKA pintu ditutup dengan rapat (AND) butang Play ditekan. Kurang salah satu syarat, enjin tak jalan!</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 3: Logik Perisian/Game</span>
+                                    <p>Sistem level bos. Pintu gua naga hanya akan dibuka JIKA pemain ada kunci emas (AND) tahap level melebihi angka 50.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Simbol <code>&&</code> (AND) jadikan aku sangat tegas. Dua-dua syarat tu mesti betul baru aku bagi lepas. Tak boleh main tipu."</p>
+                                    <p>"Tapi kalau kau letak simbol <code>||</code> (OR), aku jadi fleksibel. Cukup satu syarat betul je, aku akan benarkan terus sistem berjalan."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Penggunaan gerbang keselamatan dua syarat</span><br>
+                            <span class="k-biru">if</span> (pintu_ditutup == <span class="k-oren">1</span> && butang_mula == <span class="k-oren">1</span>) {<br>
+                            &nbsp;&nbsp;<span class="k-oren">mula_membasuh</span>();<br>
+                            }
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble bubble-bot">
+                                <strong>Bot Pintar:</strong> "Bip! Memanipulasi nilai Boolean adalah teknik sekuriti tertinggi di dalam sains data. Kuasainya, dan fail algoritma anda tidak akan dapat digodam dengan mudah!"
+                            </div>
+                            <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 12 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 2.3s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00ff66;">BAB 12: Pengenalan Arus Elektrik & Litar Asas</h3>
+                        <p>Sebelum sistem siber menyentuh dunia realiti, kita wajib memahami hukum Asas Elektrik. Arus elektrik memerlukan sebuah litar yang lengkap bersambung bermula dari Punca Kuasa hingga kembali semula ke titik Pembumian.</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #e67e22;">
+                            <li>⚡ <strong>Voltan (VCC / 3.3V):</strong> Punca kuasa. Diibaratkan seperti jantung yang mengepam darah yang penuh tenaga.</li>
+                            <li>➖ <strong>Pembumian (GND / Ground):</strong> Titik penamat di mana arus elektrik yang telah digunakan dikembalikan untuk melengkapkan kitaran litar.</li>
+                            <li>🛑 <strong>Litar Pintas (Short Circuit):</strong> Berlaku apabila wayar Voltan (VCC) terus bersentuhan dengan wayar Pembumian (GND) tanpa melalui sebarang komponen seperti LED. Arus akan berlari terlalu laju tanpa halangan!</li>
+                            <li class="kod-highlight">💻 <strong>Dari Kod Ke Realiti:</strong> Koding yang paling hebat pun tidak akan berfungsi langsung jika komponen tiada sambungan laluan wayar kuasa (VCC) dan tempat membuang arus (GND). Kod hanya memberi 'arahan', tetapi elektrik yang memberikan 'nyawa'.</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Darah di dalam badan. Jantung (VCC) mengepam darah ke seluruh saraf otot. Kemudian saluran vena (GND) akan membawa semula darah pulang untuk melengkapkan kitaran hidup.</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Air paip singki. Air yang memancut laju dari paip perlukan ruang longkang pembuangan di bawah singki. Kalau tiada tempat pembuangan (GND), air elektrik itu akan membanjiri ruang komponen dan membakarnya.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Koding algoritma C++ kau tu memang cantik dan gempak. Tapi ingat, kalau kau lupa pacak wayar hitam ke kaki GND aku, litar cip aku takkan bertenaga! Aku tetap akan membisu macam patung mati."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Peringatan Litar Perkakasan (Bukan Kod)</span><br>
+                            <span class="k-kelabu">// MESTI ADA: Wayar Positif (+) dan Wayar Negatif (GND)</span>
+                        </div>
+                        
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/uncle_amaran.png" class="img-karakter" alt="Uncle Mat Amaran">
+                            <div class="dialog-bubble bubble-amaran">
+                                <strong>AMARAN JURUTERA!:</strong> "Hati-hati semasa mencucuk wayar di atas <em>breadboard</em>. Litar Pintas (Short Circuit) akan menghasilkan haba melampau yang boleh membakar cip mikropengawal anda serta-merta!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 13 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 2.5s;">
+                    <div class="kotak-info">
+                        <h3>BAB 13: Internet of Things (Mikropengawal ESP32)</h3>
+                        <p>Inilah jambatan antara alam digital dan alam fizikal. <strong>ESP32</strong> ialah sebuah cip mikropengawal (Microcontroller) berkuasa tinggi yang bertindak sebagai "Otak" kepada papan litar anda. Di dalamnya terkandung Wi-Fi dan Bluetooth!</p>
+                        <p>Apabila anda menghantar koding dari skrin laptop, kod tersebut akan dimuat turun dan disimpan secara kekal ke dalam memori ESP32.</p>
+                        
+                        <ul class="senarai-contoh">
+                            <li class="kod-highlight">💻 <strong>Dari Kod Ke Realiti:</strong> Apabila cikgu menekan butang 'Upload' di perisian komputer, semua koding teks teks bahasa Inggeris yang panjang tadi akan ditukarkan menjadi bahasa mesin (kod 0 dan 1). Ia kemudian disuntik masuk ke dalam memori cip hitam ESP32 melalui kabel USB. Kini, otak ESP32 sudah pandai berfikir sendiri!</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Sama macam proses menghafal sifir. Cikgu (Laptop) tulis sifir kat papan hitam. Bila murid baca dan faham, mereka memasukkan fakta tersebut menjadi sebahagian dari memori di dalam kepala mereka (ESP32).</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Penghantaran program enjin automatik di kilang kereta Jepun. Skrip pengaturcaraan di <em>download</em> ke dalam cip papan utama robot pengimpal. Robot akan mengikut skrip tu seumur hidup.</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Perkataan bahasa Inggeris (seperti loop, if, delay) dalam koding yang kau tulis tu aku tak faham. Tapi waktu proses 'Upload', perisian komputer kau dah terjemahkan semua tu jadi kod angka 0 dan 1."</p>
+                                    <p>"Bila nombor-nombor tu meresap masuk dalam otak mikrocip aku, barulah aku dapat bernyawa dan arahkan suis pintu litar aku dibuka atau ditutup!"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// Tahap ini tidak melibatkan koding baharu.</span><br>
+                            <span class="k-kelabu">// Ia adalah proses suntikan 'UPLOAD' dari komputer PC ke cip ESP32.</span>
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble bubble-faiq">
+                                <strong>Faiq:</strong> "Fuh, hebatnya! Berbekalkan cip ESP32 ini, segala logik Variables, Loop, dan If-Else yang saya tulis di laptop sekarang sudah memiliki jasad dan kuasa elektrik!"
+                            </div>
+                            <img src="assets/picture/faiq_bangga.png" class="img-karakter" alt="Faiq Bangga">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 14 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 2.7s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00ff66;">BAB 14: Deria (Input) & Tindak Balas (Output) Fizikal</h3>
+                        <p>Bagi membolehkan ESP32 berfungsi sepenuhnya, ia memerlukan "Deria" untuk mengesan persekitaran (Input) dan "Otot" untuk memberi tindak balas fizikal (Output) kepada manusia.</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #3498db;">
+                            <li>🔌 <strong>Perkakasan Output:</strong> Lampu LED, mentol RGB, dan modul Buzzer yang mencetuskan cahaya bersyarat serta frekuensi gelombang bunyi.</li>
+                            <li>🎛️ <strong>Input Digital (Mutlak 1/0):</strong> Butang Suis fizikal & Penderia Inframerah (IR). Komputer hanya menapis dua nilai: ada halangan dikesan (1), atau tiada halangan (0).</li>
+                            <li>🌡️ <strong>Input Analog (Julat 0-4095):</strong> Tombol Potentiometer putaran mekanikal, Penderia Suhu (Thermistor) & Penderia Cahaya (LDR). Merekod kepekatan data yang bervariasi.</li>
+                            <li class="kod-highlight">💻 <strong>Contoh Kod Mudah:</strong> <code>if (baca_suis() == 1) { nyalakan(Lampu_D2); }</code> <br> Di sini, kod <code>baca_suis()</code> bertindak sebagai jari (Input) yang merasakan ada orang menekan butang. Manakala <code>nyalakan()</code> adalah arahan otot (Output) yang akan menghantar arus ke mentol!</li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Logik Biasa</span>
+                                    <p>Mata dan jari tangan manusia. Mata kamu melihat kelibat kawan melambai (Input), kemudian otak mengarahkan tangan kamu naik menumbuk angin dan menyahut sapaan (Output).</p>
+                                    <span class="label-contoh" style="margin-top:10px;">CONTOH 2: Logik Mesin</span>
+                                    <p>Mesin Penggera Berbunyi Kereta (Car Alarm). Penderia getaran di pintu kereta bertindak menangkap sentuhan (Deria/Input). Tiba-tiba cip arahkan penggera tanduk membingitkan kawasan (Otot/Output).</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Aku memerlukan sensor (seperti suis penderia IR) sebagai 'mata' aku untuk melihat kehadiran fizikal tangan manusia (digitalRead)."</p>
+                                    <p>"Dan bila aku terima isyarat butang ditekan, aku gunakan komponen LED dan Buzzer bising sebagai 'mulut' aku untuk menyahut respons kembali kepada manusia (digitalWrite)!"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="kotak-kod-bawah">
+                            <span class="k-kelabu">// C++ Kod Sebenar Kawalan Fizikal (Digital)</span><br>
+                            <span class="k-biru">if</span> (<span class="k-biru">digitalRead</span>(Suis_Pintu) == <span class="k-oren">1</span>) {<br>
+                            &nbsp;&nbsp;<span class="k-biru">digitalWrite</span>(Lampu_LED, <span class="k-oren">HIGH</span>); <span class="k-kelabu">// Nyalakan Output</span><br>
+                            }
+                        </div>
+
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/uncle_tablet.png" class="img-karakter" alt="Uncle Mat Tablet">
+                            <div class="dialog-bubble">
+                                <strong>Uncle Mat:</strong> "Apabila penderia Analog mula membaca data suhu, anda boleh menggunakan ilmu Logik Perbandingan (>, <) yang dipelajari dalam Bab 8 untuk mengawal kipas fizikal!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 15 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 2.9s;">
+                    <div class="kotak-info" style="border-color: #f1c40f;">
+                        <h3 style="color: #f1c40f;">BAB 15: Grand Masterpiece (Automasi Bilik Kebal)</h3>
+                        <p>Kemuncak perjalanan ilmu Sains Komputer. Menggabungkan pengurusan memori (Variables), gelung kawalan (Loop), dan operasi Perbandingan Bersyarat (If-Else) ke atas 5 komponen litar serentak di dalam satu skrip berantai!</p>
+                        
+                        <ul class="senarai-contoh" style="border-left-color: #f1c40f;">
+                            <li class="kod-highlight">💻 <strong>Bagaimana Semua Teori Bergabung Menjadi Mesin Pintar:</strong></li>
+                        </ul>
+
+                        <div class="blok-penerangan">
+                            <div class="sub-kotak">
+                                <div class="kotak-penerangan-info kotak-dunia">
+                                    <h5>🌍 Situasi Dunia Sebenar</h5>
+                                    <span class="label-contoh">CONTOH 1: Mesin Super Kompleks</span>
+                                    <p>Sistem sekuriti tahap makmal canggih bank. Sistem keselamatan gabungkan sensor laser (Input), kata laluan nombor PIN bersarang, penggera bunyi (Output), lampu merah kelip-kelip (Loop), dan memori mengunci akses bank sepenuhnya!</p>
+                                </div>
+                                <div class="kotak-penerangan-info kotak-komputer">
+                                    <h5>💻 Pemahaman Komputer</h5>
+                                    <p>"Ini adalah tahap kerumitan kemuncak. Otak C++ aku dikerah 100% untuk menapis Input, mengira Variable, berlari di dalam Loop, dan menembak tenaga voltan HIGH ke Output dalam masa satu per seratus saat!"</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kotak-kod-bawah" style="border-color: #f1c40f; box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);">
+                            <span class="k-kelabu">// 1. INPUT: Penderia inframerah kesan manusia</span><br>
+                            <span class="k-biru">if</span> (sensor_laser == <span class="k-oren">1</span>) {<br>
+                            <br>
+                            &nbsp;&nbsp;<span class="k-kelabu">// 2. OUTPUT 1: ESP32 terus hantar arus hidupkan bunyi siren</span><br>
+                            &nbsp;&nbsp;<span class="k-oren">bunyi_siren</span>(KUAT);<br>
+                            <br>
+                            &nbsp;&nbsp;<span class="k-kelabu">// 3. LOOP & OUTPUT 2: Arahkan lampu amaran merah berkelip pantas 50 kali</span><br>
+                            &nbsp;&nbsp;<span class="k-biru">for</span> (<span class="k-biru">int</span> i = 0; i < <span class="k-oren">50</span>; i++) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="k-oren">kelip_lampu_merah</span>();<br>
+                            &nbsp;&nbsp;}<br>
+                            <br>
+                            &nbsp;&nbsp;<span class="k-kelabu">// 4. MEMORI: Kekunci sistem Boolean supaya pencuri terperangkap</span><br>
+                            &nbsp;&nbsp;sistem_terkunci = <span class="k-oren">true</span>;<br>
+                            }
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble bubble-bot">
+                                <strong>Bot Pintar:</strong> "Selesai! Dari sekadar memahami Tanda Petik (" ") hinggalah membina Sistem Keselamatan Pintar. Anda kini adalah pakar inovasi penciptaan! Kuasa di tangan anda!"
+                            </div>
+                            <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar Tamat">
+                        </div>
+                    </div>
+                </div>
+
+            </div> 
+        </div>
+    </div> 
+</body>
+</html>

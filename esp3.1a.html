@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 3.1A: Tombol Kawalan (IoT)</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* ========================================================
+           🔥 1. CSS KOMPONEN DALAMAN & ANIMASI 🔥
+           ======================================================== */
+        .tema-makmal { background: linear-gradient(to bottom, #141e30 0%, #243b55 100%) !important; overflow: hidden; position: relative; height: 100%; transition: background 0.3s ease; }
+        .tema-makmal.mod-laju { background: linear-gradient(to bottom, #2c3e50 0%, #8e44ad 100%) !important; }
+        
+        .meja-makmal { position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; background: #2c3e50; border-top: 5px solid #f39c12; box-shadow: inset 0 20px 30px rgba(0,0,0,0.5); z-index: 5; display: flex; justify-content: center; align-items: center; gap: 50px; }
+
+        /* ESP32 MAYA */
+        .esp-maya { width: 120px; height: 160px; background: #111; border-radius: 10px; position: absolute; bottom: 80px; left: 15%; border: 2px solid #555; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 6; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
+        .esp-maya::before { content: "ESP32 MCU"; color: #aaa; font-family: monospace; font-size: 14px; font-weight: bold;}
+        .cip-besi { width: 50px; height: 50px; background: silver; margin-top: 10px; border-radius: 4px; }
+
+        /* TOMBOL MAYA (POTENTIOMETER) */
+        .pot-bekas { position: absolute; bottom: 110px; left: 45%; width: 90px; height: 90px; background: #34495e; border-radius: 50%; border: 5px solid #2c3e50; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 15px rgba(0,0,0,0.5); z-index: 10; }
+        .pot-tombol { width: 60px; height: 60px; background: #7f8c8d; border-radius: 50%; border: 2px solid #95a5a6; position: relative; transition: transform 0.1s ease-out; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); }
+        .pot-penunjuk { width: 4px; height: 20px; background: #f1c40f; border-radius: 2px; position: absolute; top: 5px; left: 50%; transform: translateX(-50%); box-shadow: 0 0 5px #f1c40f; }
+        .teks-nilai-pot { position: absolute; bottom: -35px; color: #f1c40f; font-family: monospace; font-weight: bold; font-size: 14px; white-space: nowrap; width: max-content; }
+
+        /* LED MAYA */
+        .led-maya { position: absolute; bottom: 130px; right: 20%; font-size: 80px; z-index: 10; filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)); transition: all 0.05s ease; opacity: 0.4; }
+        .led-kelip-laju { opacity: 1; filter: drop-shadow(0 0 40px #9b59b6) drop-shadow(0 0 80px #8e44ad) !important; animation: kelipanMaju 0.2s infinite alternate; }
+        .led-kelip-perlahan { opacity: 1; filter: drop-shadow(0 0 20px #0be881) drop-shadow(0 0 40px #00ff66) !important; animation: kelipanMaju 1s infinite alternate; }
+        
+        @keyframes kelipanMaju { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.1); opacity: 1; } }
+
+        /* ========================================================
+           🔥 2. CSS KAWALAN UI & MODAL 🔥
+           ======================================================== */
+        .btn-usb { width: 100%; padding: 12px; background-color: #e67e22; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.4); }
+        .btn-usb:hover { background-color: #d35400; transform: translateY(-2px); }
+        .btn-usb.connected { background-color: #0be881 !important; box-shadow: 0 4px 10px rgba(11, 232, 129, 0.4); pointer-events: none;}
+        .status-sambungan { text-align: center; font-size: 12px; color: #bdc3c7; margin-bottom: 15px; font-family: monospace;}
+
+        .modal-bantuan { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(5, 0, 17, 0.95); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+        .modal-bantuan.aktif { display: flex; animation: fanaIn 0.3s forwards; }
+        .kandungan-bantuan { background: #151a21; padding: 25px; border-radius: 16px; width: 95%; max-width: 650px; color: #fff; border: 2px solid #00ff66; box-shadow: 0 0 30px rgba(0, 255, 102, 0.2); max-height: 90vh; overflow-y: auto; position: relative; }
+        .kandungan-bantuan.lebar { max-width: 1100px; overflow: hidden; display: flex; flex-direction: column;} 
+        .senarai-langkah { text-align: left; background: rgba(0,0,0,0.4); padding: 15px 25px; border-radius: 8px; margin-bottom: 20px;}
+        .senarai-langkah li { margin-bottom: 14px; font-size: 14px; line-height: 1.6; color: #d2dae2;}
+        .senarai-langkah strong { color: #f1c40f; }
+        
+        .btn-tutup-modal { position: absolute; top: 15px; right: 20px; background: transparent; border: none; color: #ff5e57; font-size: 32px; cursor: pointer; transition: 0.2s; z-index: 100; }
+        .btn-tutup-modal:hover { transform: scale(1.2); color: #ff0055;}
+        .btn-aksi { width: 100%; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s; margin-top: 10px; z-index: 50;}
+        
+        /* CSS SLIDER GAMBAR */
+        .btn-panah { width: auto !important; flex-shrink: 0; background: #2c3e50; color: white; border: 2px solid #00f3ff; padding: 6px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 12px; }
+        .btn-panah:hover { background: #00f3ff; color: #000; }
+        .ruang-kanvas { position: relative; width: 100%; height: 65vh; background: #0b0c10; border-radius: 10px; border: 2px solid #2f3640; display: flex; justify-content: center; align-items: center; overflow: hidden; cursor: grab; }
+        .ruang-kanvas:active { cursor: grabbing; }
+        .imej-litar { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.1s ease-out; transform-origin: center center; pointer-events: none; }
+        .nota-zoom { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #f1c40f; padding: 8px 20px; border-radius: 20px; font-size: 12px; pointer-events: none; border: 1px solid #f1c40f; }
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <!-- 🔥 3. KOTAK KIRI (KAWALAN KOD) 🔥 -->
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 5px;">
+                <h2 style="margin: 0; line-height: 1.2; font-size: 18px;">Terminal I.O.T<br><span style="font-size: 13px; color: #00ff66;">(Misi 3.1A - Tombol Kawalan)</span></h2>
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #00ff66; color: #000; border-color: #00b894; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaModal('modalBukuPanduan')" style="background: #e67e22; color: #fff; border-color: #d35400; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">📖 Panduan</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 13px; line-height: 1.4;">Zon Input Analog. Gunakan perbandingan matematik (&gt; atau &lt;) untuk mengawal kelajuan cip.</p>
+            
+            <button id="btnConnect" class="btn-usb">🔌 HUBUNGKAN CIP ESP32</button>
+            <div id="statusUSB" class="status-sambungan">Status: 🔴 Tidak Disambungkan</div>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #00ff66; font-family: monospace;">
+                <strong style="color: #00ff66; font-family: sans-serif;">Logik Perbandingan (>):</strong><br>
+                <span style="color: #bdc3c7; display: block; margin-top: 4px;">if (tombol > 2000) {</span>
+                <span style="color: #fff; display: block; margin-left: 15px;">kelipan.laju()</span>
+                <span style="color: #bdc3c7; display: block;">} else {</span>
+                <span style="color: #fff; display: block; margin-left: 15px;">kelipan.perlahan()</span>
+                <span style="color: #bdc3c7; display: block;">}</span>
+            </div>
+
+            <textarea id="arahanInput" placeholder="Taip kod matematik if/else di sini berdasarkan logik di atas..." spellcheck="false" style="width: 100%; height: 90px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 13px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanIoT()" style="margin-top: 5px; margin-bottom: 8px; width: 100%; padding: 12px; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s; background: linear-gradient(135deg, #00ff66, #00b894); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 255, 102, 0.4);">LAKSANA KOD & MULA 🚀</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00ff66; padding: 10px; font-size: 13px;">
+                Tugasan: Hubungkan ESP32, taip kod logik di atas dan tekan Laksana Kod. Putar tombol fizikal anda!
+            </div>
+        </div>
+
+        <!-- 🔥 4. KOTAK KANAN (ANIMASI) 🔥 -->
+        <div class="panel-kanan">
+            <h2 style="color: #ecf0f1; text-align: center; margin-top: 1px; margin-bottom: 16px; text-shadow: 0 0 10px rgba(0,243,255,0.5);">Makmal Siber-Fizikal</h2>
+            
+            <div id="ruangAnimasi" class="tema-makmal">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #f1c40f; z-index: 30; font-weight: bold;">
+                    Simulasi: Menunggu kod dan sambungan...
+                </div>
+                
+                <div class="meja-makmal"></div>
+                <div class="esp-maya"><div class="cip-besi"></div></div>
+                
+                <!-- TOMBOL POTENTIOMETER MAYA -->
+                <div class="pot-bekas">
+                    <div id="tombolPutar" class="pot-tombol">
+                        <div class="pot-penunjuk"></div>
+                    </div>
+                    <div id="teksNilai" class="teks-nilai-pot">0 / 4095</div>
+                </div>
+
+                <!-- LAMPU LED MAYA -->
+                <div id="ledMaya" class="led-maya">💡</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔥 5. MODAL TEKS PANDUAN 🔥 -->
+   <div id="modalBukuPanduan" class="modal-bantuan">
+        <div class="kandungan-bantuan">
+            <button class="btn-tutup-modal" onclick="tutupModal('modalBukuPanduan')">×</button>
+            <h2 style="color: #00ff66; margin-top: 0; border-bottom: 1px dashed #00ff66; padding-bottom: 10px;">Buku Manual: Litar 3.1A (Potentiometer)</h2>
+            <p style="font-size: 14px; color: #bdc3c7;">Pemasangan dibahagikan kepada 2 fasa. Sila rujuk koordinat dengan teliti.</p>
+            
+            <div style="max-height: 45vh; overflow-y: auto; padding-right: 10px;">
+                <ol class="senarai-langkah">
+                    <h3 style="color: #00ff66; margin-top: 0; font-size: 16px;">Fasa 1: Kedudukan Asas & Rel Kuasa</h3>
+                    
+                    <li><strong style="color: #f1c40f;">1.0) Pengawal Mikro (MCU) ESP32:</strong> [ <strong style="color: #f1c40f;">Lubang 1B - 15J</strong> ].<br><span style="color:#bdc3c7; font-size:13px;">Nota: Port USB mesti menghala ke luar.</span></li>
+                    
+                    <li><strong style="color: #f1c40f;">2.0) PEMBUMIAN (GND):</strong> Tarik wayar hitam dari [ <strong style="color: #f1c40f;">Lubang 2A</strong> ] ke Jalur <strong style="color: #3498db;">Biru (-)</strong>.<br><em style="color:#bdc3c7; font-size:13px;">SEBELAH KIRI papan sahaja (seperti dalam kurungan <strong style="color: #e45b06;">Oren</strong>). Jangan guna jalur kanan!</em></li>
+                    
+                    <li><strong style="color: #f1c40f;">3.0) REL VOLTAN (3V3):</strong> Tarik wayar Merah dari [ <strong style="color: #f1c40f;">Lubang 1A</strong> ] ke mana-mana lubang di Jalur <strong style="color: #e74c3c;">Merah (+)</strong>.<br><em style="color:#bdc3c7; font-size:13px;">SEBELAH KIRI papan sahaja (seperti dalam kurungan <strong style="color: #9b59b6;">Ungu</strong>). Jangan guna jalur kanan!</em></li>
+                </ol>
+
+                <ol class="senarai-langkah" style="margin-top: 20px;">
+                    <h3 style="color: #3498db; margin-top: 0; font-size: 16px;">Fasa 2: Pendawaian Komponen</h3>
+                    
+                    <li><strong style="color: #f1c40f;">1.0) Perintang (Resistor) 220Ω:</strong> [ Dari <strong style="color: #f1c40f;">Lubang 19A</strong> ke Jalur <strong style="color: #3498db;">Biru (-)</strong> ]<br>
+                        <em style="color:#bdc3c7; font-size:13px;">PENTING: Hujung dawai kedua bebas dicucuk pada mana-mana lubang di sepanjang Jalur <strong style="color: #3498db;">Biru (-)</strong> (seperti dalam kurungan <strong style="color: #e45b06;">Oren</strong>). Jangan guna jalur kanan!</em><br>
+                        Tarik wayar isyarat LED (Pin D2) dari [ <strong style="color: #f1c40f;">Lubang 4A</strong> ] ke [ <strong style="color: #f1c40f;">Lubang 18A</strong> ].
+                    </li>
+                    
+                    <li><strong style="color: #f1c40f;">2.0) PENDAWAIAN TOMBOL (Pusing Kanan = Laju):</strong> 
+                        <br>• Wayar Kiri (Kuasa): Tarik dari [ <strong style="color: #f1c40f;">Lubang 24A</strong> ] ke Jalur <strong style="color: #e74c3c;">Merah (+)</strong>.
+                        <br>• Wayar Tengah (Analog): Tarik dari [ <strong style="color: #f1c40f;">Lubang 26A</strong> ] dan cucuk ke Pin D4 di [ <strong style="color: #f1c40f;">Lubang 5A</strong> ].
+                        <br>• Wayar Kanan (Pembumian/GND): Tarik dari [ <strong style="color: #f1c40f;">Lubang 28A</strong> ] ke Jalur <strong style="color: #3498db;">Biru (-)</strong>.
+                        <br><em style="color:#bdc3c7; font-size:13px;">PENTING: Hujung dawai kedua bebas dicucuk pada mana-mana lubang di sepanjang Jalur <strong style="color: #e74c3c;">Merah (+)</strong> (seperti dalam kurungan <strong style="color: #9b59b6;">Ungu</strong>).</em>
+                    </li>
+
+                    <li><strong style="color: #f1c40f;">3.0) KOMPONEN LED:</strong> Pacak kaki panjang (+) di [ <strong style="color: #f1c40f;">Lubang 18C</strong> ], kaki pendek (-) di [ <strong style="color: #f1c40f;">Lubang 19C</strong> ].</li>
+                    
+                    <li><strong style="color: #f1c40f;">4.0) POSISI POTENTIOMETER:</strong> Pacak 3 kakinya di lajur E. Tekan kuat-kuat! Kaki Kiri di [ <strong style="color: #f1c40f;">Lubang 24E</strong> ], Tengah di [ <strong style="color: #f1c40f;">Lubang 26E</strong> ], Kanan di [ <strong style="color: #f1c40f;">Lubang 28E</strong> ].</li>
+                </ol>
+            </div>
+            <button class="btn-aksi" style="background: #9b59b6; color: #fff;" onclick="tutupModal('modalBukuPanduan'); bukaModal('modalGambarRealiti')">🔍 LIHAT SKEMATIK LITAR SEBENAR</button>
+        </div>
+    </div>
+
+    <!-- 🔥 6. MODAL GAMBAR SLIDER 🔥 -->
+    <div id="modalGambarRealiti" class="modal-bantuan">
+        <div class="kandungan-bantuan lebar">
+            <button class="btn-tutup-modal" onclick="tutupModal('modalGambarRealiti')">×</button>
+            <h2 style="text-align: center; color: #00ff66;">Skematik Pemasangan Litar</h2>
+            
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 10px; background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 8px;">
+                <button onclick="tukarFasa(-1)" class="btn-panah">◀ SEBELUM</button>
+                <h3 id="tajukFasa" style="margin: 0; color: #00ff66; font-size: 16px; white-space: nowrap;">FASA 1: Asas & Rel Kuasa</h3>
+                <button onclick="tukarFasa(1)" class="btn-panah">SETERUSNYA ▶</button>
+            </div>
+            
+            <div class="ruang-kanvas" id="ruangKanvas">
+                <img src="assets/picture/iot_misi3_1a_fasa1.jpg" class="imej-litar" id="imejLitar" onerror="this.onerror=null; this.src='https://via.placeholder.com/1000x800/2c3e50/ffffff?text=GAMBAR+FASA+1+3.1A';">
+                <div class="nota-zoom">🔍 Guna Mouse Wheel untuk Zoom | Klik & Tarik untuk Gerak</div>
+            </div>
+
+            <button class="btn-aksi" style="background: #27ae60; color: #fff; margin-top: 15px;" onclick="tutupModal('modalGambarRealiti')">SAYA FAHAM & LITAR TELAH DIPASANG</button>
+        </div>
+    </div>
+
+    <!-- 🔥 7. AUDIO EFFECTS 🔥 -->
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3" preload="none"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3" preload="none"></audio>
+
+    <script>
+        // ========================================================
+        // 🔥 LOGIK JAVASCRIPT: SLIDER & ZOOM GAMBAR 🔥
+        // ========================================================
+        let fasaSkrg = 1;
+        function tukarFasa(arah) {
+            fasaSkrg += arah;
+            if(fasaSkrg > 2) fasaSkrg = 1; 
+            if(fasaSkrg < 1) fasaSkrg = 2; 
+
+            imgScale = 1; pointX = 0; pointY = 0; setTransform();
+            const imej = document.getElementById('imejLitar');
+            const tajuk = document.getElementById('tajukFasa');
+
+            if(fasaSkrg === 1) {
+                imej.src = 'assets/picture/iot_misi3_1a_fasa1.jpg';
+                tajuk.innerHTML = 'FASA 1: Asas & Rel Kuasa';
+                tajuk.style.color = '#00ff66';
+            } else {
+                imej.src = 'assets/picture/iot_misi3_1a_fasa2.jpg';
+                tajuk.innerHTML = 'FASA 2: Pendawaian Komponen';
+                tajuk.style.color = '#3498db';
+            }
+        }
+
+        const kanvas = document.getElementById('ruangKanvas');
+        const imejPusat = document.getElementById('imejLitar');
+        let imgScale = 1; let panning = false;
+        let pointX = 0; let pointY = 0; let startX = 0; let startY = 0;
+
+        function setTransform() { imejPusat.style.transform = `translate(${pointX}px, ${pointY}px) scale(${imgScale})`; }
+        kanvas.onmousedown = function (e) { e.preventDefault(); startX = e.clientX - pointX; startY = e.clientY - pointY; panning = true; }
+        kanvas.onmouseup = function (e) { panning = false; }
+        kanvas.onmouseleave = function (e) { panning = false; }
+        kanvas.onmousemove = function (e) { if (!panning) return; pointX = e.clientX - startX; pointY = e.clientY - startY; setTransform(); }
+        kanvas.onwheel = function (e) {
+            e.preventDefault();
+            const delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY);
+            if (delta > 0) imgScale *= 1.1; else imgScale /= 1.1; 
+            if (imgScale <= 1) { imgScale = 1; pointX = 0; pointY = 0; }
+            if (imgScale > 5) imgScale = 5;
+            setTransform();
+        }
+
+        // ========================================================
+        // 🔥 LOGIK JAVASCRIPT: BUKA/TUTUP MODAL 🔥
+        // ========================================================
+        function bukaModal(id) { 
+            document.getElementById(id).classList.add('aktif'); 
+            if(id === 'modalGambarRealiti') { 
+                fasaSkrg = 1;
+                document.getElementById('imejLitar').src = 'assets/picture/iot_misi3_1a_fasa1.jpg';
+                document.getElementById('tajukFasa').innerHTML = 'FASA 1: Asas & Rel Kuasa';
+                document.getElementById('tajukFasa').style.color = '#00ff66';
+                imgScale = 1; pointX = 0; pointY = 0; setTransform(); 
+            }
+        }
+        function tutupModal(id) { document.getElementById(id).classList.remove('aktif'); }
+
+        // ========================================================
+        // 🔥 LOGIK JAVASCRIPT: WEB SERIAL (HUBUNGAN ESP32) 🔥
+        // ========================================================
+        let port; let isConnected = false; let writer; let gameAktif = false;
+        const btnConnect = document.getElementById("btnConnect");
+        const statusUSB = document.getElementById("statusUSB");
+        const maklumBalas = document.getElementById("maklumBalas");
+        const teksAnimasi = document.getElementById("teksAnimasi");
+        const ruangAnimasi = document.getElementById("ruangAnimasi");
+        const ledMaya = document.getElementById("ledMaya");
+        const tombolPutar = document.getElementById("tombolPutar");
+        const teksNilai = document.getElementById("teksNilai");
+        const sfxBetul = document.getElementById("bunyiBetul");
+        const sfxSalah = document.getElementById("bunyiSalah");
+
+        btnConnect.addEventListener("click", async () => {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                
+                const textEncoder = new TextEncoderStream();
+                textEncoder.readable.pipeTo(port.writable);
+                writer = textEncoder.writable.getWriter();
+                
+                isConnected = true;
+                btnConnect.innerHTML = "✅ MCU DISAMBUNGKAN";
+                btnConnect.classList.add("connected");
+                statusUSB.innerHTML = "Status: 🟢 Aktif (Baud 115200)";
+                statusUSB.style.color = "#00ff66";
+                
+                maklumBalas.innerHTML = "Sistem: Pangkalan dihubungkan. Sila taip kod matematik if/else anda dan tekan LAKSANA.";
+                teksAnimasi.innerHTML = "Simulasi: Menunggu kod yang sah dikunci masuk...";
+                
+            } catch (err) {
+                console.error("Gagal menyambung:", err);
+                statusUSB.innerHTML = "Status: 🔴 Gagal / Batal";
+                statusUSB.style.color = "#ff5e57";
+            }
+        });
+
+        // 🔥 FUNGSI MEMERIKSA KOD DITAIP BUDUAK-BUDAK 🔥
+        async function laksanaArahanIoT() {
+            let inputMentah = document.getElementById("arahanInput").value;
+            let cleanInput = inputMentah.toLowerCase().replace(/\s+/g, '');
+
+            if (!isConnected) {
+                maklumBalas.innerHTML = "Ralat: Sila HUBUNGKAN CIP ESP32 terlebih dahulu sebelum menaip kod!";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                if(sfxSalah) { sfxSalah.pause(); sfxSalah.currentTime = 0; sfxSalah.play(); }
+                return;
+            }
+
+            // Sasaran jawapan yang betul
+            let targetKod = "if(tombol>2000){kelipan.laju()}else{kelipan.perlahan()}";
+
+            if (cleanInput === targetKod) {
+                // KOD TEPAT! Hantar MULA ke papan litar.
+                await writer.write("MULA\n"); 
+                gameAktif = true;
+                
+                if(sfxBetul) { sfxBetul.pause(); sfxBetul.currentTime = 0; sfxBetul.play(); }
+                
+                maklumBalas.innerHTML = "Berjaya: Logik matematik disahkan! Sila putar tombol fizikal untuk mengubah kelajuan.";
+                maklumBalas.style.borderLeftColor = "#00ff66";
+                
+                // Mula membaca data analog dari ESP32
+                bacaDataESP32();
+                
+            } else {
+                // KOD SALAH
+                maklumBalas.innerHTML = "Ralat Sintaks: Semak semula struktur if, else, dan simbol perbandingan (>) anda.";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                if(sfxSalah) { sfxSalah.pause(); sfxSalah.currentTime = 0; sfxSalah.play(); }
+            }
+        }
+
+        // 🔥 FUNGSI BACA DATA DARI ESP32 🔥
+        async function bacaDataESP32() {
+            let penimbal = "";
+            while (port.readable) {
+                const pembaca = port.readable.getReader();
+                const penyahkod = new TextDecoder();
+                try {
+                    while (true) {
+                        const { value, done } = await pembaca.read();
+                        if (done) break;
+                        
+                        if (!gameAktif) continue; 
+                        
+                        penimbal += penyahkod.decode(value, { stream: true });
+                        let baris = penimbal.split('\n');
+                        penimbal = baris.pop(); 
+                        
+                        for (let ayat of baris) {
+                            let dataMasuk = ayat.trim();
+                            // Format: STATUS|NILAI (Cth: LAJU|3500)
+                            let bahagian = dataMasuk.split("|");
+                            
+                            if(bahagian.length === 2) {
+                                let statusLaju = bahagian[0];
+                                let nilaiAnalog = parseInt(bahagian[1]);
+                                
+                                // Tukar teks nombor bawah tombol maya (Sekarang DAH TAK TERLIPAT KE BAWAH)
+                                teksNilai.innerHTML = nilaiAnalog + " / 4095";
+
+                                // Putar grafik tombol (-135 darjah ke +135 darjah)
+                                let darjah = (nilaiAnalog / 4095) * 270 - 135;
+                                tombolPutar.style.transform = `rotate(${darjah}deg)`;
+
+                                // TENTUKAN REAKSI ANIMASI LED
+                                if (statusLaju === "LAJU") {
+                                    ruangAnimasi.classList.add("mod-laju");
+                                    ledMaya.className = "led-maya led-kelip-laju";
+                                    teksAnimasi.innerHTML = `NILAI TINGGI (> 2000): KELIPAN LAJU DIKATIFKAN 🚀`;
+                                    teksAnimasi.style.borderColor = "#9b59b6";
+                                    teksAnimasi.style.color = "#9b59b6";
+                                } 
+                                else if (statusLaju === "PERLAHAN") {
+                                    ruangAnimasi.classList.remove("mod-laju");
+                                    ledMaya.className = "led-maya led-kelip-perlahan";
+                                    teksAnimasi.innerHTML = `NILAI RENDAH (< 2000): KELIPAN PERLAHAN BERJALAN ⏳`;
+                                    teksAnimasi.style.borderColor = "#00ff66";
+                                    teksAnimasi.style.color = "#00ff66";
+                                }
+                            }
+                        }
+                    }
+                } catch(e) {
+                    console.error("Ralat Bacaan:", e);
+                } finally {
+                    pembaca.releaseLock();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

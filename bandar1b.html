@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1B: Logik Pejalan Kaki</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KANVAS 2.5D RESIPROKAL */
+        .tema-bandar {
+            background: linear-gradient(to bottom, #111424 0%, #1e272e 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* STRUKTUR JALAN RAYA UTAMA */
+        #bahu-atas {
+            position: absolute; top: 30%; left: 0; width: 100%; height: 40px;
+            background: #485460; border-bottom: 4px solid #d2dae2; z-index: 5;
+        }
+        #bahu-bawah {
+            position: absolute; bottom: 20%; left: 0; width: 100%; height: 40px;
+            background: #485460; border-top: 4px solid #d2dae2; z-index: 5;
+        }
+        #jalan-tar {
+            position: absolute; top: calc(30% + 40px); left: 0; width: 100%; bottom: calc(20% + 40px);
+            background: #2f3542; z-index: 4; display: flex; align-items: center;
+        }
+        .garis-pembahagi {
+            width: 100%; height: 6px;
+            background: repeating-linear-gradient(90deg, #ffd32a 0, #ffd32a 40px, transparent 40px, transparent 80px);
+        }
+        .zebra-line {
+            position: absolute; left: 55%; width: 90px; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 15px, #ffffff 15px, #ffffff 30px);
+            z-index: 6;
+        }
+
+        /* SISTEM KAWALAN DUA LAMPU (Terapung Tanpa Tiang) */
+        #box-kereta {
+            position: absolute; top: 16%; left: 38%; width: 36px; height: 90px;
+            background: #000; border: 3px solid #ffd32a; border-radius: 8px;
+            display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; z-index: 10;
+        }
+        #box-pejalan {
+            position: absolute; top: 20%; left: 68%; width: 32px; height: 75px;
+            background: #000; border: 3px solid #d2dae2; border-radius: 6px;
+            display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; z-index: 10;
+        }
+        .led-bula { border-radius: 50%; background: #1e272e; transition: all 0.2s; width: 20px; height: 20px; }
+        .led-orang { font-size: 20px; line-height: 1; transition: all 0.2s; color: transparent; text-shadow: 0 0 0 #333; opacity: 0.5; }
+        
+        .p-merah-nyala { text-shadow: 0 0 0 #ff5e57 !important; filter: drop-shadow(0 0 8px #ff5e57); opacity: 1; }
+        .p-hijau-nyala { text-shadow: 0 0 0 #0be881 !important; filter: drop-shadow(0 0 8px #0be881); opacity: 1; }
+        .aktif-merah { background: #ff5e57 !important; box-shadow: 0 0 15px #ff5e57; }
+        .aktif-hijau { background: #0be881 !important; box-shadow: 0 0 15px #0be881; }
+
+        /* WATAK DINAMIK */
+        #pejalan-kaki {
+            position: absolute; top: 15%; left: 120%; font-size: 55px; z-index: 20; 
+            transition: top 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 1.5s linear, transform 0.3s ease;
+        }
+        #kereta-awam {
+            position: absolute; top: 50%; left: -250px; font-size: 80px; z-index: 25; 
+            transition: left 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .muka-kanan { display: inline-block; transform: scaleX(-1); filter: drop-shadow(-5px 5px 5px rgba(0,0,0,0.5)); }
+        .pusing-kanan-diri { transform: scaleX(-1); }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; transform: scale(0); background: #ffffff; color: #1c2833;
+            padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid #575fcf;
+            z-index: 40; text-align: center; width: max-content; max-width: 170px;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        
+        #dial-kereta { bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); transform-origin: bottom center; }
+        #dial-kereta::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: #575fcf transparent transparent transparent; }
+        
+        #dial-orang { top: 100%; left: 50%; transform: translateX(-50%) scale(0); transform-origin: top center; }
+        #dial-orang::after { content: ''; position: absolute; bottom: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: transparent transparent #575fcf transparent; }
+
+        .buka-cakap { transform: translateX(-50%) scale(1) !important; }
+        .marah-border { border-color: #ff5e57 !important; color: #ff3f34 !important; }
+        .marah-border::after { border-top-color: #ff5e57 !important; border-bottom-color: #ff5e57 !important; }
+
+        /* KESAN LETUPAN */
+        #boom-impak {
+            position: absolute; top: 45%; left: 52%; font-size: 110px; z-index: 30;
+            opacity: 0; transform: scale(0); transition: all 0.15s ease-out; pointer-events: none;
+        }
+        .skala-boom { opacity: 1 !important; transform: scale(1.3) !important; filter: drop-shadow(0 0 20px #e74c3c); }
+
+        /* KOTAK MODAL KUSTOM */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(255, 94, 87, 0.3); overflow: visible !important;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Keputusan<br><span style="font-size: 16px; color: #575fcf;">(Misi 1B - Zon 2)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #575fcf; border-color: #3c40c6;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Uji kawalan sistem bersyarat <strong>If-Else</strong> untuk menetapkan isyarat <strong>Lampu Kereta</strong>.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #575fcf;">
+                Pastikan syarat <code>if</code> sepadan dengan situasi di kanvas!<br><br>
+                <strong style="color: #0be881;">Perspektif Orang:</strong><br>
+                <code>if (situasi == "orang") { lampu.merah() } else { lampu.hijau() }</code><br><br>
+                <strong style="color: #ffd32a;">Perspektif Kereta:</strong><br>
+                <code>if (situasi == "kereta") { lampu.hijau() } else { lampu.merah() }</code>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip struktur If-Else lengkap di sini..." spellcheck="false" style="width: 100%; height: 75px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            <button onclick="laksanaArahanBandar1b()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #575fcf, #3c40c6); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(87, 95, 207, 0.4);">LAKSANAKAN LOGIK 🚀</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #575fcf; padding: 10px; font-size: 13px;">
+                Menunggu rantaian percabangan logik dieksekusi...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Sistem Aliran Trafik</h2>
+            
+            <div id="ruangAnimasi" class="tema-bandar">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.95); color: #1e272e; border: 2px solid #575fcf; font-size: 14px; z-index: 50;">
+                    Mengimbas sistem radar...
+                </div>
+                
+                <div id="bahu-atas"></div>
+                <div id="jalan-tar">
+                    <div class="zebra-line"></div>
+                    <div class="garis-pembahagi"></div>
+                </div>
+                <div id="bahu-bawah"></div>
+
+                <!-- SIGNAL LIGHTS SERENTAK (Tiada Batang Biru) -->
+                <div id="box-kereta">
+                    <div id="l-k-merah" class="led-bula"></div>
+                    <div id="l-k-kuning" class="led-bula"></div>
+                    <div id="l-k-hijau" class="led-bula"></div>
+                </div>
+                <div id="box-pejalan">
+                    <div id="l-p-merah" class="led-orang">🧍</div>
+                    <div id="l-p-hijau" class="led-orang" style="font-size:22px;">🏃</div>
+                </div>
+                
+                <!-- ENTITI -->
+                <div id="pejalan-kaki">
+                    <div id="dial-orang" class="awan-dialog"></div>
+                    <span id="ikon-orang-emoji">🧍</span>
+                </div>
+
+                <div id="kereta-awam">
+                    <div id="dial-kereta" class="awan-dialog"></div>
+                    <span class="muka-kanan">🚗</span>
+                </div>
+
+                <div id="boom-impak">💥</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #575fcf; box-shadow: 0 0 25px rgba(87, 95, 207, 0.3); max-width: 550px;">
+            <h2 style="color: #575fcf;">🧠 Kawalan Sistem Bersyarat (If-Else)</h2>
+            <p style="color: #ecf0f1; font-size: 15px;">Selamat datang ke Zon 2! Di sini anda akan mengawal DUA keadaan serentak menggunakan logik persimpangan bercabang.</p>
+            
+            <div style="background: rgba(87, 95, 207, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #575fcf;">
+                <strong>Bagaimana Sistem Berfungsi?</strong><br><br>
+                Anda hanya perlu memprogramkan <strong>Lampu Kereta</strong> mengikut situasi utama di skrin. Komputer akan menguruskan lampu pejalan kaki secara automatik secara berlawanan.<br><br>
+                🚦 <strong>Jika situasi = "orang":</strong><br>
+                Tulis kod untuk memberikan <code>lampu.merah()</code> kepada kereta supaya orang selamat melintas.<br><br>
+                🚗 <strong>Jika situasi = "kereta":</strong><br>
+                Tulis kod untuk memberikan <code>lampu.hijau()</code> kepada kereta supaya ia boleh jalan tanpa kesesakan lalu lintas.
+            </div>
+            
+            <p style="margin-top: 15px; font-size: 13px; color: #ffd32a;"><em>AWAS: Jangan tersilap panggil nama situasi, dan jangan terbalikkan arahan lampu. Ia boleh menyebabkan amukan pemandu atau kemalangan maut!</em></p>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 10px; width: 100%; background: #575fcf; color: #fff; font-weight: bold;">SAYA BERSEDIA!</button>
+        </div>
+    </div>
+
+    <!-- POPUPS KUSTOM -->
+    <div id="modalKemenanganKustom" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🟢✅</div>
+            <h2 style="color: #0be881;">Sistem Stabil!</h2>
+            <p>Logik pemetaan If-Else sangat tepat. Keselamatan dan kelancaran bandar terjamin.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #0be881; color: #000; font-weight: bold; width:100%;">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <div id="modalKalahKustom" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🚨💥</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Kegagalan Logik!</h2>
+            <p id="pesan-kalah">Ralat berlaku di jalan raya.</p>
+            <button class="butang-menu" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold; width:100%;">CUBA LAGI (REFRESH)</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    <audio id="bunyiHon" src="assets/audio/hon.mp3"></audio>
+    
+    <script src="script-bandar1b.js"></script>
+</body>
+</html>

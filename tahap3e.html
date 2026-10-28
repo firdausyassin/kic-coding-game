@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 3E: Keterlarutan Bahan</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA MAKMAL KIMIA */
+        .tema-makmal {
+            background: linear-gradient(to bottom, #d5dbdb 0%, #aeb6bf 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* MEJA MAKMAL */
+        #meja-makmal {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
+            background: #34495e; border-top: 10px solid #2c3e50;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.5); z-index: 2;
+        }
+
+        /* BIKAR KACA */
+        #bikar-kaca {
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 180px; 
+            background: rgba(255, 255, 255, 0.2); 
+            border-left: 6px solid rgba(255,255,255,0.7);
+            border-right: 6px solid rgba(255,255,255,0.7);
+            border-bottom: 8px solid rgba(255,255,255,0.8);
+            border-radius: 5px 5px 20px 20px; z-index: 5;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1), 0 15px 20px rgba(0,0,0,0.3);
+            overflow: hidden; /* Supaya air tak terkeluar */
+            display: flex; justify-content: center; align-items: flex-end;
+        }
+
+        /* AIR DALAM BIKAR */
+        #air-bikar {
+            width: 100%; height: 120px; background: rgba(52, 152, 219, 0.5);
+            border-top: 4px solid rgba(255,255,255,0.5);
+            transition: background 1s ease; position: relative;
+        }
+
+        /* ROD KACA (Pengacau) */
+        #rod-kaca {
+            position: absolute; bottom: 120px; left: 50%; 
+            width: 8px; height: 220px; background: rgba(255,255,255,0.9);
+            border-radius: 4px; z-index: 6; transform-origin: top center;
+            transform: translateX(-50%) rotate(15deg);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            transition: opacity 0.3s;
+        }
+        
+        /* Animasi Kacau Laju / Perlahan */
+        .kacau-laju { animation: pusingRod 0.2s infinite alternate linear; }
+        .kacau-perlahan { animation: pusingRod 0.6s infinite alternate ease-in-out; }
+        
+        @keyframes pusingRod {
+            0% { transform: translateX(-50%) rotate(5deg); }
+            100% { transform: translateX(-50%) rotate(25deg); }
+        }
+
+        /* ZARAH BAHAN (Gula / Pasir) */
+        #partikel-bahan {
+            position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+            font-size: 50px; z-index: 7; line-height: 8; opacity: 0;
+            transition: opacity 1.5s ease, bottom 1s ease;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4));
+        }
+
+        /* Papan Putih Panduan Makmal */
+        #papan-putih {
+            position: absolute; top: 18%; left: 4%; width: 200px; height: 150px;
+            background: #fff; border: 4px solid #bdc3c7; border-radius: 5px;
+            z-index: 1; padding: 10px; font-family: monospace; font-size: 11px; color: #333;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; transform: scale(0); background: #ffffff; color: #1c2833;
+            padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; width: max-content; 
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); pointer-events: none; border: 2px solid #3498db;
+        }
+
+        /* 🔥 BUNUH JARUM PUTIH ASAL DARI STYLE.CSS 🔥 */
+        .awan-dialog::before { display: none !important; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <!-- 🔥 FIX LAYOUT SCROLLBAR & SUSUNAN BUTANG 🔥 -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 5px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Sains<span style="display:block; font-size: 16px; color: #3498db; margin-top:2px;">(Misi 3E - Zon 1)</span></h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 8px; margin: 0; flex-shrink: 0; font-size: 13px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 8px; font-size: 13px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Bahan berbeza mempunyai sifat keterlarutan yang berbeza di dalam air.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Lengkapkan kod dengan memasukkan <strong>bahan larut (seperti "gula")</strong> dan <strong>kadar kelajuan ("laju")</strong>.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Parameter (Teks, Teks):</strong><br>
+                <span style="color: #fff;">objek.tindakan("bahan", "kelajuan")</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Arahan Sasaran:</strong><br>
+                <span style="color: #fff;">bikar.kacau( " ? " , " ? " )</span>
+            </div>
+            
+            <!-- 🔥 FIX BOX-SIZING SUPAYA INPUT TAK KEMBANG KELUAR KOTAK 🔥 -->
+            <input type="text" id="arahanInput" placeholder="Taip kod campuran di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap3e()" style="width: 100%; box-sizing: border-box; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap3e()" style="width: 100%; box-sizing: border-box; margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); padding: 12px; border: none; border-radius: 8px; cursor: pointer;">MULA EKSPERIMEN 🧪</button>
+
+            <!-- 🔥 FIX BOX-SIZING MAKLUM BALAS 🔥 -->
+            <div class="kotak-maklum-balas" id="maklumBalas" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border-left: 4px solid #3498db; padding: 10px; font-size: 13px; border-radius: 4px;">
+                Bikar berisi 100ml air sedia untuk diuji...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-makmal">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 30;">
+                    Status: Air pada suhu bilik. Menunggu bahan...
+                </div>
+                
+                <div id="meja-makmal"></div>
+                
+                <div id="papan-putih">
+                    <strong>PANDUAN EKSPERIMEN:</strong><br>
+                    -------------------<br>
+                    <u>Bahan Ujian:</u><br>
+                    1. gula<br>
+                    2. pasir<br><br>
+                    <u>Kelajuan Rod:</u><br>
+                    1. laju<br>
+                    2. perlahan
+                </div>
+
+                <!-- BIKAR & AIR -->
+                <div id="bikar-kaca">
+                    <div id="air-bikar"></div>
+                </div>
+                
+                <div id="rod-kaca"></div>
+                <div id="partikel-bahan">🧊</div> <!-- Gula/Pasir -->
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🧪🧊</div>
+            <h2>Eksperimen Dwi-Pembolehubah</h2>
+            <p style="text-align: left;">Anda sudah pakar dengan sintaks Dwi-Parameter di Tahap 2! Kini, aplikasikan kemahiran tersebut untuk menguji sifat bahan sains.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Parameter Eksperimen:</strong><br><br>
+                1. Parameter PERTAMA: Nama bahan (Contoh: <code>"gula"</code>, <code>"pasir"</code>).<br>
+                2. Parameter KEDUA: Kelajuan kacauan (Contoh: <code>"laju"</code>, <code>"perlahan"</code>).<br>
+                3. Uji logik anda: Adakah bahan tersebut akan larut lebih cepat jika dikacau laju?<br>
+                ✅ Format Sasaran: <code>bikar.kacau("bahan", "kelajuan")</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">💧✨</div>
+            <h2 style="color: #0be881;">Larutan Terhasil!</h2>
+            <p>Tahniah! Anda berjaya memanipulasi dwi-parameter teks dengan betul dan membuktikan bahawa gula adalah bahan yang boleh larut di dalam air.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🪨❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Bahan Mendap!</h2>
+            <p id="pesan-kalah">Bahan ini tidak larut. Eksperimen tidak menghasilkan larutan sekata.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    <audio id="bunyiKacau" src="assets/audio/betul.mp3"></audio> <!-- Guna bunyi betul dlu sbg ganti bunyi air -->
+
+    <script src="script-tahap3e.js"></script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1J: Tumbesaran Manusia</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA RUANG TAMU RUMAH */
+        .tema-rumah {
+            background: linear-gradient(to bottom, #f5e6d3 0%, #e8d5c4 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* LANTAI KAYU */
+        #lantai {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: linear-gradient(to bottom, #d4a373, #a06a38);
+            z-index: 5; border-top: 5px solid #8b5a2b;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* HIASAN LATAR (Tingkap & Jam) */
+        #tingkap {
+            position: absolute; top: 15%; left: 10%; font-size: 120px; z-index: 1;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+        }
+        #jam-dinding {
+            position: absolute; top: 20%; right: 15%; font-size: 70px; z-index: 1;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+        }
+
+        /* ========================================================
+           🔥 SUSUNAN MEJA KUSTOM DIY (DIASINGKAN SATU PERSATU) 🔥
+           ======================================================== */
+        
+        /* KERUSI (Duduk di belakang meja - z-index 6) */
+        #kerusi-makan {
+            position: absolute; bottom: 114px; left: 45%; font-size: 130px; z-index: 6;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+
+        /* PAPAN MEJA (3 Kotak Asing - z-index 8) */
+        .papan-meja { 
+            position: absolute; z-index: 7; line-height: 1; margin: 0; font-size: 80px; 
+            filter: drop-shadow(0 8px 5px rgba(0,0,0,0.5)); 
+        }
+        #papan1 { left: 44.4%; bottom: 100px; }
+        #papan2 { left: 54.5%; bottom: 100px; }
+        
+        /* DASH MEJA (5 Palang Asing - z-index 7) */
+        .kaki-meja { 
+            position: absolute; z-index: 8; line-height: 1; margin: 0; font-size: 45px; 
+        }
+        #kaki1 { left: 45%; bottom: 154px; }
+        #kaki2 { left: 50%; bottom: 154px; }
+        #kaki3 { left: 55%; bottom: 154px; }
+        #kaki4 { left: 60%; bottom: 154px; }
+    
+        /* ========================================================
+           🔥 MAKANAN & ITEM KEPERLUAN 🔥
+           ======================================================== */
+        .item-keperluan {
+            position: absolute; z-index: 12;
+            display: flex; flex-direction: column; align-items: center;
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+        }
+        .ikon-item { font-size: 45px; line-height: 1; }
+        .label-nama { 
+            background: rgba(0,0,0,0.7); color: #fff; padding: 3px 8px; 
+            border-radius: 8px; font-size: 11px; font-weight: bold; margin-top: 5px; 
+            border: 1px solid #d4a373;
+        }
+
+        /* Kedudukan item dilaraskan ngam-ngam atas meja baru */
+        #susu { bottom: 152px; left: 46%; }
+        #nasi { bottom: 152px; left: 53%; }
+        #kopi { bottom: 152px; left: 60%; }
+
+        /* ========================================================
+           🔥 KARAKTER, EFEK ASAP & DIALOG 🔥
+           ======================================================== */
+        #karakter-manusia {
+            position: absolute; bottom: 110px; left: 25%; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            transition: all 0.5s ease-in-out;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));
+        }
+        #ikon-manusia { font-size: 100px; line-height: 1; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        #label-manusia { 
+            background: #3498db; color: #fff; padding: 4px 10px; 
+            border-radius: 10px; font-size: 14px; font-weight: bold; margin-top: 10px; 
+            border: 2px solid #2980b9;
+            position: relative; z-index: 20; /* Supaya sentiasa timbul depan badan bila membesar */
+        }
+
+        /* EFEK POOF (Tegak ke atas) */
+        #efek-poof {
+            position: absolute; bottom: 130px; left: 25%; font-size: 130px; z-index: 15;
+            opacity: 0; pointer-events: none;
+            transform: scale(0) rotate(90deg); /* Pusing 90 darjah untuk luruskan asap */
+            transition: all 0.3s ease; 
+        }
+        .meletup { opacity: 1 !important; transform: scale(1.5) rotate(90deg) !important; }
+
+        /* 🔥 AWAN DIALOG KHAS (KALIS PENYEK & TIADA JARUM PUTIH) 🔥 */
+        .dialog-khas-manusia {
+            position: absolute !important; 
+            bottom: 100% !important; 
+            left: 50% !important; 
+            width: 220px !important; /* Saiz dikunci */
+            height: auto !important; 
+            padding: 10px 15px !important; 
+            background: #ffffff !important; 
+            color: #1c2833 !important; 
+            border-radius: 12px !important; 
+            font-size: 14px !important; 
+            font-weight: bold !important; 
+            line-height: 1.4 !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important; 
+            border: 3px solid #3498db !important; /* Tema Biru */
+            z-index: 40 !important; 
+            text-align: center !important; 
+            pointer-events: none !important;
+            box-sizing: border-box !important;
+            display: block !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            margin-bottom: 15px !important;
+            /* Animasi Muncul */
+            transform: translateX(-50%) scale(0);
+            transform-origin: bottom center;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        
+        .dialog-khas-manusia::after {
+            content: '' !important; 
+            position: absolute !important; 
+            top: 100% !important; 
+            left: 50% !important; 
+            margin-left: -8px !important;
+            border-width: 9px !important; 
+            border-style: solid !important; 
+            border-color: #3498db transparent transparent transparent !important; 
+            display: block !important;
+        }
+
+        /* Tumpang class asal JS kau supaya animasi jalan terus! */
+        .dialog-khas-manusia.buka-cakap { 
+            transform: translateX(-50%) scale(1) !important; 
+        }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Sains<br><span style="font-size: 16px; color: #3498db;">(Misi 1J - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 13px; line-height: 1.4;">Manusia memerlukan makanan yang berbeza mengikut tahap tumbesaran.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Ujian Terakhir String: Bantu karakter membesar menggunakan kod tindakan berserta String yang tepat!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Kod Parameter (String):</strong><br>
+                <span style="color: #bdc3c7; font-size: 11px;">*Teks mesti diletak dalam pengikat kata (" ")</span><br>
+                <span style="color: #fff;">subjek.kataKerja("nama_item")</span><br><br>
+                
+                <strong style="color: #f1c40f; font-family: sans-serif;">Contoh Fasa 1:</strong><br>
+                <span style="color: #fff;">bayi.minum("susu")</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod tumbesaran di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap1j()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap1j()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">JALANKAN KOD 🧬</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Fasa 1 bermula. Menunggu arahan untuk bayi...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-rumah">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 20;">
+                    Status: Bayi sedang kelaparan.
+                </div>
+                
+                <div id="tingkap">🪟</div>
+                <div id="jam-dinding">🕰️</div>
+                <div id="lantai"></div>
+                
+                <div id="kerusi-makan">🪑</div>
+                
+                <div id="papan1" class="papan-meja">🟫</div>
+                <div id="papan2" class="papan-meja">🟫</div>
+                
+                <div id="kaki1" class="kaki-meja">➖</div>
+                <div id="kaki2" class="kaki-meja">➖</div>
+                <div id="kaki3" class="kaki-meja">➖</div>
+                <div id="kaki4" class="kaki-meja">➖</div>
+
+                <div id="susu" class="item-keperluan">
+                    <div class="ikon-item">🍼</div>
+                    <div class="label-nama">susu</div>
+                </div>
+                <div id="nasi" class="item-keperluan">
+                    <div class="ikon-item">🍚</div>
+                    <div class="label-nama">nasi</div>
+                </div>
+                <div id="kopi" class="item-keperluan">
+                    <div class="ikon-item">☕</div>
+                    <div class="label-nama">kopi</div>
+                </div>
+
+                <div id="karakter-manusia">
+                    <div id="dialogManusia" class="dialog-khas-manusia">Uwaaa! 😭</div>
+                    <div id="ikon-manusia">👶</div>
+                    <div id="label-manusia">bayi</div>
+                </div>
+
+                <div id="efek-poof">💨</div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🔡🧠</div>
+            <h2>Sintaks & Penguasaan String</h2>
+            <p style="text-align: left;">Ini adalah ujian terakhir untuk menguji kemahiran anda menggabungkan subjek, kata kerja, dan parameter teks dengan tepat.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong style="color: #f1c40f;">Penguasaan String:</strong><br>
+                Sebarang nama item yang diambil dari meja (susu, nasi, kopi) wajib diletakkan di dalam tanda pengikat kata <code>" "</code> supaya sistem membacanya sebagai String.<br><br>
+                
+                <strong>Urutan Tumbesaran:</strong><br>
+                1. <strong>Bayi</strong> hanya perlu <code>minum("susu")</code>.<br>
+                2. <strong>Kanak</strong> (kanak-kanak) perlu <code>makan("nasi")</code>.<br>
+                3. <strong>Dewasa</strong> suka <code>minum("kopi")</code> untuk tenaga.<br><br>
+                <em>Awas:</em> Pastikan anda menggunakan kata kerja yang betul! Nasi itu untuk dimakan, bukan diminum.
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">👨‍💼💼</div>
+            <h2 style="color: #0be881;">Kitaran Sempurna!</h2>
+            <p>Tahniah! Anda berjaya membekalkan keperluan yang tepat dari fasa bayi sehingga dewasa serta lulus cemerlang dalam menguasai format penulisan String!</p>
+
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🤢❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Ralat Kesihatan!</h2>
+            <p id="pesan-kalah">Sesuatu tidak kena dengan logik tumbesaran ini.</p>
+
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script src="script-tahap1j.js"></script>
+</body>
+</html>

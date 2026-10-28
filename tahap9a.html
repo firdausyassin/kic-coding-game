@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 9A: Palang Tol Timbang</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA JALAN RAYA & TOL */
+        .tema-jalanraya {
+            background: linear-gradient(to bottom, #87CEEB 0%, #e0f6ff 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* JALAN RAYA */
+        #jalan {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 90px;
+            background: #7f8c8d; border-top: 5px solid #95a5a6; z-index: 5;
+        }
+        .garis-jalan {
+            position: absolute; top: 40px; width: 200%; height: 5px;
+            background: repeating-linear-gradient(90deg, #fff 0, #fff 30px, transparent 30px, transparent 60px);
+        }
+
+        /* ALAT PENIMBANG */
+        #penimbang {
+            position: absolute; bottom: 90px; left: 45%; transform: translateX(-50%);
+            width: 150px; height: 15px; background: #e74c3c;
+            border-radius: 5px 5px 0 0; z-index: 6;
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+            transition: background 0.3s;
+        }
+        .timbang-aktif { background: #f1c40f !important; box-shadow: 0 0 20px #f1c40f !important; }
+
+        /* 🔥 PONDOK TOL (Z-INDEX 30 - Berada di depan lori) 🔥 */
+        #pondok-tol {
+            position: absolute; bottom: 90px; left: calc(45% + 80px); /* Tembok diletakkan ngam2 tepi jalan */
+            width: 50px; height: 90px; background: #2c3e50;
+            border: 3px solid #34495e; border-radius: 10px 10px 0 0; z-index: 30;
+        }
+        
+        /* 🔥 PALANG TOL (Hinged pada pondok) 🔥 */
+        #palang {
+            position: absolute; bottom: 130px; left: calc(45% - 60px); /* Panjang 140, jadi tepat2 cantum dengan pondok */
+            width: 140px; height: 12px;
+            background: repeating-linear-gradient(45deg, #e74c3c, #e74c3c 10px, #fff 10px, #fff 20px);
+            border: 2px solid #c0392b; border-radius: 5px;
+            transform-origin: right center; /* Engsel diikat pada sebelah kanan (pondok) */
+            transform: rotate(0deg); /* Melintang */
+            z-index: 31; /* Depan dari pondok dan lori */
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .palang-buka { transform: rotate(90deg) !important; } /* Naik menegak 90 darjah ke atas */
+
+        /* SKRIN PAPARAN TOL */
+        #skrin-tol {
+            position: absolute; bottom: 200px; left: 45%; transform: translateX(-50%);
+            background: #111; border: 3px solid #2ecc71; border-radius: 5px;
+            padding: 5px 15px; color: #2ecc71; font-family: monospace; font-size: 20px; font-weight: bold;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); z-index: 15; text-align: center;
+        }
+        .amaran-merah { border-color: #e74c3c !important; color: #e74c3c !important; box-shadow: 0 0 15px rgba(231, 76, 60, 0.6) !important; }
+
+        /* 🔥 LORI KARGO (Z-INDEX 20, dan FLIP) 🔥 */
+        #lori {
+            position: absolute; bottom: 95px; left: -20%;
+            font-size: 90px; z-index: 20; /* Berada di belakang pondok (30) */
+            margin: 0; line-height: 1;
+            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.5));
+            transform: scaleX(-1); /* FLIP! Supaya memandang ke hadapan (Kanan) */
+            transition: left 2.5s ease-in-out;
+        }
+
+        /* DIALOG SISTEM AI */
+        .awan-dialog {
+            position: absolute; top: 20px; left: 50%; 
+            width: 250px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: translateX(-50%) scale(0); transform-origin: top center;
+            background: rgba(255, 255, 255, 0.95) !important; color: #2c3e50 !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important; white-space: normal !important; 
+            text-align: center !important; border: 3px solid #2ecc71 !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; bottom: -12px; left: 50%; margin-left: -8px;
+            border-width: 9px; border-style: solid; border-color: #2ecc71 transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) translateY(10px) !important; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Pengimbas<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 9A)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Jambatan rapuh! Tuliskan syarat pada pengimbas supaya hanya lori yang beratnya <strong>kurang daripada 5000</strong> kg dibenarkan lalu.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #2ecc71;">
+                <strong>Operator Logik Perbandingan:</strong><br>
+                Simbol Lebih Kecil (<code><</code>)<br><br>
+                <strong style="color: #2ecc71;">Format Kod:</strong><br>
+                <code>sistem.semak(berat < 5000)</code><br><br>
+                <span style="color: #bdc3c7; font-size: 11px;">Jika berat lori benar-benar kurang dari 5000, mesin akan menjawab <b>TRUE</b> dan palang akan dibuka.</span>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip syarat pengimbas berat di sini..." spellcheck="false" style="width: 100%; height: 60px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanTahap9a()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);">SEMAK KENDERAAN 🔍</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #2ecc71; padding: 10px; font-size: 13px;">
+                Pengimbas Tol aktif. Menunggu kenderaan memasuki plat penimbang...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Plaza Tol Keselamatan</h2>
+            
+            <div id="ruangAnimasi" class="tema-jalanraya">
+                
+                <div id="dialogSistem" class="awan-dialog"></div>
+                
+                <!-- SKRIN TOL & TIMBANG -->
+                <div id="skrin-tol">STANDBY</div>
+                <div id="penimbang"></div>
+                
+                <!-- PONDOK & PALANG TOL -->
+                <div id="pondok-tol"></div>
+                <div id="palang"></div>
+
+                <!-- KENDERAAN -->
+                <div id="lori">🚛</div>
+
+                <!-- JALAN RAYA -->
+                <div id="jalan"><div class="garis-jalan"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #fff; border: 2px solid #2ecc71; box-shadow: 0 0 25px rgba(46, 204, 113, 0.3);">
+            <h2 style="color: #27ae60;">⚖️ Logik Boolean & Perbandingan</h2>
+            <p style="color: #34495e; font-size: 15px;">Komputer tidak berfikir seperti manusia, ia hanya faham dua benda: <strong>BENAR (True)</strong> atau <strong>PALSU (False)</strong>.</p>
+            
+            <div style="background: #eafaf1; padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #333; border-left: 4px solid #2ecc71;">
+                <strong>Bagaimana ia berfungsi?</strong><br><br>
+                Anda mahu menapis lori yang beratnya melampaui had. Jadi, anda berikan syarat kepada mesin pengimbas:<br>
+                <code>berat < 5000</code><br><br>
+                Jika sebuah lori seberat 3000kg tiba, komputer akan menyoal logik tersebut:<br>
+                <i>"Adakah 3000 kurang dari 5000?"</i><br>
+                Jawapannya adalah <strong>TRUE (Benar)</strong>! Maka, mesin akan menjalankan tindakan seterusnya (buka palang).
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #2ecc71; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #fff; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">✅🚛</div>
+            <h2 style="color: #27ae60;">Logik Disahkan!</h2>
+            <p style="color: #34495e;">Bagus! Anda telah berjaya mengaturcara sistem pengimbas dengan menggunakan operator perbandingan (<code><</code>). Sistem tol kini beroperasi berdasarkan logik Boolean yang anda hasilkan.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #fff;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap9a.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 10A: Teras Mainframe</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA MAINFRAME */
+        .tema-teras {
+            background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%) !important;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* SISTEM TERAS (CORE) */
+        #cincin-luar {
+            position: absolute; width: 250px; height: 250px;
+            border: 4px dashed #e74c3c; border-radius: 50%;
+            animation: pusingKiri 5s linear infinite;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
+            transition: all 1s ease;
+        }
+        #cincin-dalam {
+            position: absolute; width: 180px; height: 180px;
+            border: 8px solid rgba(231, 76, 60, 0.3); border-top-color: #e74c3c; border-bottom-color: #e74c3c;
+            border-radius: 50%;
+            animation: pusingKanan 2s linear infinite;
+            transition: all 1s ease;
+        }
+        #nadi-teras {
+            position: absolute; width: 100px; height: 100px;
+            background: #e74c3c; border-radius: 50%;
+            box-shadow: 0 0 50px #e74c3c, 0 0 100px #e74c3c;
+            animation: denyutBahaya 0.5s infinite alternate;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 40px; transition: all 1s ease;
+        }
+
+        /* STATUS BERJAYA */
+        .cincin-luar-stabil { border-color: #2ecc71 !important; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4) !important; animation-duration: 10s !important; }
+        .cincin-dalam-stabil { border-color: rgba(46, 204, 113, 0.3) !important; border-top-color: #2ecc71 !important; border-bottom-color: #2ecc71 !important; animation-duration: 6s !important; }
+        .nadi-stabil { background: #2ecc71 !important; box-shadow: 0 0 50px #2ecc71, 0 0 100px #2ecc71 !important; animation: denyutSelamat 2s infinite alternate !important; }
+
+        @keyframes pusingKiri { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        @keyframes pusingKanan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes denyutBahaya { 0% { transform: scale(0.9); } 100% { transform: scale(1.2); } }
+        @keyframes denyutSelamat { 0% { transform: scale(0.95); } 100% { transform: scale(1.05); } }
+
+        /* SKRIN DATA */
+        #skrin-data {
+            position: absolute; top: 10%; left: 10%;
+            background: rgba(0, 0, 0, 0.8); border: 2px solid #e74c3c;
+            padding: 10px 15px; border-radius: 8px; color: #fff;
+            font-family: monospace; font-size: 14px;
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); z-index: 20;
+            transition: all 0.5s;
+        }
+        .skrin-stabil { border-color: #2ecc71 !important; box-shadow: 0 0 15px rgba(46, 204, 113, 0.5) !important; }
+        .data-label { color: #bdc3c7; font-size: 11px; }
+        .data-nilai { font-size: 18px; font-weight: bold; margin-bottom: 5px; display: block; }
+        #nilai-kuasa { color: #f1c40f; }
+        #nilai-sasaran { color: #00f3ff; }
+
+        /* DIALOG SISTEM AI */
+        .awan-dialog {
+            position: absolute; bottom: 20px; left: 50%; 
+            width: 280px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: translateX(-50%) scale(0); transform-origin: bottom center;
+            background: rgba(255, 255, 255, 0.95) !important; color: #2c3e50 !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important; text-align: center !important; 
+            border: 3px solid #e74c3c !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: -12px; left: 50%; margin-left: -8px;
+            border-width: 9px; border-style: solid; border-color: transparent transparent #e74c3c transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) translateY(-10px) !important; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Godaman<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 10A)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Teras utama tidak stabil! Anda mesti pastikan gabungan kuasa asal dan tambahan adalah <b>SAMA DENGAN</b> (==) 100 untuk menstabilkannya.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #f1c40f;">
+                <strong>Operator Sama Dengan (==):</strong><br>
+                Digunakan untuk membandingkan sama ada dua nilai adalah tepat sama!<br><br>
+                <strong style="color: #f1c40f;">Format Kod (2 Baris):</strong><br>
+                <code>tambahan = 50</code><br>
+                <code>sistem.stabil(50 + tambahan == 100)</code>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip kod override di sini..." spellcheck="false" style="width: 100%; height: 90px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanTahap10a()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);">LANCARKAN OVERRIDE ⚡</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #e74c3c; padding: 10px; font-size: 13px;">
+                Amaran: Teras utama tidak stabil. Memerlukan kalibrasi kuasa segera!
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Pusat Kawalan Mainframe</h2>
+            
+            <div id="ruangAnimasi" class="tema-teras">
+                
+                <div id="skrin-data">
+                    <span class="data-label">KUASA ASAL TERAS</span>
+                    <span id="nilai-kuasa" class="data-nilai">--</span>
+                    <span class="data-label">SASARAN KESTABILAN</span>
+                    <span id="nilai-sasaran" class="data-nilai">100</span>
+                </div>
+
+                <div id="dialogSistem" class="awan-dialog"></div>
+                
+                <!-- ANIMASI TERAS -->
+                <div id="cincin-luar"></div>
+                <div id="cincin-dalam"></div>
+                <div id="nadi-teras">☠️</div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #f1c40f; box-shadow: 0 0 25px rgba(241, 196, 15, 0.3);">
+            <h2 style="color: #f1c40f;">⚖️ Operator Sama Dengan (==)</h2>
+            <p style="color: #ecf0f1; font-size: 15px;">Ini adalah ujian akhir Zon 1! Awas, satu simbol sama dengan (<code>=</code>) bermaksud kita menyimpan data, tetapi dua simbol (<code>==</code>) bermaksud kita <strong>menyemak</strong> data!</p>
+            
+            <div style="background: rgba(241, 196, 15, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #f1c40f;">
+                <strong>Bagaimana menstabilkan teras?</strong><br><br>
+                Jika Kuasa Asal di skrin adalah <strong>45</strong>, ia memerlukan baki <strong>55</strong> lagi untuk mencapai 100.<br><br>
+                1. Masukkan nilai baki ke dalam pembolehubah tambahan:<br>
+                <code>tambahan = 55</code><br><br>
+                2. Arahkan sistem menyemak gabungan tersebut sama ada ia benar-benar bernilai 100 (True):<br>
+                <code>sistem.stabil(45 + tambahan == 100)</code>
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #f1c40f; color: #000; font-weight: bold;">SAYA BERSEDIA!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">🎓🏆</div>
+            <h2 style="color: #2ecc71;">Zon 1 Selesai!</h2>
+            <p style="color: #ecf0f1;">Luar biasa! Anda telah membuktikan kelayakan sebagai Penggodam Cilik dengan melepasi Ujian Master Override. Seluruh sistem kini di bawah kawalan anda!</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #000; font-weight: bold;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap10a.js"></script>
+</body>
+</html>

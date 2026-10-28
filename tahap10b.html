@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 10B: Overclock Mainframe</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA BILIK SERVER */
+        .tema-server {
+            background: linear-gradient(to bottom, #111 0%, #2c3e50 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* RAK SERVER */
+        #rak-server {
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+            width: 220px; height: 280px;
+            background: #1a1a2e; border: 4px solid #34495e; border-radius: 10px;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.9);
+            display: flex; flex-direction: column; justify-content: space-evenly; align-items: center;
+            z-index: 10; transition: all 1s ease;
+        }
+
+        /* SLOT BLADE SERVER */
+        .blade {
+            width: 90%; height: 40px; background: #0f171e;
+            border: 2px solid #34495e; border-radius: 5px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 10px;
+            position: relative; overflow: hidden;
+        }
+        
+        /* KIPAS PENYEJUK */
+        .kipas { font-size: 20px; color: #7f8c8d; animation: kipasPusing 0.5s linear infinite; }
+        @keyframes kipasPusing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* LAMPU STATUS (LED) */
+        .lampu-led { width: 10px; height: 10px; border-radius: 50%; background: #e74c3c; box-shadow: 0 0 10px #e74c3c; animation: kelipBahaya 0.3s infinite alternate; }
+        @keyframes kelipBahaya { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.5); } }
+
+        /* TERMOMETER GERGASI */
+        #termometer-skrin {
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.9); border: 3px solid #e74c3c; border-radius: 8px;
+            padding: 5px 15px; color: #e74c3c; font-family: monospace; font-size: 25px; font-weight: bold;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.6); z-index: 15; transition: all 1s;
+        }
+
+        /* EFEK HABA & API (CRITICAL) */
+        #haba-bahaya {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at bottom, rgba(231, 76, 60, 0.4) 0%, transparent 70%);
+            z-index: 5; animation: denyutHaba 1s infinite alternate; pointer-events: none;
+        }
+        @keyframes denyutHaba { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* PANL DATA SEBELAH KIRI SKRIN ANIMASI */
+        #panel-data-server {
+            position: absolute; top: 10%; left: 5%;
+            background: rgba(0,0,0,0.8); border: 2px solid #f39c12; border-radius: 8px;
+            padding: 10px; color: #fff; font-family: monospace; font-size: 13px;
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.4); z-index: 20;
+        }
+        .baris-data { margin-bottom: 8px; border-bottom: 1px dashed #7f8c8d; padding-bottom: 4px; }
+        .nilai-data { color: #f1c40f; font-weight: bold; font-size: 16px; float: right; margin-left: 15px; }
+
+        /* STATUS STABIL (OVERCLOCK BERJAYA) */
+        .server-sejuk { border-color: #00f3ff !important; box-shadow: 10px 10px 30px rgba(0,0,0,0.8), 0 0 50px rgba(0, 243, 255, 0.3) !important; }
+        .led-sejuk { background: #00f3ff !important; box-shadow: 0 0 10px #00f3ff !important; animation: none !important; }
+        .kipas-laju { animation-duration: 0.05s !important; color: #00f3ff !important; }
+        .suhu-sejuk { border-color: #00f3ff !important; color: #00f3ff !important; box-shadow: 0 0 20px rgba(0, 243, 255, 0.6) !important; }
+        .haba-hilang { opacity: 0 !important; }
+
+        /* DIALOG SISTEM AI (Dibaiki kedudukan ke tengah) */
+        .awan-dialog {
+            position: absolute; top: 20px; left: 50%; 
+            width: 250px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: translateX(-50%) scale(0); transform-origin: top center;
+            background: rgba(255, 255, 255, 0.95) !important; color: #c0392b !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important; text-align: center !important; 
+            border: 3px solid #e74c3c !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: -12px; left: 50%; margin-left: -8px;
+            border-width: 9px; border-style: solid; border-color: transparent transparent #e74c3c transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) translateY(10px) !important; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Penyejukan<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 10B)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Server hampir terbakar! Tetapkan nilai <strong>had_suhu</strong> dan buktikan bahawa suhu terkini adalah lebih kecil (<code><</code>) daripada had tersebut untuk mengaktifkan kipas penyejuk!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #f39c12;">
+                <strong>Protokol Logik Berangkai:</strong><br>
+                1. Campurkan Suhu Asal dan Buffer untuk mencari nilai had maksimum.<br>
+                2. Bandingkan ia dengan Suhu Terkini.<br><br>
+                <strong style="color: #f39c12;">Contoh Format Kod (Dua baris):</strong><br>
+                <code>had_suhu = 60 + 15</code><br>
+                <code>sistem.overclock(82 < had_suhu)</code>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip kod override penyejukan di sini..." spellcheck="false" style="width: 100%; height: 90px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanTahap10b()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);">AKTIFKAN PENYEJUKAN ❄️</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #e74c3c; padding: 10px; font-size: 13px;">
+                AMARAN: Suhu kritikal! Menunggu tetapan logik operator...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Bilik Teras Komputer</h2>
+            
+            <div id="ruangAnimasi" class="tema-server">
+                
+                <div id="haba-bahaya"></div>
+                <div id="dialogSistem" class="awan-dialog"></div>
+                
+                <!-- PANEL DATA SENSOR -->
+                <div id="panel-data-server">
+                    <div style="text-align:center; color:#f39c12; margin-bottom:5px;"><strong>DATA SENSOR</strong></div>
+                    <div class="baris-data">SUHU ASAL: <span id="data-asal" class="nilai-data">--</span></div>
+                    <div class="baris-data">BUFFER: <span id="data-buffer" class="nilai-data">--</span></div>
+                    <div class="baris-data" style="border:none; margin-top:10px; color:#e74c3c;">SUHU TERKINI: <span id="data-terkini" class="nilai-data" style="color:#e74c3c;">--</span></div>
+                </div>
+
+                <!-- RAK SERVER FIZIKAL -->
+                <div id="rak-server">
+                    <div id="termometer-skrin">--°C</div>
+                    
+                    <div class="blade">
+                        <div class="lampu-led"></div>
+                        <div class="kipas">☢️</div>
+                    </div>
+                    <div class="blade">
+                        <div class="lampu-led"></div>
+                        <div class="kipas">☢️</div>
+                    </div>
+                    <div class="blade">
+                        <div class="lampu-led"></div>
+                        <div class="kipas">☢️</div>
+                    </div>
+                    <div class="blade">
+                        <div class="lampu-led"></div>
+                        <div class="kipas">☢️</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #e74c3c; box-shadow: 0 0 25px rgba(231, 76, 60, 0.3);">
+            <h2 style="color: #e74c3c;">💻 Logik Berangkai (Matematik & Boolean)</h2>
+            <p style="color: #ecf0f1; font-size: 15px;">Ini adalah kemuncak pengaturcaraan! Anda mengarahkan mesin untuk mengira had matematiknya sendiri, kemudian menyemak sama ada keadaannya selamat (TRUE).</p>
+            
+            <div style="background: rgba(231, 76, 60, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #e74c3c;">
+                <strong>Bagaimana ia berfungsi?</strong><br><br>
+                Jika skrin memaparkan:<br>
+                Suhu Asal = 60, Buffer = 20. Suhu Terkini = 75.<br><br>
+                1. Cipta pembolehubah had maksimum dengan menambah Suhu Asal dan Buffer:<br>
+                <code>had_suhu = 60 + 20</code> (Komputer akan faham ia adalah 80)<br><br>
+                2. Sahkan bahawa Suhu Terkini (75) adalah <strong>Kurang Daripada (<)</strong> pembolehubah <code>had_suhu</code> tersebut:<br>
+                <code>sistem.overclock(75 < had_suhu)</code><br><br>
+                Oleh kerana 75 terbukti kurang dari 80, enjin akan memulangkan nilai <strong>TRUE</strong> dan kipas penyejuk akan terus berputar!
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #e74c3c; color: #fff; font-weight: bold;">SAYA BERSEDIA!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">❄️✅</div>
+            <h2 style="color: #2ecc71;">Sistem Disejukkan!</h2>
+            <p style="color: #ecf0f1;">Luar biasa! Anda berjaya menggabungkan pembolehubah, operasi matematik (+), dan operator logik perbandingan (<) dengan sempurna. Anda adalah arkitek kod yang sah!</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #000; font-weight: bold;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap10b.js"></script>
+</body>
+</html>

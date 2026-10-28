@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 5E: Ujian Asid Alkali</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA MAKMAL SIBER */
+        .tema-makmal {
+            background: radial-gradient(circle at 50% 50%, #2c3e50 0%, #0f1c29 100%) !important;
+            background-image: radial-gradient(rgba(0, 255, 102, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden; position: relative;
+        }
+
+        /* KOTAK STATUS PUTIH RASMI */
+        #teksAnimasi {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            z-index: 100; background: rgba(255, 255, 255, 0.95); color: #2c3e50; 
+            border: 2px solid #0be881; padding: 8px 20px; border-radius: 8px; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); width: 85%; text-align: center;
+            font-size: 15px; transition: all 0.3s;
+        }
+
+        /* MEJA MAKMAL */
+        #meja-makmal {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 90px;
+            background: linear-gradient(to right, #34495e, #2c3e50); border-top: 5px solid #00f3ff; 
+            z-index: 5; box-shadow: inset 0 20px 30px rgba(0,0,0,0.5);
+        }
+
+        /* BIKAR KACA */
+        #bikar {
+            position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 160px; background: rgba(255, 255, 255, 0.1); 
+            border: 4px solid rgba(255, 255, 255, 0.5); border-top: none;
+            border-radius: 0 0 20px 20px; z-index: 10; overflow: hidden;
+            box-shadow: inset 0 -20px 30px rgba(255,255,255,0.1), 0 10px 20px rgba(0,0,0,0.5);
+        }
+        /* BIBIR BIKAR */
+        #bikar::before {
+            content: ''; position: absolute; top: -10px; left: -10px; right: -10px; height: 20px;
+            border: 4px solid rgba(255, 255, 255, 0.5); border-radius: 50%; background: transparent;
+        }
+
+        /* CECAIR MISTERI */
+        #cecair {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 60%;
+            background: rgba(189, 195, 199, 0.6); /* Warna asal: kelabu keruh */
+            transition: background 1s ease, height 0.5s;
+            animation: buihCecair 3s infinite alternate;
+        }
+        @keyframes buihCecair { 0% { transform: scaleY(1); } 100% { transform: scaleY(1.05); } }
+        
+        .cecair-asid { background: rgba(231, 76, 60, 0.6) !important; box-shadow: 0 0 30px rgba(231, 76, 60, 0.6); }
+        .cecair-alkali { background: rgba(52, 152, 219, 0.6) !important; box-shadow: 0 0 30px rgba(52, 152, 219, 0.6); }
+
+        /* LENGAN ROBOT & KERTAS LITMUS */
+        #lengan-robot {
+            position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+            width: 15px; height: 150px; background: #7f8c8d; z-index: 15;
+            transition: top 1.5s ease-in-out;
+        }
+        #kertas-litmus {
+            position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 70px; background: #ecf0f1; /* Warna asal litmus: kuning cerah/putih */
+            border: 1px solid #bdc3c7; transition: background 1s ease 1s; /* Berubah lepas celup */
+        }
+        .celup-kertas { top: 40px !important; } /* Animasi turun lengan */
+        .litmus-merah { background: #e74c3c !important; }
+        .litmus-biru { background: #3498db !important; }
+
+        /* SKRIN PENGIMBAS WARNA */
+        #skrin-pengimbas {
+            position: absolute; top: 80px; right: 10%; width: 160px; background: #1e272e;
+            border: 3px solid #00f3ff; border-radius: 8px; padding: 10px; text-align: center;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); z-index: 5;
+        }
+        .label-skrin { color: #bdc3c7; font-family: sans-serif; font-size: 11px; margin-bottom: 5px; text-transform: uppercase;}
+        #warna-dikesan { color: #0be881; font-family: monospace; font-size: 18px; font-weight: bold; margin: 0; text-shadow: 0 0 8px #0be881;}
+        .merah-teks { color: #ff4e50 !important; text-shadow: 0 0 8px #ff4e50 !important;}
+        .biru-teks { color: #3498db !important; text-shadow: 0 0 8px #3498db !important;}
+
+        /* WATAK SAINTIS */
+        #kotak-saintis {
+            position: absolute; bottom: 90px; left: 5%; z-index: 20;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        #ikonSaintis {
+            font-size: 80px; line-height: 1; transition: transform 0.3s;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 10px 15px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 90; text-align: center; 
+            width: max-content; max-width: 200px; white-space: normal !important; word-wrap: break-word;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #0be881; margin-bottom: 5px;
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #0be881 transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #0be881; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Makmal<br><span style="font-size: 16px; color: #0be881;">(Misi 5E - Zon 1)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #0be881; color: #000; border-color: #27ae60; font-weight: bold;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Cecair misteri sedang diuji. Kertas litmus akan menukar warnanya bergantung pada sifat kimia cecair tersebut.</p>
+            <p style="color: #00f3ff; font-weight: bold; font-size: 13px; line-height: 1.4;">Berdasarkan warna yang dikesan, gunakan logik <code>if</code> untuk mengesahkan status asid atau alkali!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #0be881; font-family: monospace;">
+                <strong style="color: #0be881; font-family: sans-serif;">Pangkalan Data Litmus:</strong><br>
+                <span style="color: #ff4e50;">kertas == "merah"</span> -> <span style="color: #fff;">sahkan("asid")</span><br>
+                <span style="color: #3498db;">kertas == "biru"</span>  -> <span style="color: #fff;">sahkan("alkali")</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Format Kod:</strong><br>
+                <span style="color: #bdc3c7;">if (kertas == "merah") { sahkan("asid") }</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip syarat IF di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap5e()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap5e()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #0be881, #27ae60); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(11, 232, 129, 0.4);">SAHKAN KEPUTUSAN 🧪</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #0be881; padding: 10px; font-size: 13px;">
+                Menunggu ujian penderiaan kertas litmus selesai...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-makmal">
+                
+                <!-- KOTAK STATUS PUTIH RASMI -->
+                <div id="teksAnimasi">Status: Mesin ujian sedang mencelup kertas litmus...</div>
+                
+                <div id="meja-makmal"></div>
+
+                <!-- BIKAR DAN KERTAS LITMUS -->
+                <div id="bikar">
+                    <div id="cecair"></div>
+                </div>
+
+                <div id="lengan-robot">
+                    <div id="kertas-litmus"></div>
+                </div>
+
+                <!-- SKRIN PENGIMBAS -->
+                <div id="skrin-pengimbas">
+                    <div class="label-skrin">Penderia Warna:</div>
+                    <div id="warna-dikesan">MENGIMBAS...</div>
+                </div>
+                
+                <!-- SAINTIS -->
+                <div id="kotak-saintis">
+                    <div id="dialogSaintis" class="awan-dialog">Loading...</div>
+                    <span id="ikonSaintis">👨‍🔬</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🧪🔬</div>
+            <h2>Ujian Sifat Bahan</h2>
+            <p style="text-align: left;">Sains Tahun 3 mengajar kita cara membezakan asid dan alkali menggunakan Kertas Litmus.</p>
+            <div style="background: rgba(11, 232, 129, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #0be881;">
+                <strong>Panduan Penulisan Kod If:</strong><br><br>
+                Jika Kertas Litmus bertukar <strong>Merah</strong>, bahan tersebut adalah <strong>Asid</strong>.<br>
+                <code>if (kertas == "merah") { sahkan("asid") }</code><br><br>
+                Jika Kertas Litmus bertukar <strong>Biru</strong>, bahan tersebut adalah <strong>Alkali</strong>.<br>
+                <code>if (kertas == "biru") { sahkan("alkali") }</code><br><br>
+                Perhatikan warna yang tertera di skrin penderia sebelum memberikan arahan sahkan!
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #0be881; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🏆✅</div>
+            <h2 style="color: #0be881;">Laporan Tepat!</h2>
+            <p>Tahniah! Penulisan syarat bersyarat logik anda sangat sepadan dengan hukum sains. Data cecair telah dikemaskini dalam pangkalan data makmal.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #0be881; color: #000; font-weight: bold; width: 100%;">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💥❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Laporan Ralat!</h2>
+            <p id="pesan-kalah">Fakta sains bertembung dengan ralat kod.</p>
+            <button class="butang-menu" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold; width: 100%;">CUBA LAGI (REFRESH)</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap5e.js"></script>
+</body>
+</html>

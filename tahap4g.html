@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 4G: Tabiat Makan Haiwan</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA ZOO SAFARI */
+        .tema-zoo {
+            background: linear-gradient(to bottom, #74b9ff 0%, #81ecec 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* TANAH KANDANG */
+        #tanah-kandang {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 140px;
+            background: #d1ccc0; border-top: 15px solid #a4b0be; z-index: 5;
+            box-shadow: inset 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        /* PAGAR ZOO */
+        .pagar-zoo {
+            position: absolute; bottom: 130px; left: 0; width: 100%; height: 60px;
+            background-image: 
+                linear-gradient(90deg, #7f8c8d 10px, transparent 10px),
+                linear-gradient(0deg, #7f8c8d 10px, transparent 10px);
+            background-size: 40px 100%, 100% 30px;
+            z-index: 6; opacity: 0.8;
+        }
+
+        /* ZON HAIWAN */
+        #zon-haiwan {
+            position: absolute; bottom: 75px; left: 5%; width: 90%;
+            display: flex; justify-content: space-around; align-items: flex-end;
+            z-index: 10;
+        }
+
+        .haiwan-zoo {
+            font-size: 55px; position: relative;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+            transition: all 0.3s ease;
+        }
+
+        /* Reaksi bila diberi makanan salah */
+        .haiwan-marah { animation: lompatMarah 0.5s infinite; filter: hue-rotate(300deg) saturate(200%); }
+        @keyframes lompatMarah {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px) scale(1.1); }
+            100% { transform: translateY(0); }
+        }
+
+        /* MAKANAN JATUH DARI ATAS */
+        .makanan-jatuh {
+            position: absolute; font-size: 35px; top: -10px; opacity: 0;
+            z-index: 15; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+            transition: transform 0.4s ease-in, opacity 0.2s;
+        }
+        .sedang-jatuh { opacity: 1 !important; transform: translateY(160px) scale(1.2); }
+
+        /* PAIP MAKANAN */
+        #paip-makanan {
+            position: absolute; top: 65px; left: 14%; width: 60px; height: 50px;
+            background: #2f3640; border: 4px solid #718093; border-radius: 0 0 10px 10px;
+            z-index: 20; transition: left 0.5s ease-in-out;
+            display: flex; justify-content: center; align-items: flex-end;
+        }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 8px 12px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; 
+            white-space: nowrap !important; min-width: max-content !important;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #e84118; margin-bottom: 5px;
+            transform-origin: bottom center;
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #e84118 transparent transparent transparent;
+        }
+        .awan-dialog::before { display: none !important; }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+
+        /* Dialog Dinamik Kiri/Kanan */
+        .dialog-kanan { left: 80%; transform: translateX(0) scale(0); transform-origin: bottom left; }
+        .dialog-kanan.tunjuk-dialog { transform: translateX(0) scale(1) !important; }
+        .dialog-kanan::after { left: 20%; }
+
+        .dialog-kiri { left: 20%; transform: translateX(-100%) scale(0); transform-origin: bottom right; }
+        .dialog-kiri.tunjuk-dialog { transform: translateX(-100%) scale(1) !important; }
+        .dialog-kiri::after { left: 80%; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(232, 65, 24, 0.3); border: 2px solid #e84118;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #e84118; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Pengulangan<br><span style="font-size: 16px; color: #e84118;">(Misi 4G - Zon 1)</span></h2>
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #e84118; color: #fff; border-color: #c23616; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #e84118; color: #fff; border-color: #c23616; font-weight: bold; padding: 6px 8px; font-size: 12px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Terdapat <strong>5 ekor <span id="teks-nama-haiwan">Haiwan</span> (<span id="teks-kelas-haiwan" style="text-transform: capitalize;">Kelas</span>)</strong> yang sedang kelaparan di dalam kandang.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Arahkan sistem memberi makan kepada mereka menggunakan gelung (Loop) dan parameter teks yang tepat.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #e84118; font-family: monospace;">
+                <strong style="color: #e84118; font-family: sans-serif;">Pilihan Parameter Teks:</strong><br>
+                <span style="color: #bdc3c7;">"daging", "rumput", "buah"</span><br><br>
+                <strong style="color: #0be881; font-family: sans-serif;">Arahan Sasaran:</strong><br>
+                <span style="color: #fff;">ulang( ? ){<span id="teks-sasaran-kelas">karnivor</span>.makan(" ? ")}</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod tabiat makan..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap4g()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap4g()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #e84118, #c23616); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(232, 65, 24, 0.4); border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%;">BERI MAKAN 🛎️</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #e84118; padding: 10px; font-size: 13px;">
+                Mesin suapan sedia. Menunggu arahan gelung...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-zoo">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #e84118; z-index: 50;">
+                    Status: <span id="status-nama-haiwan">Haiwan</span> sedang menunggu makanan.
+                </div>
+                
+                <div id="paip-makanan">
+                    <div class="makanan-jatuh" id="makanan-objek">❓</div>
+                </div>
+                
+                <div class="pagar-zoo"></div>
+                
+                <div id="zon-haiwan">
+                    <div class="haiwan-zoo" id="haiwan-1"><div class="awan-dialog" id="dialog-1"></div><span id="ikon-1">❓</span></div>
+                    <div class="haiwan-zoo" id="haiwan-2"><div class="awan-dialog" id="dialog-2"></div><span id="ikon-2">❓</span></div>
+                    <div class="haiwan-zoo" id="haiwan-3"><div class="awan-dialog" id="dialog-3"></div><span id="ikon-3">❓</span></div>
+                    <div class="haiwan-zoo" id="haiwan-4"><div class="awan-dialog" id="dialog-4"></div><span id="ikon-4">❓</span></div>
+                    <div class="haiwan-zoo" id="haiwan-5"><div class="awan-dialog" id="dialog-5"></div><span id="ikon-5">❓</span></div>
+                </div>
+                
+                <div id="tanah-kandang"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🐅🥩</div>
+            <h2>Parameter Gelung Gabungan</h2>
+            <p style="text-align: left;">Sains mengelaskan haiwan berdasarkan tabiat pemakanannya. Karnivor hanya makan daging, Herbivor makan tumbuhan (rumput), dan Omnivor memakan tumbuhan dan juga haiwan lain.</p>
+            <div style="background: rgba(232, 65, 24, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #e84118;">
+                <strong>Misi Pengekodan:</strong><br><br>
+                Anda perlu memasukkan DUA maklumat:<br>
+                1. <strong>Nombor:</strong> Berapa ekor haiwan yang ada di dalam kandang? (Gelung)<br>
+                2. <strong>Teks (String):</strong> Apakah jenis makanan untuk <span id="panduan-kelas" style="text-transform: capitalize; color: #f1c40f;">Haiwan</span> ini? Jangan lupa letak tanda petik <code>" "</code>!<br><br>
+                💡 Contoh: <code>ulang(5){<span id="panduan-kod">haiwan</span>.makan("<span id="panduan-makan">makanan</span>")}</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #e84118; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">💤✨</div>
+            <h2 style="color: #0be881;">Kenyang & Tidur!</h2>
+            <p>Tahniah! Anda berjaya menggunakan *Loop* untuk memberi makanan yang tepat kepada kesemua 5 haiwan. Mereka kini kenyang dan sedang berehat.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">😾❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Haiwan Mengamuk!</h2>
+            <p id="pesan-kalah">Ralat jenis makanan, kelas haiwan atau kuantiti dikesan.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <!-- 🔥 JAVASCRIPT DISATUKAN (INLINE) DENGAN LOGIK OMNIVOR DIPERBAIKI 🔥 -->
+    <script>
+        let adakahTamat = false;
+        let adakahSibuk = false;
+        let pemasaDialog; 
+        let haiwanSemasa = {};
+
+        // 🔥 PANGKALAN DATA HAIWAN DIPERBAIKI 🔥
+        const senaraiHaiwan = [
+            { kelas: "karnivor", nama: "Harimau", ikon: "🐅", makananTerima: ["daging"], teksDiet: "daging" },
+            { kelas: "herbivor", nama: "Lembu", ikon: "🐄", makananTerima: ["rumput"], teksDiet: "rumput" },
+            { kelas: "omnivor", nama: "Monyet", ikon: "🐒", makananTerima: ["buah", "daging", "rumput"], teksDiet: "buah, rumput atau daging" }
+        ];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let indexTerdahulu = sessionStorage.getItem("indexHaiwanZoo");
+            let indexSeterusnya = 0;
+
+            if (indexTerdahulu !== null) {
+                indexSeterusnya = (parseInt(indexTerdahulu) + 1) % senaraiHaiwan.length;
+            } else {
+                indexSeterusnya = Math.floor(Math.random() * senaraiHaiwan.length);
+            }
+
+            sessionStorage.setItem("indexHaiwanZoo", indexSeterusnya);
+            haiwanSemasa = senaraiHaiwan[indexSeterusnya];
+
+            document.getElementById("teks-nama-haiwan").innerText = haiwanSemasa.nama;
+            document.getElementById("teks-kelas-haiwan").innerText = haiwanSemasa.kelas;
+            document.getElementById("teks-sasaran-kelas").innerText = haiwanSemasa.kelas;
+            document.getElementById("status-nama-haiwan").innerText = haiwanSemasa.nama;
+
+            document.getElementById("panduan-kelas").innerText = haiwanSemasa.kelas;
+            document.getElementById("panduan-kod").innerText = haiwanSemasa.kelas;
+            document.getElementById("panduan-makan").innerText = haiwanSemasa.teksDiet;
+
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`ikon-${i}`).innerText = haiwanSemasa.ikon;
+            }
+        });
+
+        function mainBunyi(audioElemen, mulaMasa = 0) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = mulaMasa;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function cakap(idDialog, mesej, masa, posisi = "kanan") {
+            let kotakDialog = document.getElementById(idDialog);
+            if(kotakDialog) {
+                kotakDialog.innerHTML = mesej;
+                kotakDialog.className = "awan-dialog"; 
+                
+                if (posisi === "kanan") kotakDialog.classList.add("dialog-kanan");
+                else if (posisi === "kiri") kotakDialog.classList.add("dialog-kiri");
+                
+                kotakDialog.classList.add("tunjuk-dialog");
+                
+                clearTimeout(pemasaDialog); 
+                pemasaDialog = setTimeout(() => { 
+                    kotakDialog.classList.remove("tunjuk-dialog"); 
+                }, masa);
+            }
+        }
+
+        async function laksanaArahanTahap4g() {
+            let inputRaw = document.getElementById("arahanInput").value;
+            let inputBersih = inputRaw.replace(/\s+/g, '').toLowerCase();
+
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            let paip = document.getElementById("paip-makanan");
+            let makananObjek = document.getElementById("makanan-objek");
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            if(adakahTamat) {
+                maklumBalas.innerHTML = "Ralat: Misi tamat. Sila muat semula (Cuba Lagi).";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                return;
+            }
+
+            if(adakahSibuk) return;
+
+            let match = inputBersih.match(/^ulang\((\d+)\)\{([a-z]+)\.makan\("([a-z]+)"\)\}$/);
+            
+            if(match) {
+                let kaliUlang = parseInt(match[1]);
+                let kelasDitaip = match[2];
+                let makananDitaip = match[3];
+
+                if(kelasDitaip !== haiwanSemasa.kelas) {
+                    maklumBalas.innerHTML = `Ralat Logik: Ini adalah kandang ${haiwanSemasa.kelas}, bukan kandang ${kelasDitaip}!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    mainBunyi(sfxSalah);
+                    cakap("dialog-1", `Kitorang ${haiwanSemasa.kelas} la bang!`, 3000, "kanan");
+                    return;
+                }
+
+                if(makananDitaip !== "daging" && makananDitaip !== "rumput" && makananDitaip !== "buah") {
+                    maklumBalas.innerHTML = "Ralat Makanan: Makanan tersebut tiada dalam pilihan logistik zoo!";
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    mainBunyi(sfxSalah);
+                    return;
+                }
+
+                if(kaliUlang === 0) {
+                    maklumBalas.innerHTML = "Ralat Parameter: Anda tidak memberi sebarang makanan.";
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    mainBunyi(sfxSalah);
+                    cakap("dialog-1", "Aduhai, bagilah kitorang makan...", 2500, "kanan");
+                    return;
+                }
+
+                adakahSibuk = true;
+                maklumBalas.innerHTML = `Sistem: Memberi makanan jenis "${makananDitaip}" sebanyak ${kaliUlang} kali...`;
+                maklumBalas.style.borderLeftColor = "#f1c40f";
+
+                let limitBeri = kaliUlang;
+                if(limitBeri > 7) limitBeri = 7; 
+                
+                let posisiPaip = ["14%", "32%", "50%", "68%", "86%"];
+
+                cakap("dialog-1", "Krukk... laparnya perut!", 1500, "kanan");
+                await tunggu(1000);
+
+                let salahBeri = false; 
+
+                for(let i = 1; i <= limitBeri; i++) {
+                    let indexPaip = i <= 5 ? i - 1 : 4; 
+                    
+                    paip.style.left = posisiPaip[indexPaip];
+                    teksAnimasi.innerHTML = `Status: Mesin melepaskan ${makananDitaip} suapan ke-${i}...`;
+                    await tunggu(500);
+
+                    let ikonMkn = "❓";
+                    if(makananDitaip === "daging") ikonMkn = "🥩";
+                    if(makananDitaip === "rumput") ikonMkn = "🌿";
+                    if(makananDitaip === "buah") ikonMkn = "🍎";
+                    makananObjek.innerHTML = ikonMkn;
+
+                    makananObjek.classList.add("sedang-jatuh");
+                    await tunggu(400); 
+
+                    if(i <= 5) {
+                        let haiwanDiv = document.getElementById(`haiwan-${i}`);
+                        let ikonHaiwan = document.getElementById(`ikon-${i}`);
+                        
+                        // 🔥 LOGIK DIET DIPERBAIKI: Semak dalam array makananTerima 🔥
+                        if(haiwanSemasa.makananTerima.includes(makananDitaip)) {
+                            ikonHaiwan.innerHTML = "💤"; 
+                            mainBunyi(sfxBetul);
+                        } else {
+                            haiwanDiv.classList.add("haiwan-marah"); 
+                            mainBunyi(sfxSalah);
+                            salahBeri = true;
+                        }
+                    }
+
+                    await tunggu(300); 
+                    makananObjek.classList.remove("sedang-jatuh"); 
+                    await tunggu(300);
+                }
+
+                await tunggu(500);
+
+                if (kaliUlang === 5 && !salahBeri) {
+                    adakahTamat = true;
+                    maklumBalas.innerHTML = "Berjaya: Semua 5 haiwan telah dijamu dengan makanan yang tepat!";
+                    maklumBalas.style.borderLeftColor = "#0be881";
+                    teksAnimasi.innerHTML = `Status: Misi selesai. Haiwan sedang nyenyak tidur.`;
+                    
+                    mainBunyi(sfxMenang);
+                    cakap("dialog-5", "Yahoo, kenyang... Zzz", 3000, "kiri");
+                    
+                    setTimeout(() => {
+                        document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+
+                } else if (salahBeri) {
+                    adakahTamat = true;
+                    maklumBalas.innerHTML = `Gagal: Anda telah memberi makanan yang salah kepada ${haiwanSemasa.kelas}!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: AMARAN! Haiwan mengamuk kerana tersalah diet.";
+                    
+                    cakap("dialog-1", "Weh ni bukan diet aku la!", 3000, "kanan");
+                    
+                    setTimeout(() => {
+                        document.getElementById("ikon-kalah").innerHTML = "😾🥩";
+                        document.getElementById("tajuk-kalah").innerHTML = "Diet Tersasar!";
+                        // 🔥 MESEJ RALAT DINAMIK MENGIKUT HAIWAN 🔥
+                        let cadanganDiet = haiwanSemasa.makananTerima.join(" atau ");
+                        document.getElementById("pesan-kalah").innerHTML = `Haiwan <strong>${haiwanSemasa.kelas}</strong> tidak memakan ${makananDitaip}. Mereka memakan <strong>${cadanganDiet}</strong>. Sila kaji semula tabiat pemakanan sains haiwan!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+
+                } else if (kaliUlang > 5) {
+                    adakahTamat = true;
+                    mainBunyi(sfxSalah);
+                    maklumBalas.innerHTML = `Gagal: Anda memberi ${kaliUlang} suapan. Makanan tumpah membazir!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Lebihan makanan berlaku. Pembaziran sumber zoo.";
+                    
+                    cakap("dialog-5", "Dah cukup bro, perut kami dah penuh!", 3000, "kiri");
+                    
+                    setTimeout(() => {
+                        document.getElementById("ikon-kalah").innerHTML = "🗑️❌";
+                        document.getElementById("tajuk-kalah").innerHTML = "Pembaziran Makanan!";
+                        document.getElementById("pesan-kalah").innerHTML = `Kandang ini hanya memuatkan tepat 5 ekor haiwan. Arahan Loop sebanyak <strong>${kaliUlang} kali</strong> telah membazirkan dana zoo. Kurangkan pengulangan anda!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+                    
+                } else {
+                    adakahTamat = true;
+                    mainBunyi(sfxSalah);
+                    maklumBalas.innerHTML = `Gagal: Anda cuma memberi ${kaliUlang} suapan. Ada haiwan masih lapar!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Tidak semua haiwan menerima makanan.";
+                    
+                    cakap("dialog-5", "Hoi! Aku tak dapat makanan lagi ni!", 3000, "kiri");
+                    
+                    setTimeout(() => {
+                        document.getElementById("tajuk-kalah").innerHTML = "Suapan Tergantung!";
+                        document.getElementById("pesan-kalah").innerHTML = `Anda hanya menjalankan sistem sebanyak <strong>${kaliUlang} kali</strong>. Terdapat haiwan yang masih kebuluran. Sila pastikan kesemua 5 ekor mendapat suapan!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+                }
+
+            } else {
+                maklumBalas.innerHTML = "Ralat Sintaks: Guna format ulang(jumlah){kelas.makan(\"makanan\")}";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+            }
+            
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById('modalInfo').classList.add('tunjuk-modal-kustom'); }
+        function tutupInfo() { document.getElementById('modalInfo').classList.remove('tunjuk-modal-kustom'); }
+    </script>
+</body>
+</html>

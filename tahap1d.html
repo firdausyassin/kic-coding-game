@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1D: Pelancaran Roket Angkasa</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA ANGKASA (DEEP SPACE) */
+        .tema-angkasa {
+            background: linear-gradient(to bottom, #000000 0%, #0d0035 40%, #2a005c 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* PERMUKAAN BULAN (Lebih 3D) */
+        #tanah-planet {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: linear-gradient(to bottom, #7f8c8d, #2c3e50); z-index: 5;
+            box-shadow: inset 0 15px 30px rgba(0,0,0,0.8);
+            border-top: 8px solid #bdc3c7;
+            border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+        }
+        
+        /* Kawah Bulan */
+        .kawah { position: absolute; background: rgba(0,0,0,0.4); border-radius: 50%; box-shadow: inset 0 5px 8px rgba(0,0,0,0.7), 0 2px 0 rgba(255,255,255,0.1); z-index: 6; }
+        #kawah1 { bottom: 30px; left: 20%; width: 60px; height: 18px; }
+        #kawah2 { bottom: 60px; left: 50%; width: 90px; height: 25px; }
+        #kawah3 { bottom: 20px; right: 25%; width: 50px; height: 15px; }
+
+        /* BINTANG & PLANET LATAR */
+        .objek-latar { position: absolute; z-index: 1; pointer-events: none; line-height: 1; margin: 0; filter: drop-shadow(0 0 8px #fff);}
+        #bintang1 { top: 10%; left: 15%; font-size: 20px; animation: kelip 2s infinite alternate; }
+        #bintang2 { top: 30%; right: 20%; font-size: 15px; animation: kelip 3s infinite alternate-reverse; }
+        #bintang3 { top: 60%; left: 10%; font-size: 12px; animation: kelip 1.5s infinite alternate; }
+        #bulan { top: 5%; right: 10%; font-size: 80px; filter: drop-shadow(0 0 30px #f1c40f); }
+        #ufo { top: 20%; left: -20%; font-size: 40px; animation: ufoTerbang 15s linear infinite; filter: drop-shadow(0 0 15px #0be881); }
+
+        @keyframes kelip { 0% { opacity: 0.1; } 100% { opacity: 1; transform: scale(1.2); } }
+        @keyframes ufoTerbang { 0% { transform: translateX(0) rotate(10deg); } 100% { transform: translateX(600px) rotate(-10deg); } }
+
+        /* OBJEK MISI */
+        #stesen-pam {
+            position: absolute; bottom: 125px; left: 30%; font-size: 70px; z-index: 10;
+            line-height: 1; margin: 0; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        /* ROKET KITA */
+        #roket-kapal {
+            position: absolute; bottom: 125px; left: 65%; font-size: 110px; z-index: 15;
+            line-height: 1; margin: 0; transform: translateX(-50%);
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.6));
+        }
+        
+        /* Animasi Gegar (Waktu Ignition) */
+        .gegar-roket { animation: gegar 0.1s infinite; }
+        @keyframes gegar { 
+            0% { transform: translateX(-52%) translateY(2px); } 
+            50% { transform: translateX(-48%) translateY(-2px); } 
+            100% { transform: translateX(-50%) translateY(0); } 
+        }
+
+        /* Animasi Terbang Melilau (Zig-zag sikit) */
+        .roket-terbang { animation: terbangMelilau 3s ease-in forwards; }
+        @keyframes terbangMelilau {
+            0%   { bottom: 125px; margin-left: 0; }
+            20%  { bottom: 300px; margin-left: -40px; }
+            50%  { bottom: 600px; margin-left: 50px; }
+            80%  { bottom: 900px; margin-left: -30px; }
+            100% { bottom: 1500px; margin-left: 0; }
+        }
+
+        /* 🔥 API & ASAP (DIBAIKI CENTER & ROTATION TEPAT!) 🔥 */
+        #api-enjin, #asap-enjin {
+            position: absolute; z-index: -1; opacity: 0; transition: opacity 0.2s;
+        }
+        
+        /* Api diturunkan lagi ke bawah sikit (center dengan roket) */
+        #api-enjin {
+            bottom: -45px; left: -30px; font-size: 70px; 
+            transform: rotate(225deg); filter: drop-shadow(0 0 15px #ff9900);
+        }
+        
+        /* Asap menggunakan kordinat yang SAMA SEBIJIK macam api, dan dipusing 135 darjah! */
+        #asap-enjin {
+            bottom: -45px; left: -30px; font-size: 80px; 
+            transform: rotate(135deg); 
+            filter: drop-shadow(0 0 15px #bdc3c7);
+        }
+
+        /* ANGKASAWAN */
+        #angkasawan {
+            position: absolute; bottom: 125px; left: 15%; font-size: 65px; z-index: 20;
+            line-height: 1; margin: 0; transition: left 1s ease-in-out, opacity 0.5s;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+        /* 🔥 PENGASINGAN FLIP: Dipindahkan kepada span emoji sahaja 🔥 */
+        .jalan-kanan { transform: scaleX(-1); display: inline-block; }
+
+        /* KESAN LETUPAN */
+        #boom-impak {
+            position: absolute; bottom: 140px; left: 65%; transform: translateX(-50%) scale(0);
+            font-size: 140px; z-index: 30; opacity: 0; transition: all 0.2s ease-out; pointer-events: none;
+        }
+        .skala-boom { opacity: 1 !important; transform: translateX(-50%) scale(1.4) !important; filter: drop-shadow(0 0 40px #e74c3c); }
+
+        /* 🔥 AWAN DIALOG GLOBAL (DIKEMASKINI DARI STYLE.CSS) 🔥 */
+        .awan-dialog {
+            border: 3px solid #9b59b6 !important; /* Tema Ungu Angkasa */
+            margin-bottom: 5px !important; 
+        }
+        
+        #dialogAngkasawan { 
+            transform-origin: bottom center !important; 
+        }
+        
+        #dialogAngkasawan::after { 
+            border-color: #9b59b6 transparent transparent transparent !important; 
+        }
+
+        #dialogAngkasawan::before { 
+            display: none !important; /* 🔥 INI BUNUH JARUM PUTIH! 🔥 */
+        }
+        
+        .buka-cakap { transform: translateX(-50%) scale(1) !important; }
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(155, 89, 182, 0.3); border: 2px solid #9b59b6;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Komander<br><span style="font-size: 16px; color: #9b59b6;">(Misi 1D - Zon 1)</span></h2>
+
+                <!-- BUTANG PANDUAN DAN MENU DENGAN WARNA TEMA UNGU (#9b59b6) -->
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #9b59b6; color: #fff; border-color: #8e44ad; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #9b59b6; color: #fff; border-color: #8e44ad; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 5px; font-size: 14px; line-height: 1.4;">Roket di tapak pelancaran sudah bersedia! Tuliskan kod arahan mengikut susunan operasi yang tepat supaya roket boleh berlepas dengan selamat.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; margin-top: 15px; font-size: 13px; border-left: 3px solid #9b59b6; font-family: monospace;">
+                <strong style="color: #9b59b6; font-family: sans-serif;">Senarai Kod Operasi:</strong><br><br>
+                <span style="color: #fff;">roket.isi_minyak()</span><br>
+                <span style="color: #fff;">angkasawan.masuk()</span><br>
+                <span style="color: #fff;">roket.lancar()</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap1d()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap1d()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);">JALANKAN KOD 🚀</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #9b59b6; padding: 10px; font-size: 13px;">
+                Stesen Kawalan Bumi sedia menerima arahan.
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Monitor Angkasa</h2>
+            
+            <div id="ruangAnimasi" class="tema-angkasa">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #9b59b6;">
+                    Status: Roket sedang melahu di tapak pelancaran...
+                </div>
+                
+                <div id="bintang1" class="objek-latar">✨</div>
+                <div id="bintang2" class="objek-latar">✨</div>
+                <div id="bintang3" class="objek-latar">✨</div>
+                <div id="bulan" class="objek-latar">🌕</div>
+                <div id="ufo" class="objek-latar">🛸</div>
+
+                <div id="tanah-planet">
+                    <div id="kawah1" class="kawah"></div>
+                    <div id="kawah2" class="kawah"></div>
+                    <div id="kawah3" class="kawah"></div>
+                </div>
+                
+                <div id="stesen-pam">⛽</div>
+                
+                <div id="roket-kapal">
+                    🚀
+                    <!-- Api dan Asap Tersembunyi -->
+                    <div id="api-enjin">🔥</div>
+                    <div id="asap-enjin">💨</div>
+                </div>
+                
+                <!-- 🔥 PERUBAHAN DI SINI: Span diletakkan khas pada emoji angkasawan 🔥 -->
+                <div id="angkasawan">
+                    <div id="dialogAngkasawan" class="awan-dialog"></div>
+                    <span class="jalan-kanan">👨‍🚀</span>
+                </div>
+
+                <div id="boom-impak">💥</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN KUSTOM PRO -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">👨‍🚀💻</div>
+            <h2>Algoritma Berjujukan</h2>
+            <p style="text-align: left;">Sistem komputer memproses arahan secara lurus dari atas ke bawah. Ini dipanggil <strong>Algoritma Berjujukan (Sequence)</strong>!</p>
+            <div style="background: rgba(155, 89, 182, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #9b59b6;">
+                <strong>Urutan Pelancaran Yang Logik:</strong><br><br>
+                1. <strong>Minyak</strong> perlu diisi terlebih dahulu sebelum angkasawan masuk.<br>
+                2. Seterusnya, angkasawan perlu <strong>masuk</strong> ke dalam roket.<br>
+                3. Apabila tangki penuh dan angkasawan bersedia, barulah roket selamat untuk <strong>dilancarkan</strong>.<br><br>
+                <em>Awas: Melangkau mana-mana proses akan menyebabkan ralat kritikal dan kemalangan!</em>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #9b59b6; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN KUSTOM PRO -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🚀🌕</div>
+            <h2 style="color: #0be881;">Misi Angkasa Berjaya!</h2>
+            <p>Tahniah Komander! Urutan logik algoritma anda sangat sempurna. Angkasawan kita telah selamat tiba di angkasa lepas.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💥</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Misi Gagal!</h2>
+            <p id="pesan-kalah">Terdapat kesilapan pada logik kod arahan anda. Sila pastikan urutan betul dan cuba lagi!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap1d.js"></script>
+</body>
+</html>

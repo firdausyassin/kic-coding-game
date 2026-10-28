@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 8B: Meriam Plasma</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .tema-kiamat {
+            background: linear-gradient(to bottom, #110000 0%, #3a0000 50%, #1a1a2e 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* METEOR GERGASI */
+        #meteor-ancaman {
+            position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
+            font-size: 100px; z-index: 10; margin: 0; line-height: 1;
+            filter: drop-shadow(0 0 20px rgba(255, 69, 0, 0.8));
+            transition: top 3s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.5s, transform 0.5s;
+        }
+        .meteor-jatuh { top: 75% !important; }
+        .meteor-hancur { opacity: 0 !important; transform: translateX(-50%) scale(2) !important; }
+
+        /* MERIAM PLASMA */
+        #meriam-base {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 80px;
+            background: #2f3640; border-radius: 10px 10px 0 0; border: 4px solid #7f8fa6;
+            z-index: 15; text-align: center;
+        }
+        #meriam-laras {
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 60px; background: #718093; border: 3px solid #dcdde1;
+            border-radius: 5px; z-index: 14;
+        }
+        .meriam-meletup { filter: drop-shadow(0 0 30px red); background: red !important; }
+
+        /* PANCARAN LASER */
+        #sinar-laser {
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+            width: 15px; height: 0; background: #00f3ff;
+            box-shadow: 0 0 20px #00f3ff, 0 0 40px #00f3ff;
+            z-index: 12; border-radius: 10px;
+            transition: height 0.5s ease-out;
+            transform-origin: bottom center;
+        }
+
+        /* INDIKATOR BATERI */
+        .slot-bateri {
+            position: absolute; bottom: 30px; width: 40px; height: 100px;
+            background: rgba(0,0,0,0.5); border: 2px solid #bdc3c7; border-radius: 5px;
+            z-index: 16; overflow: hidden;
+        }
+        #bateri-a-box { left: calc(50% - 100px); }
+        #bateri-b-box { left: calc(50% + 60px); }
+        
+        .isi-bateri {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+            background: #00ff88; transition: height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        /* DIALOG SISTEM AI */
+        .awan-dialog {
+            position: absolute; top: 120px; left: 65%; 
+            width: 250px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: scale(0); transform-origin: bottom left;
+            background: rgba(15, 25, 40, 0.95) !important; color: #00f3ff !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3) !important; white-space: normal !important; 
+            word-wrap: break-word !important; text-align: left !important; 
+            border: 2px solid #00f3ff !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; bottom: -12px; left: 15px;
+            border-width: 8px; border-style: solid; border-color: #00f3ff transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: scale(1) translateY(-10px) !important; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Bateri<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 8B)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Isytiharkan nilai <code>bateri_a</code> dan <code>bateri_b</code> supaya jumlahnya tepat <strong>100</strong>, kemudian tembak!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #00ff88;">
+                <strong style="color: #00ff88;">Format Kod (Tiga Baris):</strong><br>
+                <code>bateri_a = 50</code><br>
+                <code>bateri_b = 50</code><br>
+                <code>sistem.tembak(bateri_a + bateri_b)</code><br>
+                <span style="color: #bdc3c7; font-size: 11px;">(Anda bebas menggunakan apa sahaja nombor asalkan jumlahnya tepat 100)</span>
+            </div>
+            
+            <!-- TEXTAREA DIBESARKAN UNTUK 3 BARIS KOD -->
+            <textarea id="arahanInput" placeholder="Taip kod 3 baris di sini..." spellcheck="false" style="width: 100%; height: 110px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanTahap8b()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00f3ff, #00ff88); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);">LANCARKAN PLASMA ⚡</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00ff88; padding: 10px; font-size: 13px;">
+                Meriam bersedia. Bateri A dan B masih kosong (0%).
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #fff; text-align: center; margin-top: 1px; margin-bottom: 16px;">Sektor Pertahanan</h2>
+            
+            <div id="ruangAnimasi" class="tema-kiamat">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(0,0,0,0.8); color: #ff4757; border: 2px solid #ff4757; font-size: 14px;">
+                    AMARAN: Meteor gergasi dikesan! (Keperluan Hancur: 100 Kuasa)
+                </div>
+                
+                <div id="dialogSistem" class="awan-dialog"></div>
+                
+                <div id="meteor-ancaman">☄️</div>
+                <div id="sinar-laser"></div>
+                
+                <!-- INDIKATOR BATERI -->
+                <div id="bateri-a-box" class="slot-bateri">
+                    <div id="isi-a" class="isi-bateri"></div>
+                    <span style="position:absolute; bottom:5px; left:30%; color:#fff; font-weight:bold; font-size:12px; z-index:17;">A</span>
+                </div>
+                <div id="bateri-b-box" class="slot-bateri">
+                    <div id="isi-b" class="isi-bateri"></div>
+                    <span style="position:absolute; bottom:5px; left:30%; color:#fff; font-weight:bold; font-size:12px; z-index:17;">B</span>
+                </div>
+
+                <div id="meriam-base">
+                    <div id="meriam-laras"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN DAN KEMENANGAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #00f3ff; box-shadow: 0 0 25px rgba(0, 255, 136, 0.3);">
+            <h2 style="color: #00ff88;">⚡ Matematik + Pembolehubah</h2>
+            <p style="color: #ecf0f1; font-size: 15px;">Kita boleh menggunakan pembolehubah yang telah dicipta di dalam fungsi matematik!</p>
+            
+            <div style="background: rgba(0, 255, 136, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #00ff88;">
+                <strong>Misi Kritikal:</strong><br><br>
+                Meteor itu memerlukan <strong>100</strong> nilai kuasa untuk dihancurkan. Tidak kurang, tidak lebih.<br><br>
+                Daripada menaip nombor secara terus, letakkan nilai kuasa di dalam <code>bateri_a</code> dan <code>bateri_b</code>. Kemudian, gabungkan kedua-dua nama bateri tersebut di dalam arahan <code>sistem.tembak()</code>.<br><br>
+                Komputer akan mengekstrak nombor dari bateri tersebut dan mengiranya secara automatik!
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00ff88; color: #000; font-weight: bold;">SAYA FAHAM MISI INI</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">☄️💥</div>
+            <h2 style="color: #2ecc71;">Ancaman Dimusnahkan!</h2>
+            <p style="color: #ecf0f1;">Luar biasa! Anda kini memahami bahawa pembolehubah (variables) boleh menyimpan nombor dan digunakan di dalam operasi matematik. Inilah rahsia sebenar *programming*!</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #000; font-weight: bold;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap8b.js"></script>
+</body>
+</html>

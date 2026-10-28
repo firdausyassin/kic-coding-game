@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 4F: Susunan Sistem Suria</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA ANGKASA LEPAS */
+        .tema-angkasa {
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* BINTANG LATAR BELAKANG */
+        .bintang {
+            position: absolute; width: 2px; height: 2px; background: #fff;
+            border-radius: 50%; box-shadow: 0 0 5px #fff;
+            animation: kelipBintang 2s infinite alternate;
+        }
+        @keyframes kelipBintang { 0% { opacity: 0.2; } 100% { opacity: 1; } }
+
+        /* SISTEM SURIA TENGAH */
+        #matahari {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 50px; z-index: 10;
+            filter: drop-shadow(0 0 30px #f1c40f) drop-shadow(0 0 60px #e67e22);
+            animation: nafasMatahari 3s infinite alternate;
+        }
+        @keyframes nafasMatahari { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-50%, -50%) scale(1.1); } }
+
+        /* ORBIT DAN PLANET (Orbit sentiasa ada dari awal) */
+        .orbit {
+            position: absolute; top: 50%; left: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 50%; transform: translate(-50%, -50%) rotate(0deg);
+            z-index: 5;
+        }
+
+        .planet-ikon {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            font-size: 20px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+            opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .planet-muncul { opacity: 1 !important; transform: translateX(-50%) scale(1.3) !important; }
+
+        /* ANIMASI PUTARAN ORBIT */
+        .orbit-putar { animation: pusingOrbit linear infinite; }
+        @keyframes pusingOrbit {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* SUSUNAN SAIZ ORBIT */
+        #orbit-1 { width: 90px; height: 90px; animation-duration: 4s; }   /* Utarid */
+        #orbit-2 { width: 130px; height: 130px; animation-duration: 6s; }  /* Zuhrah */
+        #orbit-3 { width: 170px; height: 170px; animation-duration: 8s; }  /* Bumi */
+        #orbit-4 { width: 210px; height: 210px; animation-duration: 10s; } /* Marikh */
+        #orbit-5 { width: 260px; height: 260px; animation-duration: 14s; } /* Musytari */
+        #orbit-6 { width: 310px; height: 310px; animation-duration: 18s; } /* Zuhal */
+        #orbit-7 { width: 360px; height: 360px; animation-duration: 22s; } /* Uranus */
+        #orbit-8 { width: 410px; height: 410px; animation-duration: 26s; } /* Neptun */
+        
+        /* Orbit Ralat (> 8) Komet Gergasi */
+        #orbit-9 { width: 480px; height: 480px; border-color: transparent; animation-duration: 3s; z-index: 15; }
+        #planet-9 { font-size: 40px !important; top: -20px; filter: drop-shadow(0 0 10px #e74c3c); }
+
+        /* 🔥 PROTOKOL STANDARDISASI: AWAN DIALOG GLOBAL 🔥 */
+        .awan-dialog {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 8px 12px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; 
+            white-space: nowrap !important; min-width: max-content !important;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #f1c40f; margin-bottom: 5px;
+            transform-origin: bottom center;
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #f1c40f transparent transparent transparent;
+        }
+        .awan-dialog::before { display: none !important; }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+
+        /* Dialog Kanan Matahari */
+        .dialog-kanan { left: 80%; transform: translateX(0) scale(0); transform-origin: bottom left; }
+        .dialog-kanan.tunjuk-dialog { transform: translateX(0) scale(1) !important; }
+        .dialog-kanan::after { left: 20%; }
+
+        /* Dialog Kiri Matahari */
+        .dialog-kiri { left: 20%; transform: translateX(-100%) scale(0); transform-origin: bottom right; }
+        .dialog-kiri.tunjuk-dialog { transform: translateX(-100%) scale(1) !important; }
+        .dialog-kiri::after { left: 80%; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(241, 196, 15, 0.3); border: 2px solid #f1c40f;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #f1c40f; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* BUTANG DWI-PILIHAN */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Pengulangan<br><span style="font-size: 16px; color: #f1c40f;">(Misi 4F - Zon 1)</span></h2>
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #f1c40f; color: #000; border-color: #f39c12; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #f1c40f; color: #000; border-color: #f39c12; font-weight: bold; padding: 6px 8px; font-size: 12px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Sistem Suria kita mempunyai sejumlah <strong>planet</strong> yang mengorbit Matahari.</p>
+            <p style="color: #3498db; font-weight: bold; font-size: 13px; line-height: 1.4;">Gunakan arahan pengulangan (Loop) yang tepat untuk menambah kesemua planet tersebut ke dalam orbitnya.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #f1c40f; font-family: monospace;">
+                <strong style="color: #f1c40f; font-family: sans-serif;">Pangkalan Data Astronomi:</strong><br>
+                <span style="color: #bdc3c7;">Utarid, Zuhrah, Bumi, Marikh, Musytari, Zuhal, Uranus, Neptun.</span><br><br>
+                <strong style="color: #0be881; font-family: sans-serif;">Arahan Sasaran:</strong><br>
+                <span style="color: #fff;">ulang(?){orbit.tambah_planet()}</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod gelung orbit..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap4f()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap4f()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4); border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%;">JANA SISTEM SURIA 🚀</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #f1c40f; padding: 10px; font-size: 13px;">
+                Ruang angkasa kosong. Menunggu parameter gelung...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-angkasa">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #f1c40f; z-index: 50;">
+                    Status: Matahari keseorangan...
+                </div>
+                
+                <!-- Bintang Rawak dijana melalui JS -->
+                <div id="ruang-bintang"></div>
+                
+                <!-- PUSAT: MATAHARI -->
+                <div id="matahari">
+                    <div id="dialogMatahari" class="awan-dialog"></div>
+                    ☀️
+                </div>
+                
+                <!-- ORBIT-ORBIT (Sedia Ada, Tidak disembunyikan lagi) -->
+                <!-- 🔥 FIX: Tiada lagi planet berkotak! Semua planet berbentuk bulat sempurna 🔥 -->
+                <div class="orbit" id="orbit-1"><span class="planet-ikon" id="planet-1">🌑</span></div>
+                <div class="orbit" id="orbit-2"><span class="planet-ikon" id="planet-2">🌕</span></div>
+                <div class="orbit" id="orbit-3"><span class="planet-ikon" id="planet-3">🌍</span></div>
+                <div class="orbit" id="orbit-4"><span class="planet-ikon" id="planet-4">🔴</span></div>
+                <div class="orbit" id="orbit-5"><span class="planet-ikon" id="planet-5">🟠</span></div>
+                <div class="orbit" id="orbit-6"><span class="planet-ikon" id="planet-6">🪐</span></div>
+                <div class="orbit" id="orbit-7"><span class="planet-ikon" id="planet-7">🔵</span></div>
+                <div class="orbit" id="orbit-8"><span class="planet-ikon" id="planet-8">🟣</span></div>
+                
+                <!-- ORBIT RALAT KOMET -->
+                <div class="orbit" id="orbit-9"><span class="planet-ikon" id="planet-9">☄️</span></div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🪐🌌</div>
+            <h2>Sains Sistem Suria</h2>
+            <p style="text-align: left;">Sistem Suria kita terletak di dalam galaksi Bima Sakti. Pada pusatnya adalah Matahari yang memiliki tarikan graviti yang kuat untuk menarik objek lain mengelilinginya.</p>
+            <div style="background: rgba(241, 196, 15, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #f1c40f;">
+                <strong>Nota Fakta:</strong><br><br>
+                Berdasarkan silibus Sains, terdapat tepat <strong>8 buah planet</strong> utama yang mengorbit Matahari.<br>
+                Pluto dahulunya dikira planet ke-9, tetapi ia kini dikelaskan sebagai 'Planet Kerdil' sahaja.<br><br>
+                💡 Gunakan maklumat kuantiti ini untuk menetapkan nilai Gelung (Loop) anda!
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #f1c40f; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🌍✅</div>
+            <h2 style="color: #0be881;">Sistem Suria Sempurna!</h2>
+            <p>Tahniah! Anda berjaya menggunakan *Loop* untuk menjana kesemua 8 planet dalam orbit yang betul. Keseimbangan alam semesta telah terpelihara!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💥❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Anomali Graviti!</h2>
+            <p id="pesan-kalah">Kiraan orbit anda tidak menepati fakta Sains.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <!-- 🔥 JAVASCRIPT DISATUKAN (INLINE) 🔥 -->
+    <script>
+        let adakahTamat = false;
+        let adakahSibuk = false;
+        let pemasaDialog;
+
+        // JANA BINTANG BACKGROUND MASA MULA-MULA BUKA
+        document.addEventListener("DOMContentLoaded", () => {
+            const ruangBintang = document.getElementById("ruang-bintang");
+            for (let i = 0; i < 50; i++) {
+                let bintang = document.createElement("div");
+                bintang.className = "bintang";
+                bintang.style.top = Math.random() * 100 + "%";
+                bintang.style.left = Math.random() * 100 + "%";
+                bintang.style.animationDelay = Math.random() * 3 + "s";
+                ruangBintang.appendChild(bintang);
+            }
+        });
+
+        function mainBunyi(audioElemen, mulaMasa = 0) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = mulaMasa;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // 🔥 FUNGSI DIALOG DINAMIK MATAHARI 🔥
+        function cakap(mesej, masa, posisi = "kanan") {
+            let kotakDialog = document.getElementById("dialogMatahari");
+            if(kotakDialog) {
+                kotakDialog.innerHTML = mesej;
+                kotakDialog.className = "awan-dialog"; // Reset kelas asal
+                
+                if (posisi === "kanan") kotakDialog.classList.add("dialog-kanan");
+                else if (posisi === "kiri") kotakDialog.classList.add("dialog-kiri");
+                
+                kotakDialog.classList.add("tunjuk-dialog");
+                
+                clearTimeout(pemasaDialog); 
+                pemasaDialog = setTimeout(() => { 
+                    kotakDialog.classList.remove("tunjuk-dialog"); 
+                }, masa);
+            }
+        }
+
+        async function laksanaArahanTahap4f() {
+            let input = document.getElementById("arahanInput").value.toLowerCase().replace(/\s+/g, '');
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            if (adakahTamat) {
+                maklumBalas.innerHTML = "Ralat: Simulasi telah tamat. Sila muat semula halaman.";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                return;
+            }
+
+            if(adakahSibuk) return;
+
+            // RegEx: ulang(jumlah){orbit.tambah_planet()}
+            let match = input.match(/^ulang\((\d+)\)\{orbit\.tambah_planet\(\)\}$/);
+
+            if (match) {
+                let kaliUlang = parseInt(match[1]);
+
+                if (kaliUlang === 0) {
+                    maklumBalas.innerHTML = "Ralat: Loop sifar bermakna alam semesta kekal kosong!";
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    mainBunyi(sfxSalah);
+                    cakap("Sistem suria perlukan planet!", 2500, "kanan");
+                    return;
+                }
+
+                adakahSibuk = true;
+                maklumBalas.innerHTML = `Sistem: Menjana graviti untuk menarik ${kaliUlang} planet...`;
+                maklumBalas.style.borderLeftColor = "#f1c40f";
+
+                let limitOrbit = kaliUlang > 9 ? 9 : kaliUlang; // Max 9 untuk letak komet langgar
+                
+                cakap("Tarikan graviti dilaraskan...", 2000, "kanan");
+                await tunggu(1000);
+
+                // ANIMASI MENJANA PLANET SATU PER SATU
+                for(let i = 1; i <= limitOrbit; i++) {
+                    let orbitDiv = document.getElementById(`orbit-${i}`);
+                    let planetSpan = document.getElementById(`planet-${i}`);
+                    
+                    if(orbitDiv && planetSpan) {
+                        await tunggu(200);
+                        
+                        planetSpan.classList.add("planet-muncul"); // Planet meletus keluar
+                        orbitDiv.classList.add("orbit-putar"); // Mula pusing
+                        mainBunyi(sfxBetul);
+                        
+                        let namaPlanet = ["Utarid", "Zuhrah", "Bumi", "Marikh", "Musytari", "Zuhal", "Uranus", "Neptun", "KOMET GERGASI"];
+                        teksAnimasi.innerHTML = `Status: Menambah orbit ke-${i} (${namaPlanet[i-1]})`;
+                        
+                        await tunggu(600);
+                    }
+                }
+
+                await tunggu(1000);
+
+                // PENILAIAN JAWAPAN
+                if (kaliUlang === 8) {
+                    // TEPAT
+                    adakahTamat = true;
+                    maklumBalas.innerHTML = "Berjaya: Kesemua 8 planet mengorbit dengan stabil!";
+                    maklumBalas.style.borderLeftColor = "#0be881";
+                    teksAnimasi.innerHTML = "Status: 8 planet berputar dengan harmoni.";
+                    mainBunyi(sfxMenang);
+                    cakap("Sempurna! Sistem Suria dah lengkap!", 3000, "kiri");
+                    
+                    // 🔥 MASA MENONTON (DELAY) DITAMBAH KEPADA 4.5 SAAT 🔥
+                    setTimeout(() => {
+                        document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                    }, 4500);
+
+                } else if (kaliUlang > 8) {
+                    // TERLEBIH (Komet Langgar)
+                    adakahTamat = true;
+                    maklumBalas.innerHTML = `Gagal: Anda telah memanggil ${kaliUlang} objek. Ini merosakkan graviti sistem suria!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: AMARAN! Komet asing memasuki orbit dan melanggar Matahari!";
+                    mainBunyi(sfxSalah);
+                    cakap("Awas! Beban graviti melampau!", 3000, "kanan");
+                    
+                    setTimeout(() => {
+                        document.getElementById("ikon-kalah").innerHTML = "☄️🔥";
+                        document.getElementById("tajuk-kalah").innerHTML = "Sistem Suria Hancur!";
+                        document.getElementById("pesan-kalah").innerHTML = `Anda memanggil <strong>${kaliUlang} objek</strong> ruang angkasa sedangkan Sistem Suria hanya mempunyai 8 planet rasmi. Komet gergasi telah memasuki orbit dan memusnahkan segalanya!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+                    
+                } else {
+                    // TERKURANG
+                    adakahTamat = true;
+                    maklumBalas.innerHTML = `Gagal: Hanya ${kaliUlang} planet dijana. Sistem suria tidak lengkap.`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Kekurangan planet menyebabkan ketidakseimbangan graviti.";
+                    mainBunyi(sfxSalah);
+                    cakap("Eh, kenapa ada planet yang hilang?", 3000, "kiri");
+                    
+                    setTimeout(() => {
+                        document.getElementById("ikon-kalah").innerHTML = "🪐❓";
+                        document.getElementById("tajuk-kalah").innerHTML = "Planet Tidak Cukup!";
+                        document.getElementById("pesan-kalah").innerHTML = `Anda cuma memanggil <strong>${kaliUlang} planet</strong>. Berdasarkan nota sains, terdapat tepat 8 buah planet di dalam sistem suria kita. Sila tambah nilai Loop anda!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+                }
+
+            } else {
+                maklumBalas.innerHTML = "Ralat Sintaks: Ikut format -> <code>ulang(jumlah){orbit.tambah_planet()}</code>";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+            }
+            
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById("modalInfo").classList.add("tunjuk-modal-kustom"); }
+        function tutupInfo() { document.getElementById("modalInfo").classList.remove("tunjuk-modal-kustom"); }
+    </script>
+</body>
+</html>

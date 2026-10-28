@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1H: Hidup vs Bukan Hidup</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA MAKMAL BIO-SIBER */
+        .tema-makmal-bio {
+            background: linear-gradient(to bottom, #0f2027 0%, #203a43 50%, #2c5364 100%) !important;
+            position: relative; overflow: hidden;
+        }
+
+        /* 1. LANTAI MAKMAL */
+        #lantai-makmal {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 90px;
+            background: #1a252c; border-top: 4px solid #00f3ff;
+            box-shadow: inset 0 20px 30px rgba(0,0,0,0.8); z-index: 2;
+        }
+
+        /* 2. PLATFORM IMBASAN (KIRI) */
+        #platform-imbasan {
+            position: absolute; bottom: 90px; left: 15%; width: 150px; height: 20px;
+            background: #2c3e50; border: 2px solid #00f3ff; border-bottom: none;
+            border-radius: 10px 10px 0 0; z-index: 3;
+            box-shadow: 0 -5px 15px rgba(0, 243, 255, 0.4);
+        }
+
+        /* 3. ZON SELAMAT (KANAN) */
+        #zon-selamat {
+            position: absolute; bottom: 90px; right: 15%; width: 150px; height: 160px;
+            border: 3px dashed #2ecc71; border-radius: 10px; z-index: 1;
+            display: flex; justify-content: center; align-items: flex-end;
+            background: rgba(46, 204, 113, 0.1);
+        }
+        .label-zon { position: absolute; top: -25px; color: #2ecc71; font-weight: bold; font-size: 12px; font-family: monospace; }
+
+        /* 4. SUBJEK UJIAN (KUCING) */
+        #subjek-ujian {
+            position: absolute; bottom: 110px; left: 15%; width: 150px; text-align: center;
+            font-size: 80px; z-index: 10; line-height: 1; margin: 0;
+            transition: all 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* 5. LASER PENGIMBAS */
+        #cahaya-laser {
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: #ff0055; box-shadow: 0 0 15px #ff0055, 0 0 30px #ff0055;
+            z-index: 15; opacity: 0;
+        }
+        @keyframes gerakLaser {
+            0% { top: 0; opacity: 1; }
+            50% { top: 100%; opacity: 1; }
+            100% { top: 0; opacity: 0; }
+        }
+        .laser-aktif { animation: gerakLaser 1.5s ease-in-out; }
+
+        /* 6. SKRIN HOLOGRAM MAKMAL */
+        #skrin-hologram {
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+            width: 250px; padding: 15px; background: rgba(0, 243, 255, 0.1);
+            border: 2px solid #00f3ff; border-radius: 10px; text-align: center;
+            color: #fff; font-family: monospace; z-index: 5;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+        .hologram-hijau { border-color: #0be881 !important; background: rgba(11, 232, 129, 0.1) !important; color: #0be881 !important; box-shadow: 0 0 20px rgba(11, 232, 129, 0.4) !important;}
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); border: 2px solid #00f3ff;
+        }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #00f3ff; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; }
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+    
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Imbasan<br><span style="font-size: 16px; color: #00f3ff;">(Misi 1H - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #00f3ff; color: #000; border-color: #00b8d4; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #00f3ff; color: #000; border-color: #00b8d4; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Entiti misteri dikesan di atas mesin. Kenal pasti sama ada ia benda hidup menggunakan fungsi makmal.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Latihan String Diteruskan: Gunakan tanda petik (" ") pada arahan parameter teks!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #00f3ff; font-family: monospace;">
+                <strong style="color: #00f3ff; font-family: sans-serif;">Senarai Kod Makmal (String):</strong><br><br>
+                <span style="color: #fff;">imbas("kucing")</span><br>
+                <span style="color: #fff;">sahkan("bernafas")</span><br>
+                <span style="color: #fff;">asingkan("hidup")</span>
+            </div>
+
+            <input type="text" id="arahanInput" placeholder="Taip arahan di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanMakmal()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            
+            <button onclick="laksanaArahanMakmal()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00f3ff, #00b8d4); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);">LAKSANA KOD 🚀</button>
+            
+            <div id="maklumBalas" class="kotak-maklum-balas" style="background: rgba(0,0,0,0.4); border-left-color: #00f3ff; padding: 10px; font-size: 13px;">
+                Mesin sedia. Sila masukkan arahan pengimbasan pertama.
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-makmal-bio">
+                
+                <div id="skrin-hologram">
+                    <strong style="font-size: 16px;">SISTEM IMBASAN</strong><br>
+                    <span id="teks-hologram" style="font-size: 12px; color: #bdc3c7;">Menunggu arahan...</span>
+                </div>
+                
+                <div id="lantai-makmal"></div>
+                
+                <div id="platform-imbasan"></div>
+                
+                <div id="zon-selamat">
+                    <div class="label-zon">ZON HABITAT</div>
+                </div>
+                
+                <div id="subjek-ujian">
+                    <!-- Kucing di-flip menghadap kanan menggunakan scaleX(-1) -->
+                    <div style="transform: scaleX(-1); display: inline-block;">🐈</div>
+                    <div id="cahaya-laser"></div>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div> 
+    
+    <!-- PANDUAN MISI -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🔬🧬</div>
+            <h2>Hidup vs Bukan Hidup</h2>
+            <p style="text-align: left;">Sains Tahun 1 mengajar kita bahawa benda hidup mempunyai ciri-ciri seperti bernafas, memerlukan air, dan membesar.</p>
+            <div style="background: rgba(0, 243, 255, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #00f3ff;">
+                <strong>Urutan Logik & String:</strong><br><br>
+                1. Mesti mengimbas subjek untuk melihat profil fizikalnya dahulu.<br>
+                2. Buat pengesahan biologi ke atas kemampuannya bernafas.<br>
+                3. Selepas disahkan sebagai benda hidup, asingkan subjek ke dalam zon habitat.<br><br>
+                <span style="color: #f1c40f;">*Peringatan String: Pastikan anda mengekalkan tanda petik <code>" "</code> semasa mengekod parameter teks seperti <code>"kucing"</code>.</span>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00f3ff; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN KUSTOM PRO -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom" style="border-color: #0be881; box-shadow: 0 0 30px rgba(11, 232, 129, 0.3);">
+            <div style="font-size: 60px;">🧬✅</div>
+            <h2 style="color: #0be881;">Analisis Berjaya!</h2>
+            <p>Syabas! Anda berjaya menterjemah logik ciri benda hidup dan mengekalkan penulisan format String yang sangat kemas.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KALAH / RALAT -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom" style="border-color: #ff5e57; box-shadow: 0 0 30px rgba(255, 94, 87, 0.3);">
+            <div style="font-size: 60px;" id="ikon-kalah">⚠️❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Sintaks Gagal!</h2>
+            <p id="pesan-kalah">Mesin pengimbas gagal memproses arahan. Sila taip dengan teliti mengikut ejaan senarai kod, dan pastikan tanda petik (" ") diletakkan!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <!-- 🔥 SKRIP JAVASCRIPT DISATUKAN (DENGAN STRING VALIDATOR) 🔥 -->
+    <script>
+        let tahapUjian = 0;
+        let adakahTamat = false;
+        let adakahSibuk = false;
+
+        function mainBunyi(audioElemen) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = 0;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // Senarai urutan kod String yang betul (menggunakan tanda petik)
+        const senaraiArahan = [
+            'imbas("kucing")',
+            'sahkan("bernafas")',
+            'asingkan("hidup")'
+        ];
+
+        async function laksanaArahanMakmal() {
+            let inputAsal = document.getElementById("arahanInput").value;
+            let input = inputAsal.toLowerCase().replace(/\s+/g, ''); // Buang space kosong
+
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksHologram = document.getElementById("teks-hologram");
+            let skrinHologram = document.getElementById("skrin-hologram");
+            let laser = document.getElementById("cahaya-laser");
+            let subjek = document.getElementById("subjek-ujian");
+
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            if (adakahTamat) {
+                maklumBalas.innerHTML = "Sistem: Ujian selesai. Sila muat semula (Refresh).";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                return;
+            }
+
+            if (adakahSibuk) return;
+
+            // ==============================================================
+            // TRAP 1: PERANGKAP KESILAPAN TANDA PETIK STRING
+            // Contoh: imbas(kucing) <- Tiada tanda petik!
+            // ==============================================================
+            let tanpaPetik = input.match(/^([a-z]+)\(([a-z]+)\)$/);
+            if (tanpaPetik) {
+                mainBunyi(sfxSalah);
+                maklumBalas.innerHTML = `Ralat String: Anda tertinggal tanda petik! Komputer tidak dapat mengecam <strong>${tanpaPetik[2]}</strong> sebagai teks. Guna format <code>"${tanpaPetik[2]}"</code>.`;
+                maklumBalas.style.borderLeftColor = "#f1c40f";
+                document.getElementById("arahanInput").value = "";
+                return;
+            }
+
+            // ==============================================================
+            // TRAP 2: BACA FORMAT SINTAKS STRING YANG BETUL
+            // ==============================================================
+            let padananSintaks = input.match(/^([a-z]+)\("([a-z]+)"\)$/);
+
+            if (padananSintaks) {
+                let arahanSemasa = senaraiArahan[tahapUjian];
+
+                // KES TEPAT DENGAN URUTAN
+                if (input === arahanSemasa) {
+                    adakahSibuk = true;
+                    mainBunyi(sfxBetul);
+                    maklumBalas.style.borderLeftColor = "#0be881";
+
+                    if (tahapUjian === 0) {
+                        // FASA 1: imbas("kucing")
+                        maklumBalas.innerHTML = `Berjaya: Mengimbas profil fizikal...`;
+                        teksHologram.innerHTML = "MENGIMBAS FIZIKAL...";
+                        
+                        laser.classList.add("laser-aktif");
+                        await tunggu(1500);
+                        laser.classList.remove("laser-aktif");
+                        
+                        teksHologram.innerHTML = "PROFIL: KUCING<br><span style='color:#f1c40f'>Tunggu arahan pengesahan...</span>";
+                        maklumBalas.innerHTML = `Sistem: Profil dikenal pasti sebagai "kucing". Sila sahkan ciri kehidupan.`;
+                    }
+                    else if (tahapUjian === 1) {
+                        // FASA 2: sahkan("bernafas")
+                        maklumBalas.innerHTML = `Berjaya: Menjalankan ujian biologi...`;
+                        teksHologram.innerHTML = "MENGANALISIS PEPARU...";
+                        
+                        await tunggu(1000);
+                        skrinHologram.classList.add("hologram-hijau");
+                        teksHologram.innerHTML = "DISAHKAN: BERNAFAS<br>STATUS: BENDA HIDUP";
+                        maklumBalas.innerHTML = `Sistem: Ciri benda hidup disahkan. Sila asingkan ke zon habitat.`;
+                    }
+                    else if (tahapUjian === 2) {
+                        // FASA 3: asingkan("hidup")
+                        maklumBalas.innerHTML = `Berjaya: Mengaktifkan pemindahan zon habitat...`;
+                        teksHologram.innerHTML = "MEMINDAHKAN SUBJEK...";
+                        
+                        subjek.style.left = "67%"; // Bergerak ke dalam kotak hijau
+                        await tunggu(1500);
+                        
+                        teksHologram.innerHTML = "ZON HABITAT SELAMAT";
+                        maklumBalas.innerHTML = `Sistem: Subjek ujian selamat diasingkan!`;
+                        adakahTamat = true;
+                        
+                        mainBunyi(sfxMenang);
+                        await tunggu(1000);
+                        document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                    }
+                    
+                    if (!adakahTamat) tahapUjian++;
+                    adakahSibuk = false;
+                } 
+                // KES SALAH SUSUNAN ATAU PARAMETER
+                else {
+                    mainBunyi(sfxSalah);
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    
+                    // Ralat Spesifik
+                    let tindakanDiperlukan = senaraiArahan[tahapUjian].split('(')[0];
+
+                    if (tahapUjian === 0 && padananSintaks[1] !== "imbas") {
+                        maklumBalas.innerHTML = "Ralat Arahan: Anda mesti mengimbas subjek terlebih dahulu!";
+                    } else if (padananSintaks[1] !== tindakanDiperlukan) {
+                        maklumBalas.innerHTML = `Ralat Susunan: Langkah sekarang memerlukan fungsi <code>${tindakanDiperlukan}</code>.`;
+                    } else {
+                        maklumBalas.innerHTML = `Ralat Parameter: Parameter teks <strong>"${padananSintaks[2]}"</strong> salah. Sila rujuk senarai kod.`;
+                    }
+                }
+            } else if (input !== "") {
+                maklumBalas.innerHTML = "Ralat Sintaks: Guna format tepat. Ingat tanda petik!";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+            }
+
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById("modalInfo").classList.add("tunjuk-modal-kustom"); }
+        function tutupInfo() { document.getElementById("modalInfo").classList.remove("tunjuk-modal-kustom"); }
+    </script>
+</body>
+</html>

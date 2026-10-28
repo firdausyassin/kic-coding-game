@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 5A: Naga Keputusan Pintar</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA GUNUNG MISTIK CINA */
+        .tema-hutan-mistik {
+            background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* TEKS STATUS */
+        #teksAnimasi {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            z-index: 100; background: rgba(255,255,255,0.95); color: #2c3e50; 
+            border: 2px solid #e74c3c; padding: 5px 15px; border-radius: 8px; font-weight: bold;
+        }
+
+        /* LANTAI TEMBOK BATU */
+        #lantai-batu {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: linear-gradient(to bottom, #7f8c8d, #bdc3c7);
+            border-top: 8px solid #34495e; z-index: 5;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* OBJEK LATAR BELAKANG */
+        .objek-latar { position: absolute; z-index: 1; pointer-events: none; line-height: 1; margin: 0;}
+        #gunung1 { bottom: 120px; left: -5%; font-size: 250px; opacity: 0.6; }
+        #gunung2 { bottom: 120px; right: -10%; font-size: 300px; opacity: 0.4; }
+        
+        /* 🔥 BINAAN PINTU GERBANG GERGASI & TANGLUNG 🔥 */
+        #tokong-kompleks {
+            position: absolute; bottom: 105px; left: 50%; transform: translateX(-50%);
+            font-size: 350px; opacity: 0.85; z-index: 2; line-height: 1; display: inline-block;
+        }
+        
+        .tanglung { 
+            position: absolute; z-index: 3; font-size: 40px; 
+            animation: ayun 3s infinite alternate ease-in-out; 
+        }
+        #tanglung1 { top: 16%; left: 8%; }  
+        #tanglung2 { top: 16%; right: 8%; animation-delay: -1.5s; } 
+        @keyframes ayun { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
+
+        /* WATAK NAGA */
+        #kotak-naga-utama {
+            position: absolute; bottom: 120px; left: 15%; z-index: 20;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        #ikonNaga {
+            font-size: 75px; line-height: 1; margin: 0; display: inline-block;
+            transform: scaleX(-1); /* Flip tepat menghadap kanan */
+            transition: transform 0.4s ease;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+
+        /* 🔥 TEMPAT HALANGAN TENGAH SKRIN 🔥 */
+        #kotak-halangan {
+            position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
+            font-size: 75px; transition: opacity 0.5s ease; z-index: 10;
+            line-height: 1; margin: 0; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+        }
+
+        /* 🔥 KESAN AIR MENGHENTAM API 🔥 */
+        #kesan-magik {
+            position: absolute; bottom: 140px; left: 20%; font-size: 50px;
+            opacity: 0; transition: left 0.4s ease-in, opacity 0.2s; z-index: 15; line-height: 1;
+        }
+        .animasi-hembus { opacity: 1 !important; left: 46% !important; transform: scale(1.5); }
+
+        /* AWAN DIALOG GLOBAL (DIBAIKI WRAPPING) */
+        .awan-dialog {
+            position: absolute; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 10px 15px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 90; text-align: center; 
+            width: max-content; max-width: 220px; white-space: normal !important; word-wrap: break-word;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #e74c3c; margin-bottom: 5px;
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #e74c3c transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+        
+        .dialog-tepi.tunjuk-dialog { transform: translateX(-80%) scale(1) !important; }
+        .dialog-tepi::after { left: 80% !important; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(231, 76, 60, 0.3); border: 2px solid #e74c3c;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #e74c3c; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Keputusan<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 5A - Zon 1)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #e74c3c; color: #fff; border-color: #c0392b; font-weight: bold;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Naga Elemen sedang meronda hutan! Di hadapannya ada halangan rahsia yang muncul secara <strong>rawak</strong>.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Fungsi <code>if</code> membolehkan komputer membuat keputusan mengikut situasi.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #e74c3c; font-family: monospace;">
+                <strong style="color: #e74c3c; font-family: sans-serif;">Pilihan Tindakan Naga:</strong><br>
+                <span style="color: #bdc3c7;">naga.hembus_air()</span><br>
+                <span style="color: #bdc3c7;">naga.lompat()</span><br><br>
+                <strong style="color: #0be881; font-family: sans-serif;">Contoh Sintaks Bersyarat:</strong><br>
+                <span style="color: #fff;">if (halangan == "api") { naga.hembus_air() }</span><br>
+                <span style="color: #fff;">if (halangan == "batu") { naga.lompat() }</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip syarat if() di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap5a()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap5a()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);">LAKSANA KEPUTUSAN 🧭</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #e74c3c; padding: 10px; font-size: 13px;">
+                Sensor persekitaran aktif. Mengimbas halangan di hadapan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-hutan-mistik">
+                
+                <div id="teksAnimasi" class="teks-status">Status: Mengesan ancaman...</div>
+                
+                <div id="gunung1" class="objek-latar">⛰️</div>
+                <div id="gunung2" class="objek-latar">⛰️</div>
+                
+                <div id="tokong-kompleks">
+                    ⛩️
+                    <div id="tanglung1" class="tanglung">🏮</div>
+                    <div id="tanglung2" class="tanglung">🏮</div>
+                </div>
+
+                <div id="lantai-batu"></div>
+                
+                <div id="kesan-magik">💦</div>
+                <div id="kotak-halangan">❓</div>
+                
+                <div id="kotak-naga-utama">
+                    <div id="dialogNaga" class="awan-dialog"></div>
+                    <span id="ikonNaga">🐉</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🧭🐉</div>
+            <h2>Kuasa Logik "IF" (Jika)</h2>
+            <p style="text-align: left;">Dalam sains komputer, kita menggunakan kod bersyarat <code>if</code> untuk memberitahu komputer apa yang perlu dilakukan apabila sesuatu keadaan **BENAR** (berlaku).</p>
+            <div style="background: rgba(231, 76, 60, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #e74c3c;">
+                <strong>Perhatikan Halangan Di Skrin:</strong><br><br>
+                🔥 <strong>Jika "api":</strong> Naga perlu menghembuskan air.<br>
+                🪨 <strong>Jika "batu":</strong> Naga perlu melompat.<br><br>
+                Tuliskan kod dengan logik yang selari dengan halangan yang sedang terpampang di skrin! Tanda petik (" ") wajib diletakkan pada nama halangan.
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #e74c3c; color: #fff; font-weight: bold;">SAYA SEDIA!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🐉👑</div>
+            <h2 style="color: #0be881;">Keputusan Bijak!</h2>
+            <p>Hebat! Anda berjaya menggunakan kod bersyarat <strong>IF</strong> untuk bertindak balas dengan tepat mengikut situasi ancaman persekitaran. Naga selamat!</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #0be881; color: #000; font-weight: bold; width: 100%;">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💀❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Ralat Tindakan!</h2>
+            <p id="pesan-kalah">Logik keputusan anda tidak tepat dengan situasi.</p>
+            <button class="butang-menu" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold; width: 100%;">CUBA LAGI (REFRESH)</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap5a.js"></script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 4J: Mesin Ringkas Takal</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA SAVANA PEMBINAAN */
+        .tema-savana {
+            background: linear-gradient(to bottom, #f3a683 0%, #f7d794 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        #teksAnimasi {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            z-index: 100; 
+        }
+
+        /* TANAH BAWAH */
+        #tanah-bawah {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
+            background: #e66767; border-top: 10px solid #c44569; z-index: 5;
+        }
+
+        /* PENTAS SASARAN (Kekal Kiri) */
+        #pentas-atas {
+            position: absolute; bottom: 250px; left: 0; width: 35%; height: 40px;
+            background: #574b90; border-top: 8px solid #303952;
+            border-right: 5px solid #303952;
+            border-radius: 0 10px 10px 0; z-index: 4;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: flex-end;
+        }
+        
+        /* RIMBUNAN DAUN */
+        #daun-sasaran { font-size: 60px; margin-bottom: 5px; animation: apung 1.5s infinite alternate; }
+        @keyframes apung { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+
+        /* STRUKTUR TAKAL KAYU (Ubah ke Kanan Skrin, Menghala ke Kiri) */
+        #tiang-kayu {
+            position: absolute; bottom: 60px; right: 20%; width: 20px; height: 350px;
+            background: #8e44ad; border-left: 5px solid #574b90; z-index: 2;
+        }
+        
+        /* Palang sekarang unjur dari Tiang(Kanan) menghala ke Kiri */
+        #palang-kayu {
+            position: absolute; bottom: 390px; right: 20%; width: 28%; height: 20px;
+            background: #8e44ad; border-bottom: 5px solid #574b90; z-index: 2;
+            border-radius: 10px 0 0 0;
+        }
+
+        /* PUSAT TAKAL (Diletak di Hujung Kiri Palang) */
+        #pusat-takal {
+            position: absolute; bottom: 375px; right: 45%; 
+            width: 50px; height: 50px; z-index: 6;
+        }
+
+        /* RODA TAKAL */
+        #roda-takal {
+            width: 100%; height: 100%;
+            background: #95a5a6; border: 8px solid #34495e; border-radius: 50%;
+            transform-origin: center; display: flex; justify-content: center; align-items: center;
+            transition: transform 0.4s ease-in-out;
+        }
+        #roda-takal::after { content: ""; width: 4px; height: 100%; background: #2c3e50; }
+        #roda-takal::before { content: ""; width: 100%; height: 4px; background: #2c3e50; position: absolute; }
+
+        /* TALI TAKAL (Statik, hanya memendek) */
+        #tali-takal {
+            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+            width: 4px; height: 260px; background: #ecf0f1;
+            z-index: -1; transition: height 0.4s ease-in-out;
+            box-shadow: 2px 0 2px rgba(0,0,0,0.3);
+        }
+
+        /* GAJAH (BEBAN) - Sejajar di bawah Roda Takal di Kiri */
+        #objek-gajah {
+            position: absolute; bottom: 60px; right: 45%; transform: translateX(50%);
+            font-size: 65px; z-index: 10; transition: all 0.4s ease-in-out;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.4));
+        }
+
+        /* EFEK TALI PUTUS */
+        .tali-putus { display: none !important; }
+        .jatuh-hempas { animation: jatuhGajah 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards !important; }
+        @keyframes jatuhGajah {
+            0% { bottom: 250px; transform: translateX(50%) rotate(0deg); }
+            100% { bottom: 60px; transform: translateX(50%) rotate(90deg); filter: grayscale(1); }
+        }
+
+        /* AWAN DIALOG */
+        .awan-dialog {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 10px 15px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 90; text-align: center; 
+            width: max-content; max-width: 220px; white-space: normal !important; word-wrap: break-word;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #574b90; margin-bottom: 5px;
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #574b90 transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+        
+        .dialog-kiri.tunjuk-dialog { transform: translateX(-80%) scale(1) !important; }
+        .dialog-kiri::after { left: 80% !important; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(87, 75, 144, 0.3); border: 2px solid #574b90;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #f3a683; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Pengulangan<br><span style="font-size: 16px; color: #f3a683;">(Misi 4J - Zon 1)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #574b90; color: #fff; border-color: #303952; font-weight: bold;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Gajah sangat berat! Kita memerlukan mesin ringkas (Takal) untuk mengangkatnya ke atas pentas sasaran untuk memakan rimbunan daun.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Tali takal ini perlu ditarik tepat sebanyak <strong>10 kali</strong> untuk sampai ke atas.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #574b90; font-family: monospace;">
+                <strong style="color: #f3a683; font-family: sans-serif;">Logik Mekanikal:</strong><br>
+                <span style="color: #bdc3c7;">1 Tarikan = Naik Sedikit</span><br><br>
+                <strong style="color: #0be881; font-family: sans-serif;">Arahan Sasaran:</strong><br>
+                <span style="color: #fff;">ulang( ? ){takal.tarik()}</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod gelung takal..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap4j()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap4j()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #574b90, #303952); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(87, 75, 144, 0.4);">TARIK TAKAL ⚙️</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #574b90; padding: 10px; font-size: 13px;">
+                Sistem mekanikal takal dikunci. Menunggu kuasa tarikan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-savana">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #574b90;">
+                    Status: Gajah berada di atas tanah.
+                </div>
+                
+                <!-- PENTAS SASARAN -->
+                <div id="pentas-atas">
+                    <span id="daun-sasaran">🌿</span>
+                </div>
+
+                <!-- STRUKTUR TAKAL -->
+                <div id="tiang-kayu"></div>
+                <div id="palang-kayu"></div>
+                
+                <div id="pusat-takal">
+                    <div id="roda-takal"></div>
+                    <div id="tali-takal"></div>
+                </div>
+                
+                <!-- GAJAH -->
+                <div id="objek-gajah">
+                    <div id="dialogGajah" class="awan-dialog"></div>
+                    <span id="ikonGajah">🐘</span>
+                </div>
+
+                <div id="tanah-bawah"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">⚙️🐘</div>
+            <h2>Mesin Ringkas (Takal)</h2>
+            <p style="text-align: left;">Sains Tahun 3 mengajar kita bahawa takal memudahkan kerja mengangkat beban yang berat dengan mengubah arah daya.</p>
+            <div style="background: rgba(87, 75, 144, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #574b90;">
+                <strong>Awas Kapasiti Mesin!</strong><br><br>
+                Sistem takal ini direka khas untuk ditarik sebanyak <strong>10 kali</strong> sahaja untuk menaikkan gajah ke paras pentas.<br><br>
+                Jika anda menarik kurang dari 10, gajah tidak sampai. Jika anda menarik <strong>lebih dari 10</strong>, tali takal akan putus kerana lebihan daya!
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #574b90; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🐘🌿</div>
+            <h2 style="color: #0be881;">Kerja Dipermudahkan!</h2>
+            <p>Tahniah! Anda berjaya menggunakan *Loop* dengan tepat. Gajah kini selamat mendarat di atas pentas dan menikmati rimbunan daunnya. Aplikasi Sains dan Matematik yang cemerlang!</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #0be881; color: #000; font-weight: bold; width: 100%;">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💥❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Sistem Gagal!</h2>
+            <p id="pesan-kalah">Ralat dikesan pada tarikan takal anda.</p>
+            <button class="butang-menu" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold; width: 100%;">CUBA LAGI (REFRESH)</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap4j.js"></script>
+</body>
+</html>

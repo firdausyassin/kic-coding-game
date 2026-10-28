@@ -1,0 +1,179 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 1. TEMA ANGKASA GELAP & MISTERI */
+body {
+    margin: 0;
+    /* Latar belakang warna angkasa purba (hitam campur ungu/biru sangat pekat) */
+    background: radial-gradient(circle at center, #1b003a 0%, #050011 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px 20px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #ffffff; /* Semua teks lalai jadi putih */
+}
+
+/* 2. TAJUK BERSINAR (NEON GLOW) */
+.header-portal {
+    text-align: center;
+    margin-bottom: 50px;
+    z-index: 10;
+}
+
+.tajuk-neon {
+    font-size: 45px;
+    margin-bottom: 10px;
+    color: #fff;
+    /* Kesan cahaya neon bertingkat-tingkat */
+    text-shadow: 0 0 10px #00f3ff, 0 0 20px #00f3ff, 0 0 40px #00f3ff;
+}
+
+.header-portal p {
+    color: #b3e5fc;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+/* 3. SUSUNAN PAPAN PEMUKA */
+.papan-pemuka {
+    display: flex;
+    gap: 35px;
+    max-width: 1200px;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap; 
+    z-index: 10;
+}
+
+/* 4. KAD MODUL TEMA CYBERPUNK/NEON */
+.kad-modul {
+    /* Latar belakang separa lutsinar (kaca gelap) */
+    background-color: rgba(10, 10, 30, 0.7);
+    backdrop-filter: blur(5px);
+    width: 350px;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.kad-modul:hover {
+    transform: translateY(-10px);
+}
+
+.ikon-modul {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+.kad-modul h2 {
+    margin-bottom: 15px;
+}
+
+.kad-modul p {
+    color: #bdc3c7;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    height: 80px;
+}
+
+.senarai-butang {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* --- IDENTITI WARNA NEON SETIAP ZON --- */
+
+/* Zon 1: Biru Neon (Cyan) */
+.kad-zon1 {
+    border-color: #00f3ff;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+}
+.kad-zon1:hover { box-shadow: 0 0 30px rgba(0, 243, 255, 0.8); }
+.kad-zon1 h2 { color: #00f3ff; text-shadow: 0 0 5px #00f3ff; }
+.btn-zon1 {
+    background-color: transparent;
+    border: 2px solid #00f3ff;
+    color: #00f3ff;
+    box-shadow: 0 0 10px inset rgba(0, 243, 255, 0.3);
+}
+.btn-zon1:hover { background-color: #00f3ff; color: #000; box-shadow: 0 0 20px #00f3ff; }
+
+/* Zon 2: Ungu Neon (Magenta) */
+.kad-zon2 {
+    border-color: #bc13fe;
+    box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+    opacity: 0.8;
+}
+.kad-zon2 h2 { color: #bc13fe; text-shadow: 0 0 5px #bc13fe; }
+.btn-kunci {
+    background-color: #333;
+    border: 2px solid #555;
+    color: #777;
+    cursor: not-allowed;
+}
+
+/* Zon 3: Hijau Neon (Cyber Green) */
+.kad-zon3 {
+    border-color: #00ff66;
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+}
+.kad-zon3:hover { box-shadow: 0 0 30px rgba(0, 255, 102, 0.8); }
+.kad-zon3 h2 { color: #00ff66; text-shadow: 0 0 5px #00ff66; }
+.btn-zon3 {
+    background-color: transparent;
+    border: 2px solid #00ff66;
+    color: #00ff66;
+    box-shadow: 0 0 10px inset rgba(0, 255, 102, 0.3);
+}
+.btn-zon3:hover { background-color: #00ff66; color: #000; box-shadow: 0 0 20px #00ff66; }
+
+/* REKAAN BUTANG UMUM */
+button {
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+/* =========================================
+   5. ANIMASI PLANET & ROKET TERAPUNG
+   ========================================= */
+.latar-angkasa {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Duduk di belakang sekali */
+    pointer-events: none; 
+}
+
+.objek-angkasa {
+    position: absolute;
+    opacity: 0.8;
+    animation: terapung 6s infinite ease-in-out alternate;
+}
+
+.objek-angkasa:nth-child(even) {
+    animation-duration: 8s;
+    animation-direction: alternate-reverse;
+}
+
+.objek-angkasa:nth-child(3n) {
+    animation-duration: 11s;
+}
+
+@keyframes terapung {
+    0% { transform: translateY(0px) rotate(0deg); }
+    100% { transform: translateY(-40px) rotate(20deg); }
+}

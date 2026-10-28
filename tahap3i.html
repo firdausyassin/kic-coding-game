@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 3I: Campuran Warna Sekunder</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA MAKMAL KIMIA */
+        .tema-makmal {
+            background: linear-gradient(to bottom, #ecf0f1 0%, #bdc3c7 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* MEJA MAKMAL */
+        #meja-makmal {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: #2c3e50; border-top: 8px solid #1a252f;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.5); z-index: 2;
+        }
+
+        /* KELALANG KON (Bikar) */
+        #kelalang-kaca {
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+            width: 160px; height: 180px; 
+            background: rgba(255, 255, 255, 0.3); 
+            border: 6px solid rgba(255,255,255,0.8);
+            border-top: none;
+            border-radius: 10px 10px 80px 80px; z-index: 5;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1), 0 15px 20px rgba(0,0,0,0.3);
+            overflow: hidden; 
+            display: flex; justify-content: center; align-items: flex-end;
+        }
+        
+        /* LEHER KELALANG */
+        #leher-kelalang {
+            position: absolute; bottom: 280px; left: 50%; transform: translateX(-50%);
+            width: 50px; height: 60px;
+            background: rgba(255, 255, 255, 0.3);
+            border-left: 6px solid rgba(255,255,255,0.8);
+            border-right: 6px solid rgba(255,255,255,0.8);
+            border-top: 6px solid rgba(255,255,255,0.8);
+            border-radius: 5px 5px 0 0; z-index: 6;
+        }
+
+        /* AIR DALAM KELALANG */
+        #air-bikar {
+            width: 100%; height: 130px; 
+            background: rgba(236, 240, 241, 0.8); /* Air Jernih asalnya */
+            border-top: 4px solid rgba(255,255,255,0.5);
+            transition: background 1.5s ease-in-out; position: relative;
+        }
+
+        /* TITISAN CECAIR (Dari Atas) */
+        .titisan {
+            position: absolute; top: -20px; width: 20px; height: 30px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0; z-index: 7;
+        }
+        #titisan-kiri { left: calc(50% - 30px); background: #e74c3c; } /* Warna default merah */
+        #titisan-kanan { left: calc(50% + 10px); background: #3498db; } /* Warna default biru */
+        
+        .jatuh-kiri { animation: jatuhAir 0.8s ease-in forwards; }
+        .jatuh-kanan { animation: jatuhAir 0.8s ease-in forwards 0.4s; }
+
+        @keyframes jatuhAir {
+            0% { top: 0; opacity: 1; transform: scale(1); }
+            80% { top: 250px; opacity: 1; transform: scale(0.8); }
+            100% { top: 280px; opacity: 0; transform: scale(2); }
+        }
+
+        /* PAPAN PUTIH MAKMAL */
+        #papan-putih {
+            position: absolute; top: 10%; left: 10%; width: 220px; height: 160px;
+            background: #fff; border: 4px solid #bdc3c7; border-radius: 5px;
+            z-index: 1; padding: 10px; font-family: monospace; font-size: 12px; color: #333;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; transform: scale(0); background: #ffffff; color: #1c2833;
+            padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; width: max-content; 
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); pointer-events: none; border: 2px solid #3498db;
+        }
+        
+        .awan-dialog::before { display: none !important; } /* Bunuh jarum asal */
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <!-- 🔥 SUSUNAN STANDARD BUTTON MENU & PANDUAN 🔥 -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 5px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Sains<span style="display:block; font-size: 16px; color: #3498db; margin-top:2px;">(Misi 3I - Zon 1)</span></h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 8px; margin: 0; flex-shrink: 0; font-size: 13px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 8px; font-size: 13px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Ujian Makmal Warna. Anda ditugaskan untuk menghasilkan cecair berwarna <strong id="teks-sasaran-warna" style="text-transform: uppercase;">UNGU</strong>.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Pilih dua warna primer yang betul dan hantarkannya ke dalam kelalang makmal.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Parameter (Teks, Teks):</strong><br>
+                <span style="color: #fff;">objek.tindakan("warna_1", "warna_2")</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Pilihan Cecair Asas (Primer):</strong><br>merah, biru, kuning<br><br>
+                <strong style="color: #0be881; font-family: sans-serif;">Arahan Sasaran:</strong><br>
+                <span style="color: #fff;">bikar.campur( " ? " , " ? " )</span>
+            </div>
+            
+            <!-- 🔥 BOX-SIZING BORDER-BOX DITAMBAH 🔥 -->
+            <input type="text" id="arahanInput" placeholder="Taip kod campuran warna..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap3i()" style="width: 100%; box-sizing: border-box; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap3i()" style="width: 100%; box-sizing: border-box; margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); padding: 12px; border: none; border-radius: 8px; cursor: pointer;">CAMPUR CECAIR 🧪</button>
+
+            <!-- 🔥 BOX-SIZING BORDER-BOX DITAMBAH 🔥 -->
+            <div class="kotak-maklum-balas" id="maklumBalas" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border-left: 4px solid #3498db; padding: 10px; font-size: 13px; border-radius: 4px;">
+                Kelalang kosong sedia menerima campuran. Menunggu kod...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-makmal">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 30;">
+                    Status: Air Jernih.
+                </div>
+                
+                <div id="papan-putih">
+                    <strong>NOTA MAKMAL (Primer):</strong><br>
+                    ----------------------<br>
+                    <span style="color: #e74c3c;">• MERAH</span><br>
+                    <span style="color: #3498db;">• BIRU</span><br>
+                    <span style="color: #f1c40f;">• KUNING</span><br>
+                    <br>
+                    <strong>HASIL SASARAN:</strong><br>
+                    Warna Sekunder: <strong id="papan-sasaran-warna" style="font-size: 14px; text-transform: uppercase;">UNGU</strong>
+                </div>
+
+                <div id="meja-makmal"></div>
+                
+                <!-- TITISAN CECAIR -->
+                <div id="titisan-kiri" class="titisan"></div>
+                <div id="titisan-kanan" class="titisan"></div>
+
+                <!-- BIKAR / KELALANG -->
+                <div id="leher-kelalang"></div>
+                <div id="kelalang-kaca">
+                    <div id="air-bikar"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🎨🧪</div>
+            <h2>Panduan Dwi-Parameter (Rentetan)</h2>
+            <p style="text-align: left;">Sistem ini memerlukan anda memasukkan DUA parameter teks serentak untuk melakukan eksperimen campuran.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Peraturan Pengekodan:</strong><br><br>
+                1. Setiap warna primer adalah <strong>Perkataan (String)</strong> dan wajib menggunakan tanda petik <code>" "</code>.<br>
+                2. Pemisah antara parameter pertama dan kedua adalah koma <code>,</code>.<br>
+                ❌ Salah: <code>bikar.campur(merah, kuning)</code><br>
+                ✅ Betul: <code>bikar.campur("merah", "kuning")</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🪻✅</div>
+            <h2 style="color: #0be881;">Reaksi Berjaya!</h2>
+            <p id="teks-menang">Tahniah! Anda berjaya membuktikan bahawa campuran Merah dan Biru akan menghasilkan warna sekunder Ungu.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🧪❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Eksperimen Gagal!</h2>
+            <p id="pesan-kalah">Warna sekunder yang terhasil tidak menepati spesifikasi yang diminta.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <!-- 🔥 SKRIP INLINE: LOGIK BERGIRLIR (NON-RANDOM) & SEMAKAN 🔥 -->
+    <script>
+        let adakahTamat = false;
+        let sasaranSemasa = {};
+
+        // Definisi Warna Primer & Warna CSS (Hex/Rgba)
+        const warnaPangkalan = {
+            "merah": { hex: "#e74c3c", rgb: "rgba(231, 76, 60, 0.8)" },
+            "biru": { hex: "#3498db", rgb: "rgba(52, 152, 219, 0.8)" },
+            "kuning": { hex: "#f1c40f", rgb: "rgba(241, 196, 15, 0.8)" }
+        };
+
+        // Senarai Warna Sekunder Sasaran (Rawak)
+        const senaraiSasaran = [
+            { nama: "ungu", warna1: "merah", warna2: "biru", warnaCSS: "rgba(155, 89, 182, 0.8)", warnaTeks: "#9b59b6" },
+            { nama: "hijau", warna1: "biru", warna2: "kuning", warnaCSS: "rgba(46, 204, 113, 0.8)", warnaTeks: "#2ecc71" },
+            { nama: "oren", warna1: "merah", warna2: "kuning", warnaCSS: "rgba(230, 126, 34, 0.8)", warnaTeks: "#e67e22" }
+        ];
+
+        // Tetapkan sasaran warna bila page loading menggunakan susunan bergilir (Bukan rawak semberono)
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // Ambil index yang disimpan sebelum ni dalam browser (sessionStorage)
+            let indexTerdahulu = sessionStorage.getItem("indexWarnaMakmal");
+            let indexSeterusnya = 0;
+
+            if (indexTerdahulu !== null) {
+                // Tambah 1 pada index. Kalau dah sampai 3, dia patah balik 0 (0 -> 1 -> 2 -> 0)
+                indexSeterusnya = (parseInt(indexTerdahulu) + 1) % senaraiSasaran.length;
+            } else {
+                // Kalau baru pertama kali buka, pilih random
+                indexSeterusnya = Math.floor(Math.random() * senaraiSasaran.length);
+            }
+
+            // Simpan index baru ni supaya lepas refresh dia tak guna warna ni lagi
+            sessionStorage.setItem("indexWarnaMakmal", indexSeterusnya);
+            
+            // Masukkan data dalam sistem
+            sasaranSemasa = senaraiSasaran[indexSeterusnya];
+
+            // Update Teks Arahan
+            let teksArahan = document.getElementById("teks-sasaran-warna");
+            teksArahan.innerHTML = sasaranSemasa.nama;
+            teksArahan.style.color = sasaranSemasa.warnaTeks;
+
+            // Update Papan Putih
+            let papanSasaran = document.getElementById("papan-sasaran-warna");
+            papanSasaran.innerHTML = sasaranSemasa.nama;
+            papanSasaran.style.color = sasaranSemasa.warnaTeks;
+        });
+
+        // Tentukan warna campuran (jika salah sasaran)
+        function tentukanCampuran(w1, w2) {
+            let gabungan = [w1, w2].sort().join("-");
+            if (gabungan === "biru-merah") return "rgba(155, 89, 182, 0.8)"; // Ungu
+            if (gabungan === "biru-kuning") return "rgba(46, 204, 113, 0.8)"; // Hijau
+            if (gabungan === "kuning-merah") return "rgba(230, 126, 34, 0.8)"; // Oren
+            if (w1 === w2) return warnaPangkalan[w1].rgb; // Kalau masukkan warna sama
+            return "rgba(52, 73, 94, 0.8)"; // Gelap/Kelabu (fallback)
+        }
+
+        function laksanaArahanTahap3i() {
+            if (adakahTamat) return;
+
+            let inputRaw = document.getElementById("arahanInput").value;
+            let inputBersih = inputRaw.replace(/\s+/g, '').toLowerCase(); 
+
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            let airBikar = document.getElementById("air-bikar");
+            
+            let titisanKiri = document.getElementById("titisan-kiri");
+            let titisanKanan = document.getElementById("titisan-kanan");
+
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            // Reset titisan
+            titisanKiri.classList.remove("jatuh-kiri");
+            titisanKanan.classList.remove("jatuh-kanan");
+
+            // Regex check format: bikar.campur("warna1","warna2")
+            let match = inputBersih.match(/^bikar\.campur\("([a-z]+)","([a-z]+)"\)$/);
+
+            if (match) {
+                let inputWarna1 = match[1];
+                let inputWarna2 = match[2];
+
+                // Validasi warna primer wujud dalam nota
+                if (!warnaPangkalan[inputWarna1] || !warnaPangkalan[inputWarna2]) {
+                    maklumBalas.innerHTML = "Ralat: Warna yang dimasukkan bukan cecair primer dari nota makmal!";
+                    teksAnimasi.innerHTML = "Status: Bahan Tidak Dikenalpasti.";
+                    if (sfxSalah) sfxSalah.play();
+                    document.getElementById('arahanInput').value = '';
+                    return;
+                }
+
+                adakahTamat = true;
+                document.getElementById("arahanInput").disabled = true;
+
+                // Tetapkan warna titisan
+                titisanKiri.style.background = warnaPangkalan[inputWarna1].hex;
+                titisanKanan.style.background = warnaPangkalan[inputWarna2].hex;
+
+                // Mula animasi jatuh
+                maklumBalas.innerHTML = "Memproses campuran bahan cecair...";
+                teksAnimasi.innerHTML = "Status: Mengadun warna...";
+                
+                // Hack kecik untuk paksa reflow/restart animasi CSS
+                void titisanKiri.offsetWidth; 
+                void titisanKanan.offsetWidth;
+                
+                titisanKiri.classList.add("jatuh-kiri");
+                titisanKanan.classList.add("jatuh-kanan");
+
+                // Semak keputusan lepas air jatuh
+                setTimeout(() => {
+                    let warnaHasil = tentukanCampuran(inputWarna1, inputWarna2);
+                    airBikar.style.background = warnaHasil; // Air bertukar warna
+
+                    setTimeout(() => {
+                        // Semak kalau sama dengan sasaran
+                        let semakan1 = inputWarna1 === sasaranSemasa.warna1 && inputWarna2 === sasaranSemasa.warna2;
+                        let semakan2 = inputWarna1 === sasaranSemasa.warna2 && inputWarna2 === sasaranSemasa.warna1;
+
+                        if (semakan1 || semakan2) {
+                            // JAWAPAN BETUL
+                            if (sfxBetul) sfxBetul.play();
+                            teksAnimasi.innerHTML = "Status: Ujian Berjaya!";
+                            maklumBalas.innerHTML = "Reaksi kimia berjaya menghasilkan warna yang diminta.";
+                            
+                            setTimeout(() => {
+                                if (sfxMenang) sfxMenang.play();
+                                document.getElementById("teks-menang").innerHTML = `Tahniah! Anda berjaya membuktikan bahawa campuran ${inputWarna1} dan ${inputWarna2} akan menghasilkan warna sekunder <strong style="text-transform: capitalize;">${sasaranSemasa.nama}</strong>.`;
+                                document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                            }, 1500);
+
+                        } else {
+                            // JAWAPAN SALAH
+                            if (sfxSalah) sfxSalah.play();
+                            teksAnimasi.innerHTML = "Status: Hasil Ujian Tersasar!";
+                            maklumBalas.innerHTML = "Ralat: Warna primer yang dicampur menghasilkan keputusan berbeza.";
+                            
+                            setTimeout(() => {
+                                document.getElementById("pesan-kalah").innerHTML = `Campuran ${inputWarna1} dan ${inputWarna2} tidak akan menghasilkan warna ${sasaranSemasa.nama}. Sila kaji semula nota warna primer!`;
+                                document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                            }, 1500);
+                        }
+                    }, 1000); // Masa tunggu air berubah warna penuh
+                }, 1000); // Masa tunggu titisan habis jatuh
+
+            } else {
+                maklumBalas.innerHTML = `Ralat Sintaks: Sila ikut format bikar.campur("warna1", "warna2")`;
+                teksAnimasi.innerHTML = "Status: Ralat Tanda Petik / Teks...";
+                if (sfxSalah) sfxSalah.play();
+            }
+            
+            // Kosongkan input
+            document.getElementById('arahanInput').value = '';
+        }
+
+        function bukaInfo() { document.getElementById('modalInfo').classList.add('tunjuk-modal-kustom'); }
+        function tutupInfo() { document.getElementById('modalInfo').classList.remove('tunjuk-modal-kustom'); }
+    </script>
+</body>
+</html>

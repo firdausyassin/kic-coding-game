@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi IoT: Rumah Pintar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="tema-permainan tema-iot" id="badanBilik">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Terminal IoT</h2>
+                <button class="btn-info" onclick="bukaInfo()">ℹ️ Panduan IoT</button>
+            </div>
+            
+            <p>Bilik ini gelap dan panas! Gunakan arahan perkakasan pintar untuk mengawalnya:</p>
+            <p style="color: #f1c40f;">
+               Misi anda: Nyalakan lampu, dan pasang kipas pada kelajuan maksimum (3).
+            </p>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod di sini..." onkeydown="if(event.key === 'Enter') laksanaArahanIoT()">
+            <button onclick="laksanaArahanIoT()">HANTAR ISYARAT 📡</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas">
+                Sistem Pusat sedia. Menunggu isyarat...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: white; text-align: center; margin-top:0; text-shadow: 2px 2px 4px #000;">Bilik Pintar Maya</h2>
+            
+            <div id="ruangAnimasi">
+                <div class="teks-status" id="teksAnimasi" style="color: white; position: absolute; top: 10px; width: 100%; text-align: center; z-index: 30;">
+                    Status: Gelap dan Panas.
+                </div>
+                
+                <div id="bilik-iot">
+                    <div id="kipas-pusing">⚙️</div>
+                    
+                    <div id="mentol-iot">💡</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal kandungan-info" style="max-width: 550px; background-color: #1a252f; border: 2px solid #00f3ff; box-shadow: 0 0 20px #00f3ff;">
+            <h2 style="color: #00f3ff;">🔌 Panduan Kawalan IoT</h2>
+            <p style="color: #ecf0f1;">Anda boleh menghantar arahan-arahan ini satu per satu ke dalam terminal:</p>
+            
+            <ul style="color: #fff; padding-left: 20px; font-size: 14px;">
+                <li><code>lampu.on()</code> : Menyalakan lampu</li>
+                <li><code>lampu.off()</code> : Memadamkan lampu</li>
+                <li><code>kipas.on(1)</code> : Kipas perlahan (Parameter 1, 2, atau 3)</li>
+                <li><code>kipas.off()</code> : Mematikan kipas</li>
+            </ul>
+            
+            <p style="color: #f1c40f; font-weight: bold; font-size: 14px;">Tugasan: Pastikan lampu menyala dan kipas berpusing pada tahap 3 untuk menang!</p>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 10px; width: 100%;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal">
+            <div class="ikon-menang">🏡</div>
+            <h2>Sistem Berjaya!</h2>
+            <p>Anda telah berjaya memprogramkan sistem automasi rumah pintar IoT.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-iot.js"></script>
+</body>
+</html>

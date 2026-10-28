@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akademi C++ : Misi 1A</title>
+    <style>
+        body { margin: 0; padding: 0; background: #050a15; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .latar-kelas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0a192f 0%, #02050a 100%); z-index: 1; }
+        .grid-maya { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px); background-size: 40px 40px; z-index: 2; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+
+        .kanvas-game { position: relative; z-index: 10; display: flex; flex-direction: column; background: rgba(10, 15, 20, 0.95); border: 2px solid #00ff66; border-radius: 12px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.2), inset 0 0 20px rgba(0,0,0,0.8); width: 95%; max-width: 1300px; height: 95vh; margin: 2vh auto; box-sizing: border-box; overflow: hidden; }
+        .header-zon { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; background: rgba(0, 255, 102, 0.1); border-bottom: 1px solid #00ff66; }
+        .header-zon h1 { margin: 0; font-size: 20px; color: #00ff66; text-transform: uppercase; letter-spacing: 2px; }
+        .btn-kembali { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 12px; }
+        .btn-kembali:hover { background: #c0392b; transform: scale(1.05);}
+        .ruang-kerja { display: flex; width: 100%; height: calc(100% - 50px); }
+
+        /* PANEL KIRI */
+        .panel-arahan { width: 30%; padding: 25px; background: rgba(0,0,0,0.4); border-right: 2px solid #333; overflow-y: auto; box-sizing: border-box; text-align: left; }
+        .panel-arahan::-webkit-scrollbar { width: 6px; }
+        .panel-arahan::-webkit-scrollbar-thumb { background: #00ff66; border-radius: 10px; }
+        .tajuk-misi { color: #f1c40f; margin-top: 0; font-size: 20px; border-bottom: 1px dashed #f1c40f; padding-bottom: 10px; text-transform: uppercase;}
+        .panel-arahan p { font-size: 13.5px; color: #d2dae2; line-height: 1.6; margin-bottom: 15px;}
+        .panel-arahan strong { color: #f1c40f; font-weight: bold; }
+        .karakter-container { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: rgba(0, 255, 102, 0.1); border: 1px dashed #00ff66; padding: 15px; border-radius: 10px;}
+        .img-bot { width: 55px; height: auto; filter: drop-shadow(0 0 10px rgba(0, 255, 102, 0.5)); animation: floatBot 2s ease-in-out infinite alternate;}
+        .tutor-bubble { font-size: 13px; line-height: 1.5; color: #fff;}
+        @keyframes floatBot { 0% { transform: translateY(0px); } 100% { transform: translateY(-5px); } }
+
+        /* PANEL TENGAH (IDE) */
+        .panel-ide { width: 40%; display: flex; flex-direction: column; background: #1e1e1e; border-right: 2px solid #333; box-sizing: border-box; }
+        .ide-toolbar { background: #00878f; padding: 10px 15px; display: flex; gap: 10px; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 2;}
+        .btn-ide { border: none; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold; padding: 8px 12px; border-radius: 4px; transition: 0.2s; font-size: 12px;}
+        .btn-upload { background: #e74c3c; border: 1px solid #c0392b; } .btn-upload:hover { background: #c0392b; transform: scale(1.05); }
+        .btn-panduan { background: #3498db; border: 1px solid #2980b9; margin-left: auto;} .btn-panduan:hover { background: #2980b9; transform: scale(1.05); }
+        .btn-video { background: #9b59b6; border: 1px solid #8e44ad; } .btn-video:hover { background: #8e44ad; transform: scale(1.05); }
+
+        .ide-tabs { background: #111; padding: 5px 20px 0 20px; display: flex; border-bottom: 1px solid #333; }
+        .tab-aktif { background: #1e1e1e; color: #fff; padding: 8px 20px; font-size: 13px; font-family: monospace; border-top: 2px solid #00979d; border-radius: 5px 5px 0 0; }
+
+        textarea.kod-editor { flex: 1; padding: 20px; font-family: 'Consolas', monospace; font-size: 16px; line-height: 1.6; background: #1e1e1e; color: #dcdcaa; border: none; outline: none; resize: none; width: 100%; box-sizing: border-box;}
+        
+        .ide-console-container { height: 180px; background: #000; border-top: 2px solid #333; display: flex; flex-direction: column;}
+        .konsol-header { background: #2d2d2d; color: #ccc; padding: 5px 15px; font-size: 12px; font-family: sans-serif; text-align: left;}
+        .ide-console { padding: 15px; font-family: 'Consolas', monospace; font-size: 13px; overflow-y: auto; text-align: left; flex: 1;}
+
+        /* PANEL KANAN (HARDWARE) */
+        .panel-hardware { width: 30%; background: #1a252f; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box;}
+        .tajuk-hardware { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; font-size: 12px; color: #f1c40f; font-weight: bold;}
+        .litar-maya { position: relative; width: 100%; height: 500px; display: flex; justify-content: center; align-items: center;}
+        .kotak-esp32 { width: 160px; height: 220px; background: #111; border: 2px solid #444; border-radius: 8px; box-shadow: inset 0 0 20px #000, 0 10px 20px rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; transition: 0.3s;}
+        .kotak-esp32::before { content: "ESP32"; color: #555; font-weight: bold; font-size: 26px; font-family: monospace; letter-spacing: 2px;}
+
+        /* MODAL PANDUAN */
+        .modal-panduan { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .kandungan-panduan { background: #111; border: 2px solid #00f3ff; border-radius: 15px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); text-align: left;}
+        .kandungan-panduan h2 { margin-top: 0; color: #00f3ff; border-bottom: 1px dashed #00f3ff; padding-bottom: 10px;}
+        .kandungan-panduan p { color: #d2dae2; font-size: 14.5px; line-height: 1.6; }
+        .kod-box { background: #000; color: #00ff66; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 14px; white-space: pre;}
+        .btn-tutup-modal { background: #00f3ff; color: #000; border: none; padding: 10px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 20px; width: 100%; font-size: 15px; }
+
+        /* Status Warna */
+        .teks-putih { color: #fff; display: block; margin-bottom: 4px;}
+        .teks-merah { color: #ff4757; display: block; margin-bottom: 4px;}
+        .teks-hijau { color: #00ff66; font-weight: bold; display: block; margin-bottom: 4px;}
+    </style>
+</head>
+<body>
+
+    <div class="latar-kelas"></div><div class="grid-maya"></div>
+
+    <div class="kanvas-game">
+        <div class="header-zon">
+            <button class="btn-kembali" onclick="window.location.href='index.html'">◀ KEMBALI MENU</button>
+            <h1>ZON BONUS: PENGKODAN SEBENAR</h1>
+            <div style="width: 80px;"></div>
+        </div>
+
+        <div class="ruang-kerja">
+            <div class="panel-arahan">
+                <h2 class="tajuk-misi">Misi 1A: Anatomi Setup & Loop</h2>
+                <div class="karakter-container">
+                    <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar">
+                    <div class="tutor-bubble">"Selamat datang ke Akademi C++! Mari kita bina <strong>dua bilik utama</strong> yang wajib ada untuk menghidupkan mikropengawal."</div>
+                </div>
+                <p>1. <strong>Bilik Persediaan (Setup)</strong><br>Fungsi <code>void setup()</code> dibaca <strong>SEKALI SAHAJA</strong>.</p>
+                <p>2. <strong>Bilik Ulang Kerja (Loop)</strong><br>Fungsi <code>void loop()</code> dibaca secara berulang-ulang tanpa henti!</p>
+                <p>Klik butang <strong>Panduan Misi</strong> di bahagian atas editor kod untuk melihat cara menulis kerangka kod C++ yang betul.</p>
+            </div>
+
+            <div class="panel-ide">
+                <div class="ide-toolbar">
+                    <button class="btn-ide btn-upload" id="btnUpload" onclick="semakKod()">➔ Upload Kod</button>
+                    <button class="btn-ide btn-panduan" onclick="bukaPanduan()">📘 Panduan Misi</button>
+                    <button class="btn-ide btn-video" onclick="bukaVideo()">▶️ Video Tutor</button>
+                </div>
+                <div class="ide-tabs"><div class="tab-aktif">misi_1a_anatomi.ino</div></div>
+                
+                <!-- EDITOR KOSONG (HANYA PLACEHOLDER) -->
+                <textarea id="editorKod" class="kod-editor" spellcheck="false" placeholder="// Buka Panduan Misi. Taipkan kerangka kod anda di sini..."></textarea>
+
+                <div class="ide-console-container">
+                    <div class="konsol-header">Output Console</div>
+                    <div class="ide-console" id="paparanKonsol"><span class="teks-putih">Sistem sedia. Sila bina anatomi kod asas.</span></div>
+                </div>
+            </div>
+
+            <div class="panel-hardware">
+                <div class="tajuk-hardware">PAPAN LITAR MAYA</div>
+                <div class="litar-maya"><div class="kotak-esp32" id="cipESP"></div></div>
+            </div>
+        </div>
+    </div> 
+
+    <!-- 🔥 MODAL PANDUAN MISI 1A 🔥 -->
+    <div id="modalPanduan" class="modal-panduan">
+        <div class="kandungan-panduan">
+            <h2>📘 Panduan Misi 1A</h2>
+            <p>Taipkan kerangka asas ini di ruangan editor. Pastikan anda tidak tertinggal kurungan beralun <strong>{ }</strong> kerana ia adalah "dinding" bilik anda.</p>
+            <div class="kod-box">void setup() {
+
+}
+
+void loop() {
+
+}</div>
+            <button class="btn-tutup-modal" onclick="tutupPanduan()">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <script>
+        function bukaPanduan() { document.getElementById('modalPanduan').style.display = 'flex'; }
+        function tutupPanduan() { document.getElementById('modalPanduan').style.display = 'none'; }
+        function bukaVideo() { alert("Video tutorial Uncle Mat & Faiq akan datang dalam kemaskini seterusnya!"); }
+
+        function semakKod() {
+            const kodDitaip = document.getElementById('editorKod').value;
+            const konsol = document.getElementById('paparanKonsol');
+            const cip = document.getElementById('cipESP');
+            const butang = document.getElementById('btnUpload');
+
+            butang.disabled = true; butang.style.opacity = "0.5";
+            konsol.innerHTML = "<span class='teks-putih'>Kompilasi bermula... Menyemak anatomi C++...</span><br>";
+
+            const kodBersih = kodDitaip.replace(/\s+/g, '');
+            const syaratSetup = /void\s+setup\s*\(\)\s*\{[\s\S]*\}/.test(kodDitaip);
+            const syaratLoop = /void\s+loop\s*\(\)\s*\{[\s\S]*\}/.test(kodDitaip);
+
+            setTimeout(() => {
+                if (syaratSetup && syaratLoop) {
+                    konsol.innerHTML += "<span class='teks-hijau'>[BERJAYA] Anatomi kod disahkan tepat tanpa ralat sintaks!</span><br>";
+                    cip.style.borderColor = "#00ff66"; cip.style.boxShadow = "inset 0 0 20px #000, 0 0 40px rgba(0, 255, 102, 0.4)";
+                } else {
+                    konsol.innerHTML += "<span class='teks-merah'>[RALAT] Kompilasi GAGAL! Mesin menolak skrip anda. Anatomi tidak lengkap.</span><br>";
+                    if (!syaratSetup) konsol.innerHTML += "<span class='teks-putih'>&#8226; Anda belum membina fungsi <strong>void setup() { }</strong>. Rujuk Panduan Misi.</span><br>";
+                    if (!syaratLoop) konsol.innerHTML += "<span class='teks-putih'>&#8226; Anda belum membina fungsi <strong>void loop() { }</strong>. Rujuk Panduan Misi.</span><br>";
+                    cip.style.borderColor = "#ff4757"; cip.style.boxShadow = "inset 0 0 20px #000, 0 5px 20px rgba(255, 71, 87, 0.4)";
+                }
+                konsol.scrollTop = konsol.scrollHeight;
+                butang.disabled = false; butang.style.opacity = "1";
+            }, 800); 
+        }
+    </script>
+</body>
+</html>

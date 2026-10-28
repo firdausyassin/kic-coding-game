@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 6G: Kenal Prisma</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA MAKMAL GEOMETRI */
+        .tema-geometri {
+            background: linear-gradient(135deg, #2c2c54 0%, #130f40 100%) !important;
+            background-image: 
+                radial-gradient(rgba(224, 86, 253, 0.15) 2px, transparent 2px),
+                radial-gradient(rgba(224, 86, 253, 0.1) 2px, transparent 2px) !important;
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            overflow: hidden; position: relative;
+        }
+
+        /* 🔥 KELAS PAUSE GLOBAL 🔥 */
+        .paused * {
+            animation-play-state: paused !important;
+        }
+
+        /* KOTAK STATUS PUTIH RASMI */
+        #teksAnimasi {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            z-index: 100; background: rgba(255, 255, 255, 0.95); color: #2c3e50; 
+            border: 2px solid #e056fd; padding: 8px 20px; border-radius: 8px; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); width: 85%; text-align: center;
+            font-size: 14px; transition: all 0.3s;
+        }
+
+        /* LANTAI MAKMAL */
+        #lantai-makmal {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: #1e1e2e; border-top: 4px solid #e056fd; z-index: 5;
+            box-shadow: inset 0 20px 30px rgba(0,0,0,0.8), 0 -5px 15px rgba(224, 86, 253, 0.3);
+        }
+
+        /* PLATFORM HOLOGRAM (Tengah) */
+        #platform-hologram {
+            position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 20px; background: #4834d4;
+            border: 2px solid #686de0; border-radius: 50% 50% 0 0; z-index: 6;
+            box-shadow: 0 -10px 20px rgba(224, 86, 253, 0.4);
+        }
+        
+        #cahaya-hologram {
+            position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
+            width: 100px; height: 160px;
+            background: linear-gradient(to top, rgba(224, 86, 253, 0.6), transparent);
+            clip-path: polygon(20% 0, 80% 0, 100% 100%, 0% 100%);
+            z-index: 7; opacity: 0.8; animation: kelipHologram 2s infinite alternate;
+        }
+        @keyframes kelipHologram { 0% { opacity: 0.5; } 100% { opacity: 0.9; } }
+
+        /* OBJEK GEOMETRI */
+        #objek-bentuk {
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+            font-size: 80px; z-index: 10; line-height: 1; margin: 0;
+            filter: drop-shadow(0 0 15px #e056fd);
+            transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        /* Animasi Objek (Buang ke Tepi / Asingkan) */
+        .objek-terpelanting { transform: translateX(150px) translateY(50px) rotate(45deg) scale(0.5) !important; opacity: 0; }
+
+        /* COP LABEL PRISMA */
+        #label-prisma {
+            position: absolute; top: 120px; left: 50%; transform: translateX(-50%) scale(0);
+            background: rgba(46, 204, 113, 0.9); color: #fff; padding: 5px 15px;
+            border: 3px solid #fff; border-radius: 8px; font-weight: bold; font-family: monospace;
+            font-size: 20px; letter-spacing: 2px; z-index: 20; opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 20px #2ecc71;
+        }
+        .cop-muncul { transform: translateX(-50%) scale(1) rotate(-10deg) !important; opacity: 1 !important; }
+
+        /* SKRIN PENDERIA */
+        #skrin-pengimbas {
+            position: absolute; top: 60px; left: 8%; width: 160px; background: rgba(10, 10, 20, 0.9);
+            border: 3px solid #e056fd; border-radius: 8px; padding: 10px; text-align: center;
+            box-shadow: 0 0 15px rgba(224, 86, 253, 0.3); z-index: 5;
+        }
+        .label-skrin { color: #e056fd; font-family: sans-serif; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; font-weight: bold;}
+        .data-dikesan { color: #fff; font-family: monospace; font-size: 13px; margin: 0; }
+        #status-ciri { color: #f1c40f; font-weight: bold; font-size: 18px; text-shadow: 0 0 8px rgba(241,196,15,0.5); transition: color 0.3s;}
+
+        /* TONG PENGASINGAN (Kanan) */
+        #tong-asing {
+            position: absolute; bottom: 65px; right: 5%; font-size: 60px; z-index: 4;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        /* WATAK OPERATOR */
+        #kotak-pekerja { position: absolute; bottom: 15px; left: 5%; z-index: 30; display: flex; flex-direction: column; align-items: center; }
+        #ikonPekerja { font-size: 60px; line-height: 1; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%) scale(0); 
+            background: rgba(255,255,255,0.95); color: #1c2833; padding: 10px 15px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 90; text-align: center; 
+            width: max-content; max-width: 220px; white-space: normal !important; word-wrap: break-word;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); pointer-events: none; border: 2px solid #e056fd;
+        }
+        .awan-dialog::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: #e056fd transparent transparent transparent; }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom { background: #1a1a2e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; text-align: center; color: #fff; box-shadow: 0 0 30px rgba(224, 86, 253, 0.3); border: 2px solid #e056fd; }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(231, 76, 60, 0.4); border: 2px solid #e74c3c; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #e056fd; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Geometri<br><span style="font-size: 16px; color: #e056fd;">(Misi 6G - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #e056fd; color: #fff; border-color: #be2edd; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #e056fd; color: #fff; border-color: #be2edd; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 8px; font-size: 13px; line-height: 1.3;">Matematik Tahun 3: Prisma mempunyai <strong>keratan rentas yang seragam</strong>. Jika seragam, ia adalah Prisma. Jika tidak, asingkannya!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border-left: 3px solid #e056fd; line-height: 1.3;">
+                <strong style="color: #e056fd;">Tindakan Mesin:</strong><br>
+                <code>mesin.label_prisma()</code> | <code>mesin.asingkan_objek()</code><br>
+                <strong style="color: #f1c40f;">Formula Pengesahan:</strong><br>
+                <code style="color: #fff;">if(keratan=="seragam"){</code><br>
+                <code style="color: #bdc3c7;">&nbsp;&nbsp;mesin.label_prisma()</code><br>
+                <code style="color: #fff;">}else{</code><br>
+                <code style="color: #bdc3c7;">&nbsp;&nbsp;mesin.asingkan_objek()</code><br>
+                <code style="color: #fff;">}</code>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip kod if-else penuh di sini..." spellcheck="false" style="width: 100%; height: 175px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; resize: vertical; margin-bottom: 5px;"></textarea>
+            
+            <button onclick="laksanaArahanTahap6g()" style="margin-top: 5px; margin-bottom: 5px; background: linear-gradient(135deg, #e056fd, #be2edd); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(224, 86, 253, 0.4);">ANALISIS BENTUK 🔍</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #e056fd; padding: 8px; font-size: 12px;">
+                Hologram sedia. Menunggu unjuran 3D...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Pengimbas Prisma 3D</h2>
+            
+            <div id="ruangAnimasi" class="tema-geometri">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.9); color: #2c3e50; border: 2px solid #e056fd; z-index: 100;">
+                    Status: Penderia mengenal pasti bentuk...
+                </div>
+                
+                <div id="lantai-makmal"></div>
+                <div id="tong-asing">🗑️</div>
+
+                <!-- PLATFORM & OBJEK HOLOGRAM -->
+                <div id="platform-hologram"></div>
+                <div id="cahaya-hologram"></div>
+                <div id="objek-bentuk">❓</div>
+                
+                <!-- COP PRISMA -->
+                <div id="label-prisma">PRISMA ✅</div>
+
+                <!-- SKRIN PENDERIA -->
+                <div id="skrin-pengimbas">
+                    <div class="label-skrin">Penderia Bentuk</div>
+                    <p class="data-dikesan">Keratan Rentas:</p>
+                    <p id="status-ciri">TIADA</p>
+                </div>
+
+                <div id="kotak-pekerja">
+                    <div id="dialogPekerja" class="awan-dialog">Loading...</div>
+                    <span id="ikonPekerja">👩‍🏫</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🧊🔺</div>
+            <h2 style="color: #e056fd;">Kenali Bentuk Prisma</h2>
+            <p style="text-align: left;">Dalam Matematik Tahun 3, ciri utama bentuk Prisma ialah ia mempunyai <strong>keratan rentas yang seragam</strong>. Tidak kira di mana anda memotongnya, bentuk permukaannya tetap sama!</p>
+            
+            <div style="background: rgba(224, 86, 253, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #e056fd;">
+                <strong>Cara Mengelas:</strong><br><br>
+                • <strong>Prisma (Kuboid/Kubus)</strong>: Keratan <code>"seragam"</code>. Gunakan arahan <code>mesin.label_prisma()</code>.<br>
+                • <strong>Bukan Prisma (Piramid/Kon)</strong>: Keratan menirus (mengecil ke atas). Melompat ke fungsi ELSE, gunakan arahan <code>mesin.asingkan_objek()</code>.<br><br>
+                Gunakan logik IF-ELSE untuk mengawal mesin dengan automatik!
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #e056fd; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- MODAL KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">📐✅</div>
+            <h2 style="color: #27ae60;">Klasifikasi Tepat!</h2>
+            <p style="color: #d2dae2;">Hebat! Anda berjaya membina sistem algoritma yang pandai membezakan antara bentuk Prisma dan Bukan Prisma. Pengetahuan Matematik anda memang mantap!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #2ecc71; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KALAH / RALAT -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;">💥❌</div>
+            <h2 style="color: #e74c3c;">Ralat Geometri!</h2>
+            <p style="color: #d2dae2;" id="pesan-kalah-teks">Mesin telah melabelkan objek secara songsang! Piramid tidak mempunyai keratan rentas seragam, dan Kuboid adalah Prisma. Sila periksa urutan IF-ELSE anda.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #e74c3c; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap6g.js"></script>
+</body>
+</html>

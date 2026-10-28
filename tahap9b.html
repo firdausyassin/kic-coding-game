@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 9B: Dron Tinjauan Siber</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KAWASAN SIBER */
+        .tema-dron {
+            background: linear-gradient(180deg, #192a56 0%, #273c75 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* GRID SIBER (LATAR BELAKANG) */
+        .grid-siber {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px; z-index: 1;
+        }
+
+        /* LANTAI PANGKALAN */
+        #lantai-dron {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
+            background: #2c3e50; border-top: 3px solid #00f3ff;
+            box-shadow: 0 -5px 15px rgba(0, 243, 255, 0.2); z-index: 5;
+        }
+
+        /* TEMBOK FIREWALL (HALANGAN) */
+        #firewall {
+            position: absolute; bottom: 60px; left: 55%; transform: translateX(-50%);
+            width: 40px; height: 180px; 
+            background: rgba(231, 76, 60, 0.2);
+            border: 2px solid #e74c3c; border-bottom: none;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5), inset 0 0 10px #e74c3c;
+            z-index: 10;
+        }
+        
+        .grid-api {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(231, 76, 60, 0.5) 10px, rgba(231, 76, 60, 0.5) 20px);
+            animation: gerakApi 1s linear infinite;
+        }
+        @keyframes gerakApi { 0% { background-position: 0 0; } 100% { background-position: 0 20px; } }
+        
+        /* LABEL FIREWALL */
+        .label-halangan {
+            position: absolute; bottom: 250px; left: 55%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: #e74c3c; border: 1px solid #e74c3c;
+            padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 12px;
+            z-index: 11; font-weight: bold;
+        }
+
+        /* 🔥 DRON SIBER KUSTOM (Idea 4 Dash Berpusing) 🔥 */
+        #dron {
+            position: absolute; bottom: 70px; left: 10%;
+            width: 70px; height: 70px; z-index: 20;
+            /* Transition mutlak untuk Event-Driven Promise */
+            transition: bottom 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        left 2s cubic-bezier(0.42, 0, 0.58, 1);
+        }
+        
+        /* Badan Dron (UFO) */
+        .ufo-body {
+            position: absolute; top: 0; left: 0;
+            font-size: 70px; line-height: 1; margin: 0; 
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.6));
+        }
+
+        /* 4 Kipas Dron Berpusing (Dash) */
+        .rotor {
+            position: absolute; font-size: 30px; color: #fff; font-weight: 900; line-height: 1;
+            animation: pusingDron 0.05s linear infinite; text-shadow: 0 0 8px #00f3ff; z-index: 21;
+        }
+        .r1 { top: 0px; left: -5px; }
+        .r2 { top: 0px; right: -5px; }
+        .r3 { bottom: 15px; left: -15px; }
+        .r4 { bottom: 15px; right: -15px; }
+
+        @keyframes pusingDron { 0% { transform: rotate(0deg); } 100% { transform: rotate(180deg); } }
+
+        /* SKRIN PAPARAN DRON */
+        #skrin-dron {
+            position: absolute; top: 10%; left: 15%;
+            background: rgba(0, 20, 30, 0.85); border: 2px solid #00f3ff; border-radius: 8px;
+            padding: 10px 15px; color: #00f3ff; font-family: monospace; font-size: 16px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); z-index: 15;
+        }
+        .status-hijau { color: #2ecc71 !important; text-shadow: 0 0 5px #2ecc71; }
+        .status-merah { color: #e74c3c !important; text-shadow: 0 0 5px #e74c3c; }
+
+        /* 🔥 DIALOG SISTEM AI (Tali Biru Dibaiki) 🔥 */
+        .awan-dialog {
+            position: absolute; top: 20px; left: 50%; 
+            width: 250px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: translateX(-50%) scale(0); transform-origin: top center;
+            background: rgba(255, 255, 255, 0.95) !important; color: #2c3e50 !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important; white-space: normal !important; 
+            text-align: center !important; border: 3px solid #00f3ff !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        /* Ekor awan dialog standard kat bawah tengah, bukan kat tepi lagi */
+        .awan-dialog::after {
+            content: ''; position: absolute; bottom: -12px; left: 50%; margin-left: -8px;
+            border-width: 9px; border-style: solid; border-color: #00f3ff transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) translateY(10px) !important; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Logik<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 9B)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Tembok Firewall sangat tinggi! Tuliskan syarat penerbangan supaya dron hanya terbang jika altitudnya <strong>lebih besar daripada 8000</strong>.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #00f3ff;">
+                <strong>Operator Logik Perbandingan:</strong><br>
+                Simbol Lebih Besar (<code>></code>)<br><br>
+                <strong style="color: #00f3ff;">Format Kod:</strong><br>
+                <code>sistem.semak(altitud > 8000)</code><br><br>
+                <span style="color: #bdc3c7; font-size: 11px;">Jika altitud enjin terbukti lebih daripada 8000 (True), dron akan terbang melepasi halangan dengan selamat.</span>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip syarat pelepasan udara di sini..." spellcheck="false" style="width: 100%; height: 60px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanTahap9b()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00f3ff, #0984e3); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);">PENGESAHAN TERBANG 🛰️</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00f3ff; padding: 10px; font-size: 13px;">
+                Enjin Dron melahu. Menunggu parameter ketinggian disahkan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Ruang Siber</h2>
+            
+            <div id="ruangAnimasi" class="tema-dron">
+                
+                <div class="grid-siber"></div>
+                <div id="dialogSistem" class="awan-dialog"></div>
+                
+                <!-- PAPARAN DATA -->
+                <div id="skrin-dron">
+                    <div>ALTITUD SEMASA: <span id="papar-altitud" class="status-hijau">----</span></div>
+                    <div>STATUS LOGIK: <span id="papar-status">MENUNGGU</span></div>
+                </div>
+
+                <!-- HALANGAN FIREWALL -->
+                <div id="firewall"><div class="grid-api"></div></div>
+                <div class="label-halangan">HAD: 8000</div>
+
+                <!-- DRON (Dah buang helikopter, ganti dash) -->
+                <div id="dron">
+                    <div class="rotor r1">━</div>
+                    <div class="rotor r2">━</div>
+                    <div class="rotor r3">━</div>
+                    <div class="rotor r4">━</div>
+                    <div class="ufo-body">🛸</div>
+                </div>
+
+                <!-- LANTAI -->
+                <div id="lantai-dron"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #00f3ff; box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);">
+            <h2 style="color: #00f3ff;">🛰️ Logik Boolean (> Lebih Besar)</h2>
+            <p style="color: #ecf0f1; font-size: 15px;">Kali ini kita menggunakan operator perbandingan <strong>Lebih Besar Daripada (>)</strong> untuk menghasilkan keputusan <strong>TRUE</strong>.</p>
+            
+            <div style="background: rgba(0, 243, 255, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #00f3ff;">
+                <strong>Bagaimana ia berfungsi?</strong><br><br>
+                Tembok Firewall itu berketinggian 8000. Dron anda mempunyai kapasiti altitud yang tinggi tetapi sistem perlukan pengesahan logik anda.<br><br>
+                Berikan syarat ini:<br>
+                <code>altitud > 8000</code><br><br>
+                Jika dron mempunyai tenaga altitud bernilai 8500, mesin akan menilai: <i>"Adakah 8500 lebih besar daripada 8000?"</i><br>
+                Jawapannya <strong>TRUE</strong>, dan Dron akan terbang tinggi melepasi tembok tersebut!
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00f3ff; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- TUKAR IKON KEJAYAAN -->
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">🛰️✅</div>
+            <h2 style="color: #2ecc71;">Logik TRUE Disahkan!</h2>
+            <p style="color: #ecf0f1;">Terbaik! Anda telah menguasai operator Lebih Besar Daripada (<code>></code>). Pengurusan True/False (Boolean) ini adalah nadi utama dalam sistem kepintaran buatan (AI).</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #000; font-weight: bold;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap9b.js"></script>
+</body>
+</html>

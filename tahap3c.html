@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tahap 3C: Monyet Panjat Pokok</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA HUTAN MENEGAK (RIMBA TROPIKA) */
+        .tema-hutan-menegak {
+            background: linear-gradient(to bottom, #4facfe 0%, #a8e063 60%, #56ab2f 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* TANAH RIMBA (3D Depth) */
+        #tanah-belakang {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 160px;
+            background: linear-gradient(to bottom, #2ecc71, #1e8449);
+            z-index: 5; border-top: 8px solid #27ae60;
+            box-shadow: inset 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        /* LATAR BELAKANG HUTAN BERLAPIS (Parallax Illusion) */
+        .objek-latar { position: absolute; z-index: 1; pointer-events: none; }
+        .pokok-hutan { position: absolute; z-index: 2; line-height: 1; margin: 0; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
+        
+        #hutan1 { left: 5%; bottom: 155px; font-size: 150px; filter: brightness(0.8) drop-shadow(0 5px 5px rgba(0,0,0,0.5)); z-index: 3;}
+        #hutan2 { left: 20%; bottom: 170px; font-size: 120px; filter: blur(2px) brightness(0.6); z-index: 1;}
+        #hutan3 { right: 25%; bottom: 150px; font-size: 180px; filter: brightness(0.75); z-index: 3;}
+        #hutan4 { right: 5%; bottom: 165px; font-size: 130px; filter: blur(1px) brightness(0.7); z-index: 2;}
+
+        #awan1 { top: 10%; left: 40%; font-size: 80px; animation: gerakAwan 20s linear infinite alternate; opacity: 0.9;}
+        #awan2 { top: 25%; left: 10%; font-size: 60px; animation: gerakAwan 25s linear infinite alternate-reverse; opacity: 0.8;}
+        #matahari { top: 5%; right: 10%; font-size: 100px; filter: drop-shadow(0 0 30px #f1c40f); animation: putarMatahari 20s linear infinite;}
+        
+        @keyframes gerakAwan { 0% { transform: translateX(0); } 100% { transform: translateX(60px); } }
+        @keyframes putarMatahari { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 🔥 BATANG POKOK PISANG (z-index 3 supaya duduk BELAKANG daun) 🔥 */
+        #batang-pisang {
+            position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%);
+            width: 55px; height: 260px; 
+            background: repeating-linear-gradient(
+                0deg,
+                #8bc34a,
+                #8bc34a 25px,
+                #7cb342 25px,
+                #7cb342 28px
+            ); 
+            border-radius: 8px 8px 0 0; 
+            z-index: 3; 
+            border-left: 5px solid #558b2f; border-right: 5px solid #33691e;
+            box-shadow: inset -10px 0 20px rgba(0,0,0,0.4), 10px 10px 15px rgba(0,0,0,0.3);
+        }
+        
+        /* 🔥 DAUN PISANG (z-index 5 supaya MENINDIH batang pisang) 🔥 */
+        #daun-pisang-kumpulan {
+            position: absolute; bottom: 415px; left: 50%; transform: translateX(-50%);
+            z-index: 5; 
+            width: 200px; height: 0px;
+        }
+        
+        .daun-css {
+            position: absolute; width: 130px; height: 45px; 
+            background: linear-gradient(to bottom, #4caf50, #2e7d32);
+            border-radius: 50% 50% 50% 50% / 100% 0 100% 0; 
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3), 5px 5px 10px rgba(0,0,0,0.4);
+            border-top: 2px solid #8bc34a;
+        }
+        #daun1 { bottom: -25px; left: -40px; transform: rotate(-35deg); }
+        #daun2 { bottom: -25px; right: -40px; transform: scaleX(-1) rotate(-35deg); }
+        #daun3 { bottom: -40px; left: -10px; transform: rotate(-60deg); height: 50px; width: 150px; }
+        #daun4 { bottom: -40px; right: -10px; transform: scaleX(-1) rotate(-45deg); height: 50px; width: 140px; }
+        
+        /* PISANG SETANDAN GERGASI */
+        #pisang-gergasi {
+            position: absolute; bottom: 335px; left: 52%; transform: translateX(-50%);
+            font-size: 60px; z-index: 6; transition: opacity 0.3s;
+            line-height: 1; margin: 0; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+        }
+
+        /* SANG MONYET */
+        #monyet {
+            position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%);
+            font-size: 60px; 
+            
+            /* 🔥 ISU 1: TINGKATKAN Z-INDEX UNTUK MONYET & DIALOG (DI ATAS KOTAK STATUS) 🔥 */
+            z-index: 200; 
+            
+            transition: bottom 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.5s ease; 
+            width: max-content; text-align: center; display: flex; flex-direction: column; align-items: center;
+            line-height: 1; margin: 0; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+        .monyet-jatuh { transform: translateX(-50%) rotate(720deg) scale(0.8) !important; transition: bottom 0.6s ease-in, transform 0.6s linear !important; }
+
+        /* Pisang Yang Dipegang Monyet */
+        #pisang-tangan {
+            position: absolute; top: 15px; right: -10px; font-size: 40px; 
+            opacity: 0; z-index: 15; transform: rotate(15deg); 
+            transition: opacity 0.3s ease-in; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; transform: scale(0); background: #ffffff; color: #1c2833;
+            padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; width: max-content; max-width: 180px; 
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); pointer-events: none; border: 2px solid #f39c12;
+        }
+        
+        /* 🔥 MEMBUNUH JARUM PUTIH ASAL 🔥 */
+        .awan-dialog::before, #dialogMonyet::before { display: none !important; }
+
+        #dialogMonyet { bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); transform-origin: bottom center; margin-bottom: 5px; }
+        #dialogMonyet::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: #f39c12 transparent transparent transparent; }
+        
+        /* Dialog Buka */
+        .buka-cakap { transform: translateX(-50%) scale(1) !important; }
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(241, 196, 15, 0.3); border: 2px solid #f1c40f;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #f1c40f; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <!-- HEADER TERMINAL DIKEMASKINI -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Ketinggian<br><span style="font-size: 16px; color: #f1c40f;">(Misi 3C - Zon 1)</span></h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #f1c40f; color: #000; border-color: #f39c12; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #f1c40f; color: #000; border-color: #f39c12; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Tandan pisang gergasi berada di puncak pokok pada ketinggian tepat <strong>10 Meter</strong>.</p>
+            <p style="color: #e74c3c; font-weight: bold; font-size: 13px; line-height: 1.4;">Gunakan parameter menegak (Paksi-Y). Anda DIWAJIBKAN memanjat secara berperingkat!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #f1c40f; font-family: monospace;">
+                <strong style="color: #f1c40f; font-family: sans-serif;">Contoh Penambahan (Memori):</strong><br><br>
+                <span style="color: #bdc3c7;">1. Taip:</span> <span style="color: #fff;">monyet.panjat(4)</span><br>
+                <span style="color: #bdc3c7;">2. Taip:</span> <span style="color: #fff;">monyet.panjat(6)</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap3c()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap3c()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4);">JALANKAN KOD 🚀</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #f1c40f; padding: 10px; font-size: 13px;">
+                Sistem koordinat Y sedia. Menunggu input...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-hutan-menegak">
+                
+                <!-- 🔥 ISU 1: GAYA SEBARIN PADA KOTAK STATUS (TEKS-STATUS) UNTUK MERENDAHKAN Z-INDEX 🔥 -->
+                <div id="teksAnimasi" class="teks-status" style="z-index: 100; background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #f1c40f;">
+                    Status: Monyet sedang meninjau puncak pokok pisang...
+                </div>
+                
+                <div id="awan1" class="objek-latar">☁️</div>
+                <div id="awan2" class="objek-latar">☁️</div>
+                <div id="matahari" class="objek-latar">☀️</div>
+                
+                <!-- Hutan Belakang -->
+                <div id="hutan1" class="pokok-hutan">🌴</div>
+                <div id="hutan2" class="pokok-hutan">🌲</div>
+                <div id="hutan3" class="pokok-hutan">🌲</div>
+                <div id="hutan4" class="pokok-hutan">🌴</div>
+                
+                <div id="tanah-belakang"></div>
+
+                <!-- POKOK PISANG & BUAH -->
+                <div id="batang-pisang"></div>
+                <div id="daun-pisang-kumpulan">
+                    <div id="daun1" class="daun-css"></div>
+                    <div id="daun2" class="daun-css"></div>
+                    <div id="daun3" class="daun-css"></div>
+                    <div id="daun4" class="daun-css"></div>
+                </div>
+                <div id="pisang-gergasi">🍌</div>
+                
+                <div id="monyet">
+                    <div id="dialogMonyet" class="awan-dialog"></div>
+                    <span id="ikonMonyet">🐒</span>
+                    <!-- Pisang yang akan dipegang oleh monyet -->
+                    <span id="pisang-tangan">🍌</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN KUSTOM PRO -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🐒📈</div>
+            <h2>Panduan Paksi-Y</h2>
+            <p style="text-align: left;">Misi ini melatih logik penambahan parameter pada kedudukan menegak (Y-Axis).</p>
+            <div style="background: rgba(241, 196, 15, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #f1c40f;">
+                <strong>Cara Bermain:</strong><br><br>
+                1. Monyet perlu naik tepat <strong>10 meter</strong>.<br>
+                2. Anda <strong>DIWAJIBKAN</strong> memanjat secara berperingkat (Contoh: Mula dengan 4 meter, kemudian tambah 6 meter).<br>
+                3. Berhati-hati! Jika jumlah melebihi 10, monyet akan terlajak dari dahan dan jatuh berderai ke tanah!
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #f1c40f; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN KUSTOM PRO -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🍌🐒</div>
+            <h2 style="color: #0be881;">Pakar Koordinat!</h2>
+            <p>Hebat! Anda berjaya menguasai logik penambahan matematik menegak (Paksi-Y) dengan sangat sempurna.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💫</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Misi Gagal!</h2>
+            <p id="pesan-kalah">Monyet cedera parah akibat ralat parameter.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script src="script-tahap3c.js"></script>
+
+    <!-- 🔥 SKRIP INLINE OVERRIDE: DELAY DIALOG DILAMBATKAN & KEMBALI KOSONG INPUT 🔥 -->
+    <script>
+        // Simulasi nilai memori terkumpul untuk Misi 3C (Ganti fungsi asal)
+        let nilaiTerkumpulY = 0;
+        
+        function laksanaArahanTahap3c() {
+            let inputRaw = document.getElementById('arahanInput').value.replace(/\s+/g, '');
+            let maklumBalas = document.getElementById('maklumBalas');
+            let teksAnimasi = document.getElementById('teksAnimasi');
+            let monyet = document.getElementById('monyet');
+            let pisangPokok = document.getElementById('pisang-gergasi');
+            let pisangTangan = document.getElementById('pisang-tangan');
+            let dialogMonyet = document.getElementById('dialogRusa') || document.getElementById('dialogMonyet'); // Just in case id tertukar
+            
+            let modalMenang = document.getElementById('modalKemenangan');
+            let modalKalah = document.getElementById('modalKalah');
+            
+            // Regex detect: monyet.panjat(nombor)
+            let match = inputRaw.match(/^monyet\.panjat\((\d+)\)$/);
+
+            if (match) {
+                let langkah = parseInt(match[1]);
+
+                // SYARAT KHAS: Tak boleh terus taip 10
+                if (langkah === 10 && nilaiTerkumpulY === 0) {
+                    maklumBalas.innerHTML = "Ralat: Anda mesti memanjat secara berperingkat!";
+                    teksAnimasi.innerHTML = "Status: Batang licin! Monyet kena naik sikit-sikit.";
+                    dialogMonyet.innerHTML = "Tinggi sangat! Aku tak berani naik terus!";
+                    dialogMonyet.classList.add('buka-cakap');
+                    
+                    let bunyiSalah = document.getElementById('bunyiSalah');
+                    if(bunyiSalah) bunyiSalah.play();
+                    
+                    setTimeout(() => {
+                        dialogMonyet.classList.remove('buka-cakap');
+                    }, 3000);
+                    return; // Stop execution
+                }
+
+                // Tambah nilai ke memori
+                nilaiTerkumpulY += langkah;
+
+                // Animasi Panjat Naik (Setiap nombor bersamaan lebih kurang 18px ke atas)
+                let posisiBaru = 160 + (nilaiTerkumpulY * 18);
+                monyet.style.bottom = posisiBaru + 'px';
+
+                // ----- LOMPATAN TERKUMPUL TEPAT (MENANG) -----
+                if (nilaiTerkumpulY === 10) {
+                    maklumBalas.innerHTML = "Koordinat disahkan. Monyet berjaya mencapai dahan.";
+                    teksAnimasi.innerHTML = "Status: Mencapai ketinggian 10 Meter!";
+                    
+                    // Delay 1: Tunggu Monyet sampai ke atas (0.8s asal CSS)
+                    setTimeout(() => {
+                        dialogMonyet.innerHTML = "Yahoo! Dapat pisang!!";
+                        dialogMonyet.classList.add('buka-cakap');
+                        
+                        pisangPokok.style.opacity = '0'; // Pisang di pokok hilang
+                        pisangTangan.style.opacity = '1'; // Pisang di tangan muncul
+                        
+                        let bunyiBetul = document.getElementById('bunyiBetul');
+                        if(bunyiBetul) bunyiBetul.play();
+                        
+                        // Delay 2: Biar Monyet "cakap" lama sikit (2.5 Saat)
+                        setTimeout(() => {
+                            teksAnimasi.innerHTML = "Status: Operasi logik memori berjaya dilaksanakan!";
+                            
+                            // Delay 3: Timbul Modal Menang (1.5 Saat)
+                            setTimeout(() => {
+                                dialogMonyet.classList.remove('buka-cakap');
+                                modalMenang.classList.add('tunjuk-modal-kustom');
+                                let bunyiMenang = document.getElementById('bunyiMenang');
+                                if(bunyiMenang) bunyiMenang.play();
+                            }, 1500);
+
+                        }, 2500);
+
+                    }, 800);
+                } 
+                
+                // ----- LOMPATAN TERKUMPUL TERLAJAK (KALAH JATUH) -----
+                else if (nilaiTerkumpulY > 10) {
+                    maklumBalas.innerHTML = `Ralat: Jumlah terkumpul (${nilaiTerkumpulY}) melepasi had 10 Meter!`;
+                    teksAnimasi.innerHTML = "Status: Monyet terlajak tinggi...";
+                    
+                    // Delay 1: Tunggu monyet naik atas sekali
+                    setTimeout(() => {
+                        dialogMonyet.innerHTML = "Alamak, terlebih naik lahh!!";
+                        dialogMonyet.classList.add('buka-cakap');
+                        
+                        // Delay 2: Monyet sedar dia terlajak (2 Saat)
+                        setTimeout(() => {
+                            dialogMonyet.classList.remove('buka-cakap');
+                            teksAnimasi.innerHTML = "Status: Ranting patah! Monyet jatuh terhempas!";
+                            
+                            // Monyet jatuh pusing
+                            monyet.classList.add('monyet-jatuh');
+                            monyet.style.bottom = '80px'; 
+                            
+                            let bunyiSalah = document.getElementById('bunyiSalah');
+                            if(bunyiSalah) bunyiSalah.play();
+                            
+                            // Delay 3: Monyet Pening kat lantai (2 Saat)
+                            setTimeout(() => {
+                                dialogMonyet.innerHTML = "Aduh! Berpinar mata aku...";
+                                dialogMonyet.classList.add('buka-cakap');
+                                
+                                // Delay 4: Baru keluar Modal Kalah (2.5 Saat)
+                                setTimeout(() => {
+                                    dialogMonyet.classList.remove('buka-cakap');
+                                    modalKalah.classList.add('tunjuk-modal-kustom');
+                                }, 2500);
+
+                            }, 1000); // Masa animasi monyet jatuh pusing
+
+                        }, 2000); 
+
+                    }, 800);
+                } 
+                
+                // ----- LOMPATAN BELUM CUKUP (ON THE WAY) -----
+                else {
+                    maklumBalas.innerHTML = `Koordinat ${nilaiTerkumpulY} meter direkodkan. Tinggi lagi!`;
+                    teksAnimasi.innerHTML = `Status: Memanjat ke paras ${nilaiTerkumpulY} Meter...`;
+                    
+                    setTimeout(() => {
+                        dialogMonyet.innerHTML = `Sikit lagi... baru ${nilaiTerkumpulY} meter ni!`;
+                        dialogMonyet.classList.add('buka-cakap');
+                        
+                        setTimeout(() => {
+                            dialogMonyet.classList.remove('buka-cakap');
+                        }, 2500); // 2.5 Saat sebelum dialog on-the-way hilang
+
+                    }, 800);
+                }
+            } else {
+                maklumBalas.innerHTML = "Ralat: Format arahan tidak sah!";
+                teksAnimasi.innerHTML = "Status: Sistem gagal membaca kod...";
+                let bunyiSalah = document.getElementById('bunyiSalah');
+                if(bunyiSalah) bunyiSalah.play();
+            }
+            
+            // 🔥 ISU 2: KEMBALIKAN KOSONG PADA INPUT TERMINAL SELEPAS DIJALANKAN 🔥
+            document.getElementById('arahanInput').value = ''; 
+        }
+    </script>
+</body>
+</html>

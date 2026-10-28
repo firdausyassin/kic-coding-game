@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 2D: Mesin Wang Syiling</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KANTIN / RUANG REHAT */
+        .tema-kantin {
+            background: linear-gradient(to bottom, #ecf0f1 0%, #bdc3c7 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* LANTAI JUBIN */
+        #lantai-jubin {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: repeating-linear-gradient(45deg, #95a5a6, #95a5a6 20px, #7f8c8d 20px, #7f8c8d 40px);
+            z-index: 1; border-top: 6px solid #34495e;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* ========================================================
+           🔥 MESIN LAYAN DIRI (VENDING MACHINE CSS) 🔥
+           ======================================================== */
+        #mesin-vending {
+            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+            width: 240px; height: 350px; background: #e74c3c;
+            border: 5px solid #c0392b; border-radius: 15px 15px 5px 5px; z-index: 5;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.4), inset -10px -10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Papan Tanda Atas Mesin */
+        #papan-tanda {
+            width: 100%; height: 40px; background: #222; border-bottom: 3px solid #c0392b;
+            color: #f1c40f; text-align: center; line-height: 40px; font-weight: bold;
+            font-family: monospace; font-size: 18px; letter-spacing: 2px;
+            text-shadow: 0 0 5px #f1c40f; border-radius: 10px 10px 0 0;
+        }
+
+        /* Cermin Kaca Utama */
+        #cermin-kaca {
+            position: absolute; top: 55px; left: 15px; width: 150px; height: 170px;
+            background: rgba(174, 214, 241, 0.4); border: 3px solid #34495e;
+            border-radius: 8px; overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* Rak dalam cermin */
+        .rak {
+            position: absolute; bottom: 10px; left: 0; width: 100%; height: 5px;
+            background: #7f8c8d; box-shadow: 0 2px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Air Tin Atas */
+        #air-tin {
+            position: absolute; top: 70px; left: 0; width: 100%; text-align: center; font-size: 65px; 
+            transition: opacity 0.3s ease;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+        .hilang-tin { opacity: 0 !important; }
+
+        /* Panel Kanan (Tempat Duit) */
+        #panel-kawalan {
+            position: absolute; top: 55px; right: 15px; width: 45px; height: 170px;
+            background: #bdc3c7; border: 2px solid #7f8c8d; border-radius: 5px;
+            display: flex; flex-direction: column; align-items: center; padding-top: 15px;
+        }
+
+        #lubang-syiling {
+            width: 8px; height: 35px; background: #000; border: 2px solid #333;
+            border-radius: 4px; box-shadow: 0 2px 2px rgba(255,255,255,0.5);
+            z-index: 15; 
+        }
+
+        /* Skrin Harga Hijau */
+        #skrin-harga {
+            margin-top: 20px; width: 35px; height: 25px; background: #2c3e50;
+            color: #bdc3c7; 
+            font-family: monospace; font-size: 14px; font-weight: bold;
+            display: flex; justify-content: center; align-items: center;
+            border: 2px solid #1a252f; box-shadow: inset 0 0 5px #000;
+            transition: all 0.3s ease;
+        }
+        
+        .baki-cukup {
+            color: #0be881 !important; 
+            text-shadow: 0 0 5px #0be881;
+            box-shadow: inset 0 0 8px rgba(11, 232, 129, 0.5) !important;
+        }
+
+        /* Ruang Keluar Air Bawah */
+        #ruang-keluar {
+            position: absolute; bottom: 20px; left: 15px; width: 150px; height: 75px;
+            background: #2c3e50; border: 4px solid #1a252f; border-radius: 10px;
+            box-shadow: inset 0 15px 20px rgba(0,0,0,0.6); overflow: hidden;
+            display: flex; justify-content: center; align-items: flex-end; padding-bottom: 5px;
+        }
+
+        /* Air Tin yang dah jatuh */
+        #air-tin-keluar {
+            font-size: 65px; opacity: 0; transform: translateY(-50px);
+            transition: all 0.4s ease-out; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+        .dah-jatuh { opacity: 1 !important; transform: translateY(0) !important; }
+
+        /* ========================================================
+           🔥 SYILING & ANIMASI (DIPERBAIKI KOORDINAT & GHAIB) 🔥
+           ======================================================== */
+        #syiling-emas {
+            position: absolute; bottom: 150px; left: 20%; font-size: 60px; z-index: 10;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+            transform-origin: center center;
+            /* Delay diletakkan pada opacity: terbang jelas 0.4s, baru mula ghaib pada 0.2s terakhir! */
+            transition: left 0.6s ease-in, bottom 0.6s ease-in, transform 0.6s ease-in, opacity 0.2s ease-in 0.4s;
+        }
+
+        .syiling-masuk {
+            left: calc(50% + 68px) !important; /* Dilaras ke kanan tepat pada lubang */
+            bottom: 325px !important; /* Dilaras ke atas sedikit */
+            transform: scale(0) rotate(180deg) !important; /* Mengecil sehingga saiz 0 (hilang sepenuhnya) */
+            opacity: 0 !important; /* Padam sepenuhnya di penghujung animasi */
+        }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Matematik<br><span style="font-size: 16px; color: #3498db;">(Misi 2D - Zon 1)</span></h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Harga minuman jus epal ini adalah <strong>50 sen</strong>.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Masukkan nilai wang yang tepat. Ingat, sistem hanya membaca "angka" tanpa perkataan atau tanda petik!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Parameter Berangka:</strong><br>
+                <span style="color: #fff;">objek.tindakan(nilai_angka)</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Sasaran Arahan:</strong><br>
+                <span style="color: #fff;">mesin.masuk( ? )</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod wang di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap2d()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap2d()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">MASUK SYILING 🪙</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Mesin sedia. Harga: 50 sen. Menunggu wang...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-kantin">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 20;">
+                    Status: Sila masukkan wang syiling.
+                </div>
+                
+                <div id="lantai-jubin"></div>
+                
+                <!-- SYILING -->
+                <div id="syiling-emas">🪙</div>
+                
+                <!-- MESIN LAYAN DIRI -->
+                <div id="mesin-vending">
+                    <div id="papan-tanda">JUS EPAL</div>
+                    
+                    <div id="cermin-kaca">
+                        <div id="air-tin">🧃</div>
+                        <div class="rak"></div>
+                    </div>
+                    
+                    <div id="panel-kawalan">
+                        <div id="lubang-syiling"></div>
+                        <div id="skrin-harga">00</div> 
+                    </div>
+                    
+                    <div id="ruang-keluar">
+                        <!-- Air tin yang akan muncul lepas jatuh -->
+                        <div id="air-tin-keluar">🧃</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🧃🪙</div>
+            <h2>Panduan Wang & Angka</h2>
+            <p style="text-align: left;">Dalam bahasa pengaturcaraan, apabila meminta pengiraan, kita hanya perlukan <strong>nombor bulat</strong>. Sistem tidak dapat membaca nilai jika anda meletakkan unit ukuran bersama-sama.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Peraturan Penting:</strong><br><br>
+                ❌ Salah: <code>mesin.masuk(50sen)</code> (Terdapat huruf).<br>
+                ❌ Salah: <code>mesin.masuk("50")</code> (Terdapat tanda petik).<br>
+                ✅ Betul: <code>mesin.masuk(50)</code> (Hanya angka tulen).
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🧃✨</div>
+            <h2 style="color: #0be881;">Transaksi Berjaya!</h2>
+            <p>Tahniah! Anda berjaya menggunakan nilai angka integer tulen untuk melepasi pengesahan sistem mesin layan diri ini.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🚫🪙</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Baki Tidak Cukup!</h2>
+            <p id="pesan-kalah">Mesin menolak transaksi atau format kod tidak sah. Sila semak semula.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script src="script-tahap2d.js"></script>
+
+    <!-- 🔥 SKRIP INLINE UNTUK TURUTAN MASA ANIMASI & BUNYI 🔥 -->
+    <script>
+        function laksanaArahanTahap2d() {
+            let input = document.getElementById('arahanInput').value.replace(/\s+/g, '');
+            let maklumBalas = document.getElementById('maklumBalas');
+            let teksAnimasi = document.getElementById('teksAnimasi');
+            let syiling = document.getElementById('syiling-emas');
+            let skrinHarga = document.getElementById('skrin-harga');
+            let airTinAtas = document.getElementById('air-tin');
+            let airTinKeluar = document.getElementById('air-tin-keluar');
+            let modalMenang = document.getElementById('modalKemenangan');
+            let modalKalah = document.getElementById('modalKalah');
+
+            // Reset
+            syiling.classList.remove('syiling-masuk');
+            skrinHarga.classList.remove('baki-cukup');
+            skrinHarga.innerText = "00";
+            airTinAtas.classList.remove('hilang-tin');
+            airTinKeluar.classList.remove('dah-jatuh');
+
+            if (input === 'mesin.masuk(50)') {
+                maklumBalas.innerHTML = "Wang syiling 50 sen disahkan. Memproses minuman...";
+                teksAnimasi.innerHTML = "Status: Memasukkan wang syiling...";
+                
+                // 1. Syiling masuk lubang (Animasi CSS ambil masa 0.6s)
+                syiling.classList.add('syiling-masuk');
+                
+                // 2. TUNGGU 0.6 SAAT -> Mainkan bunyi syiling masuk tepat pada waktu ia hilang!
+                setTimeout(() => {
+                    let bunyiBetul = document.getElementById('bunyiBetul');
+                    if(bunyiBetul) {
+                        bunyiBetul.currentTime = 0;
+                        bunyiBetul.play();
+                    }
+                }, 600);
+                
+                // 3. TUNGGU 1 SAAT -> Skrin jadi 50 Hijau
+                setTimeout(() => {
+                    skrinHarga.innerText = "50";
+                    skrinHarga.classList.add('baki-cukup');
+                    teksAnimasi.innerHTML = "Status: Baki disahkan. Menjatuhkan minuman...";
+                    
+                    // 4. TUNGGU 1.5 SAAT -> Tin atas hilang, tin bawah jatuh
+                    setTimeout(() => {
+                        airTinAtas.classList.add('hilang-tin'); // Tin atas ghaib
+                        airTinKeluar.classList.add('dah-jatuh'); // Tin bawah muncul jatuh
+                        
+                        // Bunyi jatuh telah dibuang dari sini
+                        
+                        // 5. TUNGGU 1.5 SAAT -> Keluar Modal Menang
+                        setTimeout(() => {
+                            modalMenang.classList.add('tunjuk-modal-kustom');
+                            let bunyiMenang = document.getElementById('bunyiMenang');
+                            if(bunyiMenang) bunyiMenang.play();
+                        }, 1500);
+                        
+                    }, 1500); // Delay tin nak jatuh lepas skrin hijau
+
+                }, 1000); // Delay skrin nak jadi hijau lepas syiling ditarik masuk
+
+            } else {
+                maklumBalas.innerHTML = "Ralat: Transaksi ditolak oleh mesin!";
+                teksAnimasi.innerHTML = "Status: Transaksi DITOLAK!";
+                let bunyiSalah = document.getElementById('bunyiSalah');
+                if(bunyiSalah) bunyiSalah.play();
+                
+                setTimeout(() => {
+                    modalKalah.classList.add('tunjuk-modal-kustom');
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>

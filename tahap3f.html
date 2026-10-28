@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 3F: Pencarian Koordinat</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA SKRIN RADAR */
+        .tema-radar {
+            background: #021114;
+            overflow: hidden; position: relative;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* GRID RADAR (Paksi X dan Y) */
+        #papan-grid {
+            position: relative; width: 250px; height: 250px;
+            background-image: 
+                linear-gradient(rgba(0, 255, 102, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 102, 0.3) 1px, transparent 1px);
+            background-size: 50px 50px; /* 5x5 Grid (0-4) */
+            border: 2px solid #00ff66; border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+            margin-bottom: 20px;
+        }
+
+        /* LABEL PAKSI */
+        .label-x { position: absolute; bottom: -25px; left: 0; width: 100%; display: flex; justify-content: space-around; color: #00ff66; font-family: monospace; font-size: 14px; font-weight: bold; }
+        .label-y { position: absolute; left: -20px; top: 0; height: 100%; display: flex; flex-direction: column-reverse; justify-content: space-around; color: #00ff66; font-family: monospace; font-size: 14px; font-weight: bold; }
+        .tajuk-paksi-x { position: absolute; bottom: -45px; left: 50%; transform: translateX(-50%); color: #00ff66; font-size: 12px; font-family: monospace; }
+        .tajuk-paksi-y { position: absolute; left: -62px; top: 50%; transform: translateY(-50%) rotate(-90deg); color: #00ff66; font-size: 12px; font-family: monospace; white-space: nowrap; }
+
+        /* GARISAN SCANNER (Pusingan Radar) */
+        #garisan-scan {
+            position: absolute; top: 50%; left: 50%; width: 125px; height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff66);
+            transform-origin: left center;
+            animation: pusingRadar 4s linear infinite; z-index: 5;
+            transition: transform 0.3s ease; /* Transisi supaya nampak smooth kalau jarum terpacak */
+        }
+        @keyframes pusingRadar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* OBJEK SASARAN (Kapal Selam Asing) - Disorokkan awal-awal */
+        #sasaran-objek {
+            position: absolute; width: 40px; height: 40px; font-size: 25px;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0.1; transition: all 0.3s; z-index: 3;
+            /* Kedudukan X=3, Y=2 (Dalam grid 50px: 3*50=150px, Y=2 dari bawah) */
+            left: 155px; bottom: 105px; 
+        }
+        .sasaran-dijumpai { opacity: 1 !important; filter: drop-shadow(0 0 10px #ff0055); animation: kelipAmaran 1s infinite alternate; }
+        @keyframes kelipAmaran { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+
+        /* KOTAK KOHEL (Crosshair) */
+        #crosshair {
+            position: absolute; width: 50px; height: 50px;
+            border: 2px dashed #ffeb3b; border-radius: 5px;
+            left: 0; bottom: 0; transition: all 0.5s ease-in-out;
+            opacity: 0; z-index: 10;
+        }
+        .crosshair-aktif { opacity: 1 !important; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <!-- 🔥 FIX LAYOUT SCROLLBAR & SUSUNAN BUTANG MENU 🔥 -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 5px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Matematik<span style="display:block; font-size: 16px; color: #3498db; margin-top:2px;">(Misi 3F - Zon 1)</span></h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 8px; margin: 0; flex-shrink: 0; font-size: 13px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 8px; font-size: 13px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Amaran! Radar mengesan pergerakan ganjil kapal selam asing di perairan kita.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Perhatikan grid dengan teliti. Masukkan koordinat <span style="color: #00ff66;">Paksi X (Melintang)</span> diikuti dengan <span style="color: #00ff66;">Paksi Y (Menegak)</span> untuk mengunci sasaran!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Parameter (X, Y):</strong><br>
+                <span style="color: #fff;">objek.tindakan(nilai_X, nilai_Y)</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Arahan Sasaran:</strong><br>
+                <span style="color: #fff;">radar.kesan( ? , ? )</span>
+            </div>
+            
+            <!-- 🔥 BOX-SIZING BORDER-BOX UNTUK KAWAL LEBAR KOTAK 🔥 -->
+            <input type="text" id="arahanInput" placeholder="Taip koordinat di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap3f()" style="width: 100%; box-sizing: border-box; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap3f()" style="width: 100%; box-sizing: border-box; margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); padding: 12px; border: none; border-radius: 8px; cursor: pointer;">KUNCI KOORDINAT 📡</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border-left: 4px solid #3498db; padding: 10px; font-size: 13px; border-radius: 4px;">
+                Sistem Radar aktif. Menunggu isyarat koordinat (X, Y)...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-radar">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 30;">
+                    Status: Tinjauan kawasan...
+                </div>
+                
+                <!-- PAPAN GRID RADAR -->
+                <div id="papan-grid">
+                    <div id="garisan-scan"></div>
+                    <div id="crosshair"></div>
+                    
+                    <div id="sasaran-objek">🛳️</div>
+                    
+                    <!-- Label Bawah (Paksi X) -->
+                    <div class="label-x"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></div>
+                    <div class="tajuk-paksi-x">Paksi X</div>
+                    
+                    <!-- Label Kiri (Paksi Y) -->
+                    <div class="label-y"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></div>
+                    <div class="tajuk-paksi-y">Paksi Y</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">📡📈</div>
+            <h2>Panduan Koordinat (X, Y)</h2>
+            <p style="text-align: left;">Dalam matematik, kedudukan sesuatu objek ditentukan menggunakan sistem titik pertemuan Paksi X dan Paksi Y.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Cara Membaca Grid:</strong><br><br>
+                1. Mula-mula, baca nilai pada <strong>Paksi X</strong> (Garisan melintang di bawah).<br>
+                2. Kemudian, baca nilai pada <strong>Paksi Y</strong> (Garisan menegak di kiri).<br>
+                3. Masukkan kedua-dua nilai tersebut sebagai Dwi-Parameter Angka dalam sintaks anda.<br>
+                ✅ Contoh format: <code>radar.kesan(X, Y)</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🎯✅</div>
+            <h2 style="color: #0be881;">Sasaran Dikunci!</h2>
+            <p>Hebat! Anda berjaya membaca peta titik koordinat matematik dengan tepat menggunakan Dwi-Parameter berangka.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">❌🌊</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Tersasar Jauh!</h2>
+            <p id="pesan-kalah">Sistem imbasan telah ditembak ke kawasan kosong. Koordinat X dan Y anda tidak menepati lokasi kapal selam.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <!-- 🔥 SKRIP INLINE OVERRIDE UNTUK LOGIK TRIGONOMETRI JARUM RADAR 🔥 -->
+    <script>
+        function laksanaArahanTahap3f() {
+            let inputRaw = document.getElementById('arahanInput').value.replace(/\s+/g, '');
+            let maklumBalas = document.getElementById('maklumBalas');
+            let teksAnimasi = document.getElementById('teksAnimasi');
+            let crosshair = document.getElementById('crosshair');
+            let sasaran = document.getElementById('sasaran-objek');
+            let garisanScan = document.getElementById('garisan-scan');
+            
+            let modalMenang = document.getElementById('modalKemenangan');
+            let modalKalah = document.getElementById('modalKalah');
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            // Reset UI
+            crosshair.classList.remove('crosshair-aktif');
+            sasaran.classList.remove('sasaran-dijumpai');
+            garisanScan.style.animation = 'none'; // Hentikan animasi asal
+            void garisanScan.offsetWidth; // Paksa browser untuk render reset (reflow)
+            garisanScan.style.animation = 'pusingRadar 4s linear infinite';
+            garisanScan.style.transform = '';
+            garisanScan.style.background = 'linear-gradient(90deg, transparent, #00ff66)';
+
+            // Cek format: radar.kesan(X,Y)
+            let match = inputRaw.match(/^radar\.kesan\((\d+),(\d+)\)$/);
+
+            if (match) {
+                let x = parseInt(match[1]);
+                let y = parseInt(match[2]);
+
+                // Pindah kotak crosshair
+                crosshair.style.left = (x * 50) + 'px';
+                crosshair.style.bottom = (y * 50) + 'px';
+                crosshair.classList.add('crosshair-aktif');
+
+                // ----------------------------------------------------
+                // 🔥 LOGIK TRIGONOMETRI: HALAKAN JARUM KE KOORDINAT 🔥
+                // ----------------------------------------------------
+                // Grid = 250px. Titik tengah radar = (125px, 125px).
+                let titikSasaranX = (x * 50) + 25; // Tengah kotak X
+                let titikSasaranY = 250 - ((y * 50) + 25); // Tengah kotak Y (Paksi DOM terbalik dari atas)
+                let radarTengahX = 125;
+                let radarTengahY = 125;
+                
+                // Cari beza jarak paksi
+                let bezaX = titikSasaranX - radarTengahX;
+                let bezaY = titikSasaranY - radarTengahY;
+                
+                // Gunakan Math.atan2 untuk cari sudut dan tukar Radian ke Darjah (Degree)
+                let sudutDarjah = Math.atan2(bezaY, bezaX) * (180 / Math.PI);
+
+                // Paksa jarum berhenti dan pusing ke sudut yang dikira
+                garisanScan.style.animation = 'none';
+                garisanScan.style.transform = `rotate(${sudutDarjah}deg)`;
+                // ----------------------------------------------------
+
+                if (x === 3 && y === 2) {
+                    // JAWAPAN BETUL: Menang
+                    maklumBalas.innerHTML = "Koordinat (3, 2) disahkan. Sasaran tepat dikunci!";
+                    maklumBalas.style.borderLeftColor = "#0be881";
+                    teksAnimasi.innerHTML = "Status: Kapal Selam Asing Ditemui!";
+                    
+                    garisanScan.style.background = 'linear-gradient(90deg, transparent, #ff0055)';
+                    sasaran.classList.add('sasaran-dijumpai');
+                    if(sfxBetul) sfxBetul.play();
+
+                    setTimeout(() => {
+                        modalMenang.classList.add('tunjuk-modal-kustom');
+                        if(sfxMenang) sfxMenang.play();
+                    }, 2000);
+
+                } else {
+                    // JAWAPAN SALAH: Kalah
+                    maklumBalas.innerHTML = `Ralat: Kawasan X=${x}, Y=${y} adalah kosong!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Sasaran Tidak Ditemui!";
+                    
+                    // Jarum warna merah menembak ke koordinat yang salah
+                    garisanScan.style.background = 'linear-gradient(90deg, transparent, #ff5e57)';
+                    if(sfxSalah) sfxSalah.play();
+
+                    setTimeout(() => {
+                        modalKalah.classList.add('tunjuk-modal-kustom');
+                    }, 2000);
+                }
+            } else {
+                maklumBalas.innerHTML = "Ralat Sintaks: Sila ikut format radar.kesan(X, Y)";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                teksAnimasi.innerHTML = "Status: Ralat Koordinat...";
+                if(sfxSalah) sfxSalah.play();
+            }
+
+            // Kosongkan input selepas hantar
+            document.getElementById('arahanInput').value = '';
+        }
+
+        // Fungsi Panduan Misi
+        function bukaInfo() { document.getElementById('modalInfo').classList.add('tunjuk-modal-kustom'); }
+        function tutupInfo() { document.getElementById('modalInfo').classList.remove('tunjuk-modal-kustom'); }
+    </script>
+</body>
+</html>

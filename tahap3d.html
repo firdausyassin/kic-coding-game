@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tahap 3D: Monyet vs Ular Sawa</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA SENJA (Waktu Bahaya Ular Keluar) */
+        .tema-ular-sawa {
+            background: linear-gradient(to bottom, #FF4E50 0%, #F9D423 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* TANAH RIMBA (Diturunkan ke 100px supaya ruang udara luas) */
+        #tanah-belakang {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100px;
+            background: linear-gradient(to bottom, #2d3436, #1c2833);
+            z-index: 5; border-top: 5px solid #1abc9c;
+            box-shadow: inset 0 15px 30px rgba(0,0,0,0.8);
+        }
+
+        /* SILUET GUNUNG (Parallax Senja) */
+        .gunung-siluet { position: absolute; z-index: 1; pointer-events: none; line-height: 1; margin: 0; filter: brightness(0.2) sepia(1) hue-rotate(300deg); }
+        #gunung-1 { bottom: 80px; left: -10%; font-size: 250px; opacity: 0.7; }
+        #gunung-2 { bottom: 80px; left: 20%; font-size: 350px; opacity: 0.5; z-index: 0; }
+        #gunung-3 { bottom: 80px; right: -5%; font-size: 300px; opacity: 0.6; }
+
+        /* POKOK BELAKANG SILUET */
+        .pokok-gelap { position: absolute; z-index: 2; opacity: 0.8; filter: brightness(0.15); line-height: 1; margin: 0; }
+        #gelap1 { bottom: 90px; left: 5%; font-size: 200px; }
+        #gelap2 { bottom: 90px; right: 10%; font-size: 250px; }
+        #gelap3 { bottom: 90px; left: 25%; font-size: 150px; opacity: 0.6;}
+        #gelap4 { bottom: 90px; right: 30%; font-size: 180px; opacity: 0.5;}
+
+        /* AWAN & MATAHARI TERBENAM */
+        .objek-latar { position: absolute; z-index: 1; pointer-events: none; }
+        #awan1 { top: 15%; left: 20%; font-size: 60px; animation: gerakAwan 25s linear infinite alternate; opacity: 0.6; filter: brightness(0.8) sepia(0.5); }
+        #awan2 { top: 25%; right: 15%; font-size: 70px; animation: gerakAwan 30s linear infinite alternate-reverse; opacity: 0.5; filter: brightness(0.8) sepia(0.5); }
+        #matahari { top: 10%; left: 70%; font-size: 100px; filter: drop-shadow(0 0 40px #f39c12) blur(1px); animation: turunMatahari 40s linear infinite alternate; }
+
+        @keyframes gerakAwan { 0% { transform: translateX(0); } 100% { transform: translateX(40px); } }
+        @keyframes turunMatahari { 0% { transform: translateY(0); } 100% { transform: translateY(20px); } }
+
+        /* BATANG POKOK UTAMA (Realistik Kayu) */
+        #batang-pokok {
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); 
+            width: 70px; height: 350px; 
+            background: repeating-linear-gradient(
+                90deg,
+                #5D4037,
+                #5D4037 10px,
+                #4E342E 10px,
+                #4E342E 20px
+            ); 
+            border-radius: 5px 5px 0 0; z-index: 3;
+            box-shadow: inset -10px 0 20px rgba(0,0,0,0.6), 10px 0px 15px rgba(0,0,0,0.3);
+            border-left: 3px solid #3E2723; border-right: 3px solid #212121;
+        }
+
+        /* DAUN POKOK KANOPI (Tempat Ular Menyorok) */
+        .kanopi {
+            position: absolute; 
+            background: radial-gradient(circle, #2ecc71, #1e8449); 
+            border-radius: 50%; z-index: 4;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5), 5px 5px 15px rgba(0,0,0,0.4);
+        }
+        #kanopi1 { bottom: 380px; left: 50%; transform: translateX(-50%); width: 240px; height: 150px; }
+        #kanopi2 { bottom: 350px; left: 38%; transform: translateX(-50%); width: 160px; height: 130px; }
+        #kanopi3 { bottom: 350px; left: 62%; transform: translateX(-50%); width: 160px; height: 130px; z-index: 2;}
+
+        /* ULAR SAWA */
+        #ular-sawa {
+            position: absolute; bottom: 350px; left: 50%; transform: translateX(-50%);
+            font-size: 80px; z-index: 5;
+            animation: ularMengintai 3s infinite alternate ease-in-out;
+            line-height: 1; margin: 0; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.6));
+        }
+
+        @keyframes ularMengintai {
+            0% { transform: translate(-50%, 0px) rotate(-5deg); }
+            100% { transform: translate(-50%, 15px) rotate(5deg); }
+        }
+
+        /* 🔥 SANG MONYET & KOTAKNYA (DIKEMASKINI) 🔥 */
+        #kotak-monyet-utama {
+            /* Diturunkan sikit ke 380px dan ditinggikan z-index supaya duduk atas status */
+            position: absolute; bottom: 380px; left: 50%; transform: translateX(-50%);
+            z-index: 200; width: 150px; text-align: center;
+            transition: bottom 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s ease;
+        }
+
+        #monyet {
+            font-size: 60px; transition: transform 0.5s ease; 
+            line-height: 1; margin: 0; white-space: nowrap; display: inline-block;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+        .monyet-pening { transform: rotate(-90deg); }
+
+        /* AWAN DIALOG GLOBAL */
+        #dialogMonyet {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); transform-origin: bottom center;
+            background: #ffffff; color: #1c2833; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; 
+            line-height: 1.3; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 20; text-align: center; 
+            width: max-content; max-width: 180px; pointer-events: none; border: 2px solid #e67e22; margin-bottom: 5px;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        #dialogMonyet::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px;
+            border-width: 6px; border-style: solid; border-color: #e67e22 transparent transparent transparent;
+        }
+        .buka-cakap { transform: translateX(-50%) scale(1) !important; }
+
+        /* 🔥 PEMBUNUH JARUM PUTIH ASAL DARI STYLE.CSS 🔥 */
+        .awan-dialog::before, #dialogMonyet::before { display: none !important; }
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(230, 126, 34, 0.3); border: 2px solid #e67e22;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #e67e22; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            
+            <!-- 🔥 FIX LAYOUT SCROLLBAR: PADDING BUTANG DIKECILKAN SIKIT & PERKATAAN DIPENDEKKAN 🔥 -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 5px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Keselamatan<br><span style="font-size: 16px; color: #e67e22;">(Misi 3D - Zon 1)</span></h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #e67e22; color: #fff; border-color: #d35400; font-weight: bold; padding: 5px 8px; margin: 0; flex-shrink: 0; font-size: 13px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #e67e22; color: #fff; border-color: #d35400; font-weight: bold; padding: 5px 8px; font-size: 13px;">ℹ️ Panduan</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 20px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Bahaya! Seekor ular sawa gergasi muncul di puncak pokok. Monyet perlu turun dari ketinggian <strong>10 Meter</strong>.</p>
+            <p style="color: #e74c3c; font-weight: bold; font-size: 13px; line-height: 1.4;">Gunakan logik penolakan matematik. Tolak nilai tersebut sehingga mencapai tepat lantai tanah (0 Meter)!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #e67e22; font-family: monospace;">
+                <strong style="color: #e67e22; font-family: sans-serif;">Pilihan Penolakan:</strong><br><br>
+                <span style="color: #bdc3c7;">Turun Berperingkat:</span> <span style="color: #fff;">monyet.turun(4)</span><br>
+                <span style="color: #bdc3c7;">Turun Mengejut:</span> <span style="color: #fff;">monyet.turun(10)</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap3d()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap3d()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);">TURUN SEKARANG! 🚀</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #e67e22; padding: 10px; font-size: 13px;">
+                Sistem pengesan pemangsa aktif. Menunggu arahan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-ular-sawa">
+                
+                <!-- 🔥 KOTAK STATUS DIRENDAHKAN Z-INDEX KEPADA 100 🔥 -->
+                <div id="teksAnimasi" class="teks-status" style="position: relative; z-index: 100; background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #e67e22;">
+                    Status: Monyet terperangkap di atas pokok!
+                </div>
+                
+                <div id="matahari" class="objek-latar">☀️</div>
+                <div id="awan1" class="objek-latar">☁️</div>
+                <div id="awan2" class="objek-latar">☁️</div>
+
+                <div id="gunung-1" class="gunung-siluet">⛰️</div>
+                <div id="gunung-2" class="gunung-siluet">⛰️</div>
+                <div id="gunung-3" class="gunung-siluet">⛰️</div>
+
+                <div id="gelap1" class="pokok-gelap">🌲</div>
+                <div id="gelap2" class="pokok-gelap">🌳</div>
+                <div id="gelap3" class="pokok-gelap">🌲</div>
+                <div id="gelap4" class="pokok-gelap">🌳</div>
+                
+                <div id="tanah-belakang"></div>
+                <div id="batang-pokok"></div>
+
+                <div id="kanopi2" class="kanopi"></div>
+                <div id="kanopi3" class="kanopi"></div>
+                <div id="kanopi1" class="kanopi"></div>
+                
+                <div id="ular-sawa">🐍</div>
+                
+                <div id="kotak-monyet-utama">
+                    <div id="dialogMonyet"></div>
+                    <div id="monyet">
+                        <span id="ikonMonyet">🐒</span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🐍➖</div>
+            <h2>Panduan Logik Penolakan</h2>
+            <p style="text-align: left;">Monyet bermula pada kedudukan asal 10 meter. Gunakan logik penolakan (subtraction) untuk mencapai lantai tanah.</p>
+            <div style="background: rgba(230, 126, 34, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #e67e22;">
+                <strong>Cara Turun:</strong><br><br>
+                1. Anda boleh melompat turun secara mengejut terus ke tanah.<br>
+                2. Atau anda boleh turun sedikit demi sedikit.<br>
+                3. Contoh: taip <code>monyet.turun(4)</code>, baki ketinggian dari tanah akan menjadi 6 meter.<br>
+                4. Peringatan: Jangan tolak angka melebihi baki ketinggian, nanti monyet akan terhempas ke bawah tanah!
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #e67e22; color: #fff; font-weight: bold;">FAHAM, SELAMATKAN MONYET!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🐒💨</div>
+            <h2 style="color: #0be881;">Selamat Di Tanah!</h2>
+            <p>Hebat! Anda berjaya menggunakan formula penolakan matematik untuk menyelamatkan monyet kita dari dibaham ular sawa.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💥</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Misi Gagal!</h2>
+            <p id="pesan-kalah">Monyet terhempas ke tanah akibat ralat pengiraan baki parameter.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script src="script-tahap3d.js"></script>
+</body>
+</html>

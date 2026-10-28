@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1B: Operasi Petik Kelapa</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KANVAS ALAM SEMULAJADI */
+        .tema-kampung {
+            background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* 1. LANTAI RUMPUT */
+        #tanah-kampung {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: linear-gradient(to bottom, #27ae60, #2ecc71);
+            border-top: 8px solid #2196f3; z-index: 6;
+        }
+
+        /* 2. LATAR JAUH */
+        .objek-latar { position: absolute; z-index: 1; pointer-events: none; line-height: 1; margin: 0; }
+        #awan1 { top: 10%; left: 10%; font-size: 70px; animation: gerakAwan 25s linear infinite alternate; }
+        #awan2 { top: 25%; right: 20%; font-size: 50px; animation: gerakAwan 30s linear infinite alternate-reverse; }
+        #matahari { top: 5%; right: 10%; font-size: 80px; filter: drop-shadow(0 0 20px #f1c40f); }
+        @keyframes gerakAwan { 0% { transform: translateX(0); } 100% { transform: translateX(40px); } }
+
+        /* HUTAN BAYANG-BAYANG DI LATAR BELAKANG */
+        .bayang-pokok {
+            position: absolute; z-index: 1; opacity: 0.25; filter: brightness(0.2); 
+            line-height: 1; margin: 0;
+        }
+        #bayang1 { bottom: 120px; left: -2%; font-size: 220px; } 
+        #bayang2 { bottom: 120px; left: 15%; font-size: 180px; } 
+        #bayang3 { bottom: 120px; right: 25%; font-size: 240px; } 
+        #bayang4 { bottom: 120px; right: -5%; font-size: 260px; } 
+
+        /* 3. POKOK KELAPA (DIROMBAK - SINGLE EMOJI GERGASI) */
+        #pokok-utama {
+            position: absolute; bottom: 80px; left: 30%; transform: translateX(-50%);
+            font-size: 320px; z-index: 3; line-height: 1; margin: 0;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+        }
+
+        .kelapa-pokok { position: absolute; font-size: 35px; z-index: 5; transition: opacity 0.3s; margin: 0; line-height: 1;}
+        #kelapa-p1 { bottom: 300px; left: 26%; transform: rotate(-15deg); }
+        #kelapa-p2 { bottom: 290px; left: 29.5%; transform: rotate(10deg); }
+        #kelapa-p3 { bottom: 275px; left: 30%; transform: rotate(25deg); }
+
+        /* 4. BAKUL & KELAPA DALAM BAKUL */
+        #kotak-bakul { position: absolute; bottom: 95px; left: 55%; font-size: 70px; z-index: 7; line-height: 1; margin: 0;}
+        .kelapa-bakul { position: absolute; font-size: 25px; z-index: 8; opacity: 0; transition: opacity 0.3s; margin: 0; line-height: 1;}
+        #kelapa-b1 { bottom: 128px; left: 60.5%; } 
+        #kelapa-b2 { bottom: 125px; left: 57%; } 
+        #kelapa-b3 { bottom: 130px; left: 58%; }  
+
+        /* 5. TUAN & PISANG */
+        #pak-mail {
+            position: absolute; bottom: 90px; left: 72%; font-size: 98px; z-index: 10;
+            display: flex; flex-direction: column; align-items: center; margin: 0; line-height: 1;
+        }
+        #pisang-terbang {
+            position: absolute; bottom: 118px; left: 74.6%; font-size: 35px; margin: 0; line-height: 1;
+            z-index: 30; opacity: 1; transform: rotate(-20deg);
+            transition: left 0.4s linear, bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s linear; 
+        }
+
+        /* 6. MONYET KITA */
+        #kotak-monyet {
+            position: absolute; bottom: 105px; left: 26%; z-index: 20;
+            transition: bottom 0.8s ease-in-out, left 0.6s ease-in-out; 
+            display: flex; flex-direction: column; align-items: center;
+        }
+        
+        /* 🔥 MONYET DI-FLIP KE KANAN DI SINI 🔥 */
+        #ikon-monyet { 
+            font-size: 65px; 
+            line-height: 1; 
+            margin: 0; 
+            transition: transform 0.3s ease; 
+            transform: scaleX(-1); 
+            display: inline-block; 
+        }
+        
+        #kelapa-tangan {
+            position: absolute; bottom: 10px; right: -15px; font-size: 30px; opacity: 0; z-index: 21; line-height: 1; margin: 0;
+        }
+
+        /* 🔥 AWAN DIALOG GLOBAL (MEMANFAATKAN STYLE.CSS) 🔥 */
+        #dialogMonyet { border: 3px solid #f39c12 !important; margin-bottom: 5px; }
+        #dialogMonyet::after { border-color: #f39c12 transparent transparent transparent !important; }
+        #dialogMonyet::before { display: none !important; } 
+
+        #dialogTuan { border: 3px solid #3498db !important; margin-bottom: 5px; }
+        #dialogTuan::after { border-color: #3498db transparent transparent transparent !important; }
+        #dialogTuan::before { display: none !important; } 
+
+        /* 🔥 KOTAK MODAL KUSTOM PRO 🔥 */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(243, 156, 18, 0.3); border: 2px solid #f39c12;
+        }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #f39c12; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; }
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Arahan<br><span style="font-size: 16px; color: #f39c12;">(Misi 1B - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #f39c12; color: #000; border-color: #e67e22; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #f39c12; color: #000; border-color: #e67e22; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 20px; font-size: 14px; line-height: 1.4;">Bantu Pak Mail arahkan monyetnya memetik <strong>3 biji kelapa</strong> dan masukkan ke dalam bakul!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #f39c12; font-family: monospace;">
+                <strong style="color: #f39c12; font-family: sans-serif;">Senarai Kod Arahan:</strong><br><br>
+                <span style="color: #fff;">monyet.panjat()</span><br>
+                <span style="color: #fff;">monyet.turun()</span><br>
+                <span style="color: #fff;">tuan.beri_pisang()</span>
+            </div>
+
+            <input type="text" id="arahanInput" placeholder="Taip kod di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap1b()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            
+            <button onclick="laksanaArahanTahap1b()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #f39c12, #e67e22); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);">JALANKAN ARAHAN 🐒</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #f39c12; padding: 10px; font-size: 13px;">
+                Sistem sedia. Menunggu arahan pertama...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-kampung">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.9); color: #2c3e50; border: 2px solid #f39c12;">
+                    Status: Menunggu arahan untuk mula bekerja...
+                </div>
+                
+                <div id="awan1" class="objek-latar">☁️</div>
+                <div id="awan2" class="objek-latar">☁️</div>
+                <div id="matahari" class="objek-latar">☀️</div>
+                
+                <div id="bayang1" class="bayang-pokok">🌳</div>
+                <div id="bayang2" class="bayang-pokok">🌴</div>
+                <div id="bayang3" class="bayang-pokok">🌳</div>
+                <div id="bayang4" class="bayang-pokok">🌴</div>
+
+                <div id="pokok-utama">🌴</div>
+                <div id="kelapa-p1" class="kelapa-pokok">🥥</div>
+                <div id="kelapa-p2" class="kelapa-pokok">🥥</div>
+                <div id="kelapa-p3" class="kelapa-pokok">🥥</div>
+                
+                <div id="tanah-kampung"></div>
+                
+                <div id="kotak-bakul">🧺</div>
+                <div id="kelapa-b1" class="kelapa-bakul">🥥</div>
+                <div id="kelapa-b2" class="kelapa-bakul">🥥</div>
+                <div id="kelapa-b3" class="kelapa-bakul">🥥</div>
+
+                <div id="pak-mail">
+                    <div id="dialogTuan" class="awan-dialog"></div>
+                    🧍🏽‍♂️
+                </div>
+                <div id="pisang-terbang">🍌</div>
+                
+                <div id="kotak-monyet">
+                    <div id="dialogMonyet" class="awan-dialog"></div>
+                    <span id="ikon-monyet">🐒</span>
+                    <span id="kelapa-tangan">🥥</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN KUSTOM PRO -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🥥🧠</div>
+            <h2>Panduan Urutan Logik</h2>
+            <p style="text-align: left;">Dalam pengaturcaraan, enjin pemprosesan hanya akan ikut arahan baris demi baris. Urutan sangat penting!</p>
+            <div style="background: rgba(243, 156, 18, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #f39c12;">
+                <strong>Cara Selesaikan Misi:</strong><br><br>
+                1. Taip <code>monyet.panjat()</code> supaya monyet naik ambil kelapa.<br>
+                2. Taip <code>monyet.turun()</code> supaya monyet letak kelapa dalam bakul.<br>
+                3. <strong>Ulang Langkah 1 dan 2</strong> sehingga kesemua 3 biji kelapa habis dipetik.<br>
+                4. Akhir sekali, taip <code>tuan.beri_pisang()</code> sebagai upah untuk monyet!
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #f39c12; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN KUSTOM PRO -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom" style="border-color: #0be881; box-shadow: 0 0 30px rgba(11, 232, 129, 0.3);">
+            <div style="font-size: 60px;">🐒🍌</div>
+            <h2 style="color: #0be881;">Kerja Selesai!</h2>
+            <p>Tahniah! Anda berjaya menyusun urutan logik (*Sequence*) yang betul. Komputer sangat bergantung kepada urutan arahan yang tepat untuk berfungsi.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KALAH / RALAT KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom" style="border-color: #ff5e57; box-shadow: 0 0 30px rgba(255, 94, 87, 0.3);">
+            <div style="font-size: 60px;" id="ikon-kalah">⚠️❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Sintaks Gagal!</h2>
+            <p id="pesan-kalah">Terdapat ralat pada arahan anda. Sila periksa ejaan dan urutan logik, kemudian cuba lagi!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap1b.js"></script>
+</body>
+</html>

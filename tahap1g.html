@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1G: Kenal Bentuk 2D</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KILANG ROBOTIK */
+        .tema-kilang {
+            background: linear-gradient(to bottom, #2c3e50 0%, #1a252f 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* CONVEYOR BELT (Lantai Kilang) */
+        #conveyor {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
+            background: repeating-linear-gradient(90deg, #7f8c8d, #7f8c8d 40px, #95a5a6 40px, #95a5a6 80px);
+            z-index: 5; border-top: 10px solid #34495e;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
+            animation: gerakBelt 2s linear infinite;
+        }
+        @keyframes gerakBelt { 0% { background-position: 0 0; } 100% { background-position: -80px 0; } }
+
+        /* SASARAN LUBANG (Atas Belt) */
+        #kotak-sasaran {
+            position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 40px; background: #95a5a6; border-radius: 10px 10px 0 0;
+            z-index: 4; border: 4px solid #7f8c8d; border-bottom: none;
+            display: flex; justify-content: center; align-items: flex-end; padding-bottom: 5px;
+        }
+
+        /* 🔥 FIX: BENTUK CSS TULEN (SAIZ 100% SAMA RATA) 🔥 */
+        .bentuk-segiempat { width: 55px; height: 55px; }
+        .bentuk-bulat { width: 55px; height: 55px; border-radius: 50%; }
+        .bentuk-segitiga {
+            width: 0; height: 0; background-color: transparent !important;
+            border-left: 27px solid transparent; border-right: 27px solid transparent;
+            border-bottom: 55px solid; 
+        }
+
+        /* Warna Lubang Gelap */
+        .warna-lubang { background-color: rgba(0,0,0,0.3); }
+        .warna-lubang.bentuk-segitiga { border-bottom-color: rgba(0,0,0,0.3); }
+
+        /* Warna Cop Sebenar */
+        .warna-cop-segiempat { background-color: #3498db; }
+        .warna-cop-bulat { background-color: #e74c3c; }
+        .warna-cop-segitiga { border-bottom-color: #2ecc71; }
+
+        #lubang-bentuk {
+            filter: drop-shadow(0 -2px 2px rgba(255,255,255,0.2));
+            transition: all 0.3s ease; margin-bottom: 2px;
+        }
+
+        /* LENGAN ROBOT */
+        #robot-base {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 100px; height: 40px; background: #e67e22; border-radius: 0 0 10px 10px;
+            z-index: 10; border: 5px solid #d35400; border-top: none;
+        }
+        #robot-lengan {
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 120px; background: #95a5a6; z-index: 9;
+            border-left: 5px solid #7f8c8d; border-right: 5px solid #7f8c8d;
+            transition: height 0.6s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+            display: flex; justify-content: center; align-items: flex-end;
+        }
+        #robot-kepala {
+            position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+            width: 80px; height: 40px; background: #f1c40f; border-radius: 10px;
+            border: 4px solid #f39c12; z-index: 11;
+            display: flex; justify-content: center; align-items: flex-end;
+        }
+        
+        /* BENTUK YANG DICOP */
+        #bentuk-cop {
+            position: absolute; bottom: -55px; 
+            opacity: 0; transition: opacity 0.2s; z-index: 12;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+        
+        /* EFEK SPARK/KILAT */
+        #efek-spark {
+            position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%) scale(0);
+            font-size: 100px; z-index: 15; opacity: 0; pointer-events: none;
+            transition: all 0.2s ease;
+        }
+        .meletup-spark { opacity: 1 !important; transform: translateX(-50%) scale(1.5) !important; }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; transform: scale(0); background: #ffffff; color: #1c2833;
+            padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; width: max-content; 
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); pointer-events: none; border: 2px solid #3498db;
+        }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Sains<br><span style="font-size: 16px; color: #3498db;">(Misi 1G - Zon 1)</span></h2>
+
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Produk di atas kotak penghantar memerlukan komponen berbentuk <strong id="hint-bentuk" style="color: #0be881; text-transform: uppercase;">Menganalisis...</strong>.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Kenal pasti bentuk dan arahkan lengan robot untuk mengecap menggunakan parameter <strong>Teks (String)</strong>!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Kod Parameter Teks:</strong><br>
+                <span style="color: #fff;">objek.tindakan("nama_bentuk")</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Bentuk Sedia Ada:</strong><br>
+                <span style="color: #fff;">"segiempat", "segitiga", "bulat"</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod robot di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap1g()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap1g()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">AKTIFKAN ROBOT 🦾</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Sistem Kilang: Menunggu arahan pengecaman bentuk 2D...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-kilang">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 20;">
+                    Status: Pemasangan terhenti. Kehilangan bentuk.
+                </div>
+                
+                <div id="conveyor"></div>
+                
+                <div id="kotak-sasaran">
+                    <!-- Bayang lubang menggunakan CSS Tulen -->
+                    <div id="lubang-bentuk"></div> 
+                </div>
+
+                <!-- LENGAN ROBOT -->
+                <div id="robot-base"></div>
+                <div id="robot-lengan">
+                    <div id="robot-kepala"></div>
+                    <!-- Cop bentuk menggunakan CSS Tulen -->
+                    <div id="bentuk-cop"></div>
+                </div>
+
+                <!-- EFEK COP -->
+                <div id="efek-spark">💥</div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🔡💻</div>
+            <h2>Pengenalan String (Teks)</h2>
+            <p style="text-align: left;">Sistem robot ini dikawal menggunakan nama bentuk geometri (segiempat, segitiga, bulat).</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong style="color: #f1c40f;">Syarat Wajib "String":</strong><br>
+                Dalam bahasa pengekodan, jika kita mahu komputer membaca dan menggunakan perkataan (teks), kita WAJIB meletakkannya di dalam tanda petik ganda <code>" "</code>. Ini dipanggil <strong>String</strong>.<br><br>
+                <strong>Peraturan Misi:</strong><br>
+                1. Perhatikan lubang pada komponen. Baca ayat arahan di panel kiri untuk mengetahui bentuk yang diminta.<br>
+                2. Oleh kerana parameter ini adalah huruf (String), anda wajib meletakkan tanda petik <code>" "</code>.<br>
+                ✅ Contoh tepat: <code>robot.cop("segiempat")</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🟦🦾</div>
+            <h2 style="color: #0be881;">Pemasangan Sempurna!</h2>
+            <p>Tahniah! Anda berjaya mengenal pasti bentuk geometri yang betul dan menghantarnya dalam format parameter String (Teks) yang tepat.</p>
+
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">⚠️❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Bentuk Tersekat!</h2>
+            <p id="pesan-kalah">Bentuk yang dicop tidak padan dengan lubang komponen. Produk telah rosak.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <!-- 🔥 SKRIP JAVASCRIPT DISATUKAN (LOOP ROTATION) 🔥 -->
+    <script>
+        let adakahTamat = false;
+        let adakahSibuk = false;
+        
+        // Pangkalan Data Bentuk & Kelas CSS
+        const kamusBentuk = {
+            "segiempat": { kelasBentuk: "bentuk-segiempat", kelasWarna: "warna-cop-segiempat", namaTeks: "segi empat" },
+            "segitiga": { kelasBentuk: "bentuk-segitiga", kelasWarna: "warna-cop-segitiga", namaTeks: "segi tiga" },
+            "bulat": { kelasBentuk: "bentuk-bulat", kelasWarna: "warna-cop-bulat", namaTeks: "bulat" }
+        };
+
+        const senaraiKunci = ["segiempat", "segitiga", "bulat"];
+        let bentukSasaran = "";
+
+        function mainBunyi(audioElemen) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = 0;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // 🔥 LOGIK PUSINGAN BERURUT (REFRESH CONFIRM TUKAR) 🔥
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // Baca indeks terakhir dari memori browser
+            let indeksSemasa = sessionStorage.getItem("misi1g_indeks");
+            
+            if (indeksSemasa === null) {
+                indeksSemasa = 0; // Kalau main kali pertama, mula dari segiempat
+            } else {
+                indeksSemasa = parseInt(indeksSemasa) + 1;
+                // Kalau dah habis bulat, patah balik segiempat
+                if (indeksSemasa >= senaraiKunci.length) {
+                    indeksSemasa = 0;
+                }
+            }
+            
+            // Simpan indeks baru untuk kegunaan refresh seterusnya
+            sessionStorage.setItem("misi1g_indeks", indeksSemasa);
+            
+            bentukSasaran = senaraiKunci[indeksSemasa];
+            
+            // Kemas kini Paparan UI
+            document.getElementById("hint-bentuk").innerText = kamusBentuk[bentukSasaran].namaTeks;
+            document.getElementById("lubang-bentuk").className = `${kamusBentuk[bentukSasaran].kelasBentuk} warna-lubang`;
+        });
+
+        async function laksanaArahanTahap1g() {
+            let inputAsal = document.getElementById("arahanInput").value;
+            let input = inputAsal.replace(/\s+/g, ''); // Buang space
+            
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            
+            let lenganRobot = document.getElementById("robot-lengan");
+            let bentukCop = document.getElementById("bentuk-cop");
+            let efekSpark = document.getElementById("efek-spark");
+            let lubangBentuk = document.getElementById("lubang-bentuk");
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            if (adakahTamat) {
+                maklumBalas.innerHTML = "Ralat: Tugas selesai. Sila muat semula (Refresh).";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                return;
+            }
+
+            if (adakahSibuk) return;
+
+            // Semak jika pengguna tertinggal tanda petik (")
+            let cekKetiadaanString = input.match(/^robot\.cop\(([a-zA-Z]+)\)$/);
+            if (cekKetiadaanString) {
+                mainBunyi(sfxSalah);
+                maklumBalas.innerHTML = `Ralat String: Komputer tidak faham parameter <strong>${cekKetiadaanString[1]}</strong>. Anda WAJIB menggunakan tanda petik ( " " ) untuk menghantar teks!`;
+                maklumBalas.style.borderLeftColor = "#f1c40f";
+                document.getElementById("arahanInput").value = "";
+                return;
+            }
+
+            // Semak format yang tepat: robot.cop("bentuk")
+            let padananSintaks = input.match(/^robot\.cop\("([a-z]+)"\)$/i); 
+
+            if (padananSintaks) {
+                adakahSibuk = true;
+                let bentukDiisi = padananSintaks[1].toLowerCase();
+
+                if (!kamusBentuk[bentukDiisi]) {
+                    mainBunyi(sfxSalah);
+                    maklumBalas.innerHTML = `Ralat Objek: Komponen "${bentukDiisi}" tidak wujud di kilang ini!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    adakahSibuk = false;
+                    document.getElementById("arahanInput").value = "";
+                    return;
+                }
+
+                // =====================================
+                // MULAKAN ANIMASI LENGAN ROBOT TURUN
+                // =====================================
+                maklumBalas.innerHTML = `Sistem: Menerima String "${bentukDiisi}". Mengecap...`;
+                maklumBalas.style.borderLeftColor = "#3498db";
+                teksAnimasi.innerHTML = "Status: Lengan robot diaktifkan.";
+
+                // Letak warna cop & bentukan padanya
+                bentukCop.className = `${kamusBentuk[bentukDiisi].kelasBentuk} ${kamusBentuk[bentukDiisi].kelasWarna}`;
+                bentukCop.style.opacity = "1";
+
+                // Robot turun bawah (ngecop)
+                lenganRobot.style.height = "290px"; 
+                await tunggu(600);
+
+                // EFEK LETUPAN SPARK
+                efekSpark.classList.add("meletup-spark");
+                await tunggu(200);
+
+                // KES 1: JAWAPAN TEPAT
+                if (bentukDiisi === bentukSasaran) {
+                    mainBunyi(sfxBetul);
+                    
+                    // Isi warna lubang dengan warna cop
+                    lubangBentuk.className = `${kamusBentuk[bentukDiisi].kelasBentuk} ${kamusBentuk[bentukDiisi].kelasWarna}`;
+                    lubangBentuk.style.filter = "none"; 
+                    bentukCop.style.opacity = "0"; // Cop diserap ke dalam lubang
+
+                    // Robot naik balik
+                    lenganRobot.style.height = "120px";
+                    efekSpark.classList.remove("meletup-spark");
+                    
+                    maklumBalas.innerHTML = "Berjaya: String Parameter dikenali dan tepat!";
+                    maklumBalas.style.borderLeftColor = "#0be881";
+                    teksAnimasi.innerHTML = "Status: Produk lengkap! Pemasangan diteruskan.";
+                    
+                    await tunggu(1000);
+                    adakahTamat = true;
+                    
+                    // Conveyor jalan laju
+                    document.getElementById("conveyor").style.animationDuration = "0.5s";
+                    document.getElementById("kotak-sasaran").style.transition = "left 1.5s linear";
+                    document.getElementById("kotak-sasaran").style.left = "-20%"; // Hilang ke kiri
+                    
+                    mainBunyi(sfxMenang);
+                    await tunggu(1000);
+                    document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                } 
+                // KES 2: SALAH BENTUK
+                else {
+                    mainBunyi(sfxSalah);
+                    
+                    // Robot naik balik (tapi bentuk tak melekat)
+                    lenganRobot.style.height = "120px";
+                    efekSpark.classList.remove("meletup-spark");
+                    
+                    maklumBalas.innerHTML = `Ralat Pemasangan: Anda meletakkan "${bentukDiisi}", tetapi mesin perlukan "${bentukSasaran}"!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Kesilapan operasi. Sistem rosak.";
+                    
+                    await tunggu(1000);
+                    adakahTamat = true;
+                    
+                    document.getElementById("pesan-kalah").innerHTML = `Anda telah memasukkan parameter teks <strong>"${bentukDiisi}"</strong>. Komponen tersebut tidak padan dengan lubang pada produk (memerlukan <strong>"${bentukSasaran}"</strong>). Sila baca arahan dengan teliti.`;
+                    document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                }
+
+            } else if (input !== "") {
+                maklumBalas.innerHTML = "Ralat Sintaks: Guna format <code>robot.cop(\"nama_bentuk\")</code>";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+            }
+
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById("modalInfo").classList.add("tunjuk-modal-kustom"); }
+        function tutupInfo() { document.getElementById("modalInfo").classList.remove("tunjuk-modal-kustom"); }
+    </script>
+</body>
+</html>

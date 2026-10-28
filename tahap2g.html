@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 2G: Haiwan Membiak</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA LADANG / REBAN */
+        .tema-ladang {
+            background: linear-gradient(to bottom, #87CEEB 0%, #a1c4fd 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* TANAH LADANG */
+        #tanah-ladang {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
+            background: linear-gradient(to bottom, #deb887, #8b4513);
+            z-index: 5; border-top: 6px solid #a0522d;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        /* STRUKTUR REBAN (Latar belakang) */
+        #rumah-reban {
+            position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
+            width: 280px; height: 200px; background: #e67e22; border: 8px solid #d35400;
+            border-radius: 10px 10px 0 0; z-index: 2; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: flex-end; padding-bottom: 20px;
+        }
+        
+        /* Bumbung Reban */
+        #bumbung-reban {
+            position: absolute; bottom: 320px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; 
+            border-left: 160px solid transparent; 
+            border-right: 160px solid transparent; 
+            border-bottom: 80px solid #c0392b; z-index: 3;
+        }
+
+        /* 🔥 KUMPULAN SARANG & TELUR (KEBAL OS WIN 10/11) 🔥 */
+        #kumpulan-sarang {
+            position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 110px; z-index: 6;
+            /* Container ni ikat sarang dan telur supaya tak lari! */
+        }
+
+        /* JERAMI (Sarang) */
+        #sarang-jerami {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            font-size: 110px; line-height: 1; margin: 0; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        /* TELUR */
+        .telur-biji {
+            position: absolute; font-size: 35px; opacity: 0; 
+            transition: all 0.5s ease-out; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
+            line-height: 1; margin: 0; transform-origin: center center;
+        }
+        
+        /* FASA 1: Kedudukan awal sebelum ayam bertelur (Disorok atas) */
+        #telur1 { top: -60px; left: 15px; }
+        #telur2 { top: -70px; left: 45px; }
+        #telur3 { top: -60px; left: 75px; }
+        #telur4 { top: -70px; left: 105px; }
+
+        /* FASA 2: Telur Keluar Berterabur (Bila ayam melompat) */
+        .keluar-telur { opacity: 1 !important; top: -10px !important; }
+
+        /* 🔥 FASA 3: Telur Masuk Sarang (DITARIK NAIK KE ATAS UNTUK FIT LUBANG!) 🔥 */
+        #telur1.masuk-sarang { top: 30px !important; left: 25px !important; transform: scale(0.8) rotate(-20deg) !important; z-index: 11; }
+        #telur2.masuk-sarang { top: 20px !important; left: 45px !important; transform: scale(0.8) rotate(15deg) !important; z-index: 12; }
+        #telur3.masuk-sarang { top: 35px !important; left: 60px !important; transform: scale(0.8) rotate(-15deg) !important; z-index: 13; }
+        #telur4.masuk-sarang { top: 25px !important; left: 80px !important; transform: scale(0.8) rotate(20deg) !important; z-index: 14; }
+
+
+        /* IBU AYAM */
+        #ibu-ayam {
+            position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%);
+            font-size: 100px; z-index: 20; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+        .ayam-naik { transform: translate(-50%, -100px) !important; }
+
+
+        /* HUD PANDUAN MISI (Atas Kanan) */
+        .hud-misi {
+            position: absolute; top: 70px; right: 15px; background: rgba(255,255,255,0.9);
+            padding: 10px 15px; border-radius: 8px; border: 3px solid #e67e22;
+            font-family: monospace; font-weight: bold; font-size: 13px; color: #d35400;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 20; text-align: left;
+        }
+        .hud-misi span { color: #2c3e50; }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; transform: scale(0); background: #ffffff; color: #1c2833;
+            padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; width: max-content; 
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); pointer-events: none; border: 2px solid #3498db;
+        }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Sains<br><span style="font-size: 16px; color: #3498db;">(Misi 2G - Zon 1)</span></h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Haiwan terbahagi kepada kumpulan yang bertelur dan beranak.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Bantu ibu ayam ini membiak. Masukkan kaedah pembiakan yang betul (Teks) dan kuantiti sasaran (Angka) serentak!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Kod (Teks & Angka):</strong><br>
+                <span style="color: #fff;">objek.tindakan("kaedah", jumlah)</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Sasaran Kod:</strong><br>
+                <span style="color: #fff;">ayam.biak( ? , ? )</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod pembiakan di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap2g()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap2g()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">LAKSANAKAN BIOLOGI 🧬</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Sistem menunggu input biologi ibu ayam...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-ladang">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 30;">
+                    Status: Ibu ayam sedia untuk membiak.
+                </div>
+                
+                <!-- HUD SASARAN -->
+                <div class="hud-misi">
+                    <u>OBJEKTIF BIAK</u><br>
+                    Kaedah: <span>???</span><br>
+                    Kuantiti: <span>4 Biji</span>
+                </div>
+
+                <div id="tanah-ladang"></div>
+                
+                <!-- REBAN AYAM -->
+                <div id="bumbung-reban"></div>
+                <div id="rumah-reban"></div>
+
+                <!-- 🔥 GABUNGAN SARANG & TELUR 🔥 -->
+                <div id="kumpulan-sarang">
+                    <div id="sarang-jerami">🪹</div>
+                    
+                    <div id="telur1" class="telur-biji">🥚</div>
+                    <div id="telur2" class="telur-biji">🥚</div>
+                    <div id="telur3" class="telur-biji">🥚</div>
+                    <div id="telur4" class="telur-biji">🥚</div>
+                </div>
+
+                <div id="ibu-ayam">🐓</div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🐔🥚</div>
+            <h2>Ujian Sintaks Teks & Angka</h2>
+            <p style="text-align: left;">Mari uji semula kemahiran gabungan parameter anda! Ingat kembali teknik dari Misi 2E di mana kita menggabungkan data jenis teks dan nombor bulat.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Peraturan Penting:</strong><br><br>
+                1. Parameter PERTAMA ialah <strong>Kaedah Membiak</strong> ("bertelur" atau "beranak"). Letak tanda petik <code>" "</code>.<br>
+                2. Parameter KEDUA ialah <strong>Kuantiti</strong>. Rujuk objektif di skrin (4 biji). Tulis angka <strong>TANPA</strong> tanda petik.<br>
+                ✅ Contoh tepat: <code>ayam.biak("bertelur", 4)</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🐣🎊</div>
+            <h2 style="color: #0be881;">Kitaran Hayat Berjaya!</h2>
+            <p>Hebat! Anda berjaya mengelaskan cara haiwan membiak dengan parameter rentetan (String) dan nombor bulat (Integer) yang tepat.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🧬❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Ralat Biologi!</h2>
+            <p id="pesan-kalah">Fakta sains anda terpesong dari fitrah alam semula jadi. Sila kaji kelas haiwan ini dan pastikan format kod adalah tepat.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script>
+        function laksanaArahanTahap2g() {
+            let input = document.getElementById('arahanInput').value.replace(/\s+/g, '');
+            let maklumBalas = document.getElementById('maklumBalas');
+            let teksAnimasi = document.getElementById('teksAnimasi');
+            let ayam = document.getElementById('ibu-ayam');
+            let telurBiji = document.querySelectorAll('.telur-biji');
+            let modalMenang = document.getElementById('modalKemenangan');
+            let modalKalah = document.getElementById('modalKalah');
+
+            // Reset Kelas Animasi
+            ayam.classList.remove('ayam-naik');
+            telurBiji.forEach(t => {
+                t.classList.remove('keluar-telur', 'masuk-sarang');
+            });
+
+            // Jawapan Valid
+            if (input === 'ayam.biak("bertelur",4)' || input === "ayam.biak('bertelur',4)") {
+                maklumBalas.innerHTML = "Kod disahkan. Ibu ayam mula bertelur...";
+                teksAnimasi.innerHTML = "Status: Ibu ayam bertelur...";
+                
+                // 1. Ayam Melompat
+                ayam.classList.add('ayam-naik');
+
+                // 2. Telur Keluar Berterabur
+                setTimeout(() => {
+                    telurBiji.forEach(t => t.classList.add('keluar-telur'));
+                    let bunyiBetul = document.getElementById('bunyiBetul');
+                    if(bunyiBetul) bunyiBetul.play();
+
+                    // 3. Telur Masuk Sarang 1 PER 1 & Tertindih Rapat!
+                    setTimeout(() => {
+                        teksAnimasi.innerHTML = "Status: Telur dikumpulkan ke dalam sarang.";
+                        
+                        // Gelung forEach dengan index supaya telur bergerak satu per satu
+                        telurBiji.forEach((t, index) => {
+                            setTimeout(() => {
+                                t.classList.add('masuk-sarang');
+                            }, index * 400); // Beza 0.4 saat untuk setiap telur seterusnya
+                        });
+
+                        // 4. Modal Menang Keluar (Tunggu semua telur siap masuk + sikit delay)
+                        let masaSiapSemuaTelur = (telurBiji.length * 400) + 600; 
+                        
+                        setTimeout(() => {
+                            modalMenang.classList.add('tunjuk-modal-kustom');
+                            let bunyiMenang = document.getElementById('bunyiMenang');
+                            if(bunyiMenang) bunyiMenang.play();
+                        }, masaSiapSemuaTelur);
+
+                    }, 1500); // Biar telur berterabur kat bawah selama 1.5 saat dulu
+                    
+                }, 400);
+
+            } else {
+                maklumBalas.innerHTML = "Ralat: Kaedah pembiakan atau kuantiti salah!";
+                teksAnimasi.innerHTML = "Status: Maklumat pembiakan salah!";
+                let bunyiSalah = document.getElementById('bunyiSalah');
+                if(bunyiSalah) bunyiSalah.play();
+                
+                setTimeout(() => {
+                    modalKalah.classList.add('tunjuk-modal-kustom');
+                }, 500);
+            }
+        }
+
+        // Fungsi Panduan Misi
+        function bukaInfo() { document.getElementById('modalInfo').classList.add('tunjuk-modal-kustom'); }
+        function tutupInfo() { document.getElementById('modalInfo').classList.remove('tunjuk-modal-kustom'); }
+    </script>
+</body>
+</html>

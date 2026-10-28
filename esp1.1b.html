@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1.1B: Amaran Bunyi (IoT)</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* ========================================================
+           🔥 CSS KOMPONEN DALAMAN 🔥
+           ======================================================== */
+        .tema-makmal {
+            background: linear-gradient(to bottom, #141e30 0%, #243b55 100%) !important;
+            overflow: hidden; position: relative; height: 100%;
+        }
+
+        .meja-makmal {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 150px;
+            background: #2c3e50; border-top: 5px solid #00f3ff;
+            box-shadow: inset 0 20px 30px rgba(0,0,0,0.5); z-index: 5;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* CIP ESP32 MAYA */
+        .esp-maya {
+            width: 120px; height: 160px; background: #111; border-radius: 10px;
+            position: absolute; bottom: 80px; left: 25%; border: 2px solid #555;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 6;
+            display: flex; flex-direction: column; align-items: center; padding-top: 20px;
+        }
+        .esp-maya::before { content: "ESP32 MCU"; color: #aaa; font-family: monospace; font-size: 14px; font-weight: bold;}
+        .cip-besi { width: 50px; height: 50px; background: silver; margin-top: 10px; border-radius: 4px; }
+
+        /* SIMULASI BUZZER */
+        .buzzer-maya {
+            position: absolute; bottom: 150px; right: 30%; font-size: 80px;
+            z-index: 10; filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+            transition: all 0.3s ease;
+        }
+        
+        .bunyi-aktif {
+            filter: drop-shadow(0 0 20px #e74c3c) drop-shadow(0 0 40px #c0392b) !important;
+            animation: getarBuzzer 0.1s infinite alternate;
+        }
+
+        .gelombang-bunyi {
+            position: absolute; top: -20px; right: -40px; font-size: 50px; color: #ff5e57;
+            opacity: 0; transition: 0.2s;
+        }
+        .bunyi-aktif .gelombang-bunyi { opacity: 1; animation: denyutGelombang 0.5s infinite alternate; }
+
+        @keyframes getarBuzzer { 0% { transform: translateX(-3px) rotate(-2deg); } 100% { transform: translateX(3px) rotate(2deg); } }
+        @keyframes denyutGelombang { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.3); opacity: 1; } }
+
+        /* ========================================================
+           🔥 AMARAN EARPLUG (RUANG KUNING KIRI) 🔥
+           ======================================================== */
+        .ruang-amaran-earplug {
+            position: absolute; top: 20%; left: 5%;
+            display: flex; align-items: center; gap: 12px; z-index: 8;
+        }
+
+        .gambar-earplug {
+            width: 100px; height: auto;
+            animation: goyangDenyut 1s infinite ease-in-out;
+            filter: drop-shadow(0 0 8px rgba(255, 56, 56, 0.4));
+        }
+
+        .teks-neon-amaran {
+            color: #ff3838; font-family: monospace; font-size: 13px; font-weight: bold;
+            text-transform: uppercase; line-height: 1.4;
+            animation: timbulTenggelam 1.5s infinite alternate;
+            text-shadow: 0 0 5px #ff3838, 0 0 10px #ff0000;
+        }
+
+        @keyframes goyangDenyut {
+            0% { transform: scale(1) rotate(-8deg); }
+            50% { transform: scale(1.15) rotate(8deg); }
+            100% { transform: scale(1) rotate(-8deg); }
+        }
+
+        @keyframes timbulTenggelam {
+            0% { opacity: 0.2; text-shadow: 0 0 2px #ff3838; }
+            100% { opacity: 1; text-shadow: 0 0 12px #ff3838, 0 0 25px #ff0000; }
+        }
+
+        /* BUTANG USB & STATUS */
+        .btn-usb {
+            width: 100%; padding: 12px; background-color: #e67e22; color: white;
+            border: none; border-radius: 8px; font-size: 14px; font-weight: bold;
+            cursor: pointer; transition: 0.3s; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(230, 126, 34, 0.4);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-usb:hover { background-color: #d35400; transform: translateY(-2px); }
+        .btn-usb.connected { background-color: #0be881 !important; box-shadow: 0 4px 10px rgba(11, 232, 129, 0.4); pointer-events: none;}
+        
+        .status-sambungan { text-align: center; font-size: 12px; color: #bdc3c7; margin-bottom: 15px; font-family: monospace;}
+
+        /* ========================================================
+           🔥 CSS MODAL 🔥
+           ======================================================== */
+        .modal-bantuan {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.95); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(8px);
+        }
+        .modal-bantuan.aktif { display: flex; animation: fanaIn 0.3s forwards; }
+        
+        .kandungan-bantuan {
+            background: #151a21; padding: 25px; border-radius: 16px; width: 95%; max-width: 650px;
+            color: #fff; border: 2px solid #00ff66; box-shadow: 0 0 30px rgba(0, 255, 102, 0.2);
+            max-height: 90vh; overflow-y: auto; position: relative;
+        }
+        .kandungan-bantuan.lebar { max-width: 1200px; overflow: hidden; display: flex; flex-direction: column;} 
+        .kandungan-bantuan h2 { color: #00ff66; margin-top: 0; border-bottom: 1px dashed #00ff66; padding-bottom: 10px;}
+        
+        .senarai-langkah { text-align: left; background: rgba(0,0,0,0.4); padding: 15px 25px; border-radius: 8px; margin-bottom: 20px;}
+        .senarai-langkah li { margin-bottom: 14px; font-size: 14px; line-height: 1.6; color: #d2dae2;}
+        .senarai-langkah strong { color: #f1c40f; }
+
+        .btn-tutup-modal {
+            position: absolute; top: 15px; right: 20px; background: transparent; border: none;
+            color: #ff5e57; font-size: 32px; cursor: pointer; transition: 0.2s; z-index: 100;
+        }
+        .btn-tutup-modal:hover { transform: scale(1.2); color: #ff0055;}
+
+        .btn-aksi { width: 100%; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s; margin-top: 10px; z-index: 50; position: relative;}
+        .btn-aksi.biru { background: #3498db; color: #fff; }
+
+        /* 🔥 KANVAS GAMBAR (DENGAN FUNGSI DRAG & ZOOM) 🔥 */
+        .ruang-kanvas {
+            position: relative; width: 100%; height: 65vh; background: #0b0c10; border-radius: 10px;
+            border: 2px solid #2f3640; display: flex; justify-content: center; align-items: center; 
+            overflow: hidden; cursor: grab;
+        }
+        .ruang-kanvas:active { cursor: grabbing; }
+        
+        .imej-litar { 
+            max-width: 100%; max-height: 100%; object-fit: contain; 
+            transition: transform 0.1s ease-out; transform-origin: center center;
+            pointer-events: none; 
+        }
+
+        .nota-zoom {
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); color: #f1c40f; padding: 5px 15px;
+            border-radius: 20px; font-size: 12px; pointer-events: none; z-index: 20; border: 1px solid #f1c40f;
+        }
+
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <!-- 🔥 ANTARAMUKA UTAMA SKRIN 🔥 -->
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 5px;">
+                <h2 style="margin: 0; line-height: 1.2; font-size: 18px;">Terminal I.O.T<br><span style="font-size: 13px; color: #00ff66;">(Misi 1.1B - Amaran Bunyi)</span></h2>
+                
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #00ff66; color: #000; border-color: #00b894; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaModal('modalBukuPanduan')" style="background: #e67e22; color: #fff; border-color: #d35400; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">📖 Panduan Litar</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 13px; line-height: 1.4;">Aplikasi Zon 1 (Output Asas). Menggunakan arahan tindakan tanpa angka untuk membunyikan modul <strong>Active Buzzer</strong>.</p>
+            
+            <button id="btnConnect" class="btn-usb">🔌 HUBUNGKAN CIP ESP32</button>
+            <div id="statusUSB" class="status-sambungan">Status: 🔴 Tidak Disambungkan</div>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #00ff66; font-family: monospace;">
+                <strong style="color: #00ff66; font-family: sans-serif;">Sintaks Amaran Audio:</strong><br>
+                <span style="color: #fff; display: block; margin-top: 4px;">amaran.bunyi()</span>
+                <span style="color: #fff; display: block; margin-top: 4px;">amaran.senyap()</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod untuk kawal penggera..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanIoT()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanIoT()" style="margin-top: 5px; margin-bottom: 8px; width: 100%; padding: 12px; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s; background: linear-gradient(135deg, #00ff66, #00b894); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 255, 102, 0.4);">LAKSANA KOD 🔊</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00ff66; padding: 10px; font-size: 13px;">
+                Tugasan: Sila pastikan wayar Buzzer dipasang. Klik butang Hubungkan ESP32.
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #ecf0f1; text-align: center; margin-top: 1px; margin-bottom: 16px; text-shadow: 0 0 10px rgba(0,243,255,0.5);">Makmal Siber-Fizikal</h2>
+            
+            <div id="ruangAnimasi" class="tema-makmal">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #00ff66; z-index: 30;">
+                    Simulasi: Menunggu sambungan perkakasan MCU.
+                </div>
+                
+                <!-- 🔥 PAPAN AMARAN EARPLUG 🔥 -->
+                <div class="ruang-amaran-earplug">
+                    <img src="assets/picture/earplug.png" alt="Pakai Earplug" class="gambar-earplug">
+                    <div class="teks-neon-amaran">AMARAN!<br>SILA PAKAI<br>PENUTUP<br>TELINGA</div>
+                </div>
+
+                <div class="meja-makmal"></div>
+                <div class="esp-maya"><div class="cip-besi"></div></div>
+                
+                <!-- BUZZER MAYA -->
+                <div id="buzzerMaya" class="buzzer-maya">
+                    🎛️
+                    <div class="gelombang-bunyi">)))</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalBukuPanduan" class="modal-bantuan">
+        <div class="kandungan-bantuan">
+            <button class="btn-tutup-modal" onclick="tutupModal('modalBukuPanduan')">×</button>
+            <h2>Buku Manual: Litar 1.1B (Buzzer)</h2>
+            <p style="font-size: 14px; color: #bdc3c7;">Gunakan komponen <strong>Active Buzzer</strong>. Patuhi koordinat <em>Breadboard</em> di bawah dengan teliti.</p>
+            
+            <div style="max-height: 45vh; overflow-y: auto; padding-right: 10px;">
+                <ol class="senarai-langkah">
+                    <h3 style="color: #00ff66; margin-top: 0; font-size: 16px;">Pendawaian Lengkap Litar</h3>
+                    
+                    <li><strong>POSISI MCU:</strong> Pastikan cip ESP32 dipacak dari <strong>Lubang 1B hingga 15J</strong>. Pastikan port USB menghala ke luar.</li>
+                    
+                    <li><strong>WAYAR ISYARAT (Merah):</strong> Tarik Wayar Pelompat (Merah) bermula dari <strong>Lubang 8A</strong> (Pin D5) dan cucuk terus ke <strong>Lubang 25A</strong>.</li>
+                    
+                    <li><strong>WAYAR PEMBUMIAN (Hitam):</strong> Tarik Wayar Pelompat (Hitam) bermula dari <strong>Lubang 2A</strong> (Pin GND) dan cucuk terus ke <strong>Lubang 28A</strong>.</li>
+                    
+                    <li><strong>KOMPONEN PENGGERA (Buzzer):</strong> PENTING! Perhatikan polariti. Pacak kaki panjang (+) di <strong>25C</strong> dan kaki pendek (-) di <strong>28C</strong>.</li>
+                    
+                </ol>
+                <div style="background: rgba(231, 76, 60, 0.2); padding: 10px; border-left: 3px solid #e74c3c; font-size: 13px; color: #ffcccb; margin-bottom: 10px;">
+                    <em>Awas: Tanggalkan stiker pelekat di atas buzzer selepas litar dipasang supaya amaran berbunyi dengan kuat!</em>
+                </div>
+            </div>
+
+            <button class="btn-aksi" style="background: #9b59b6; color: #fff;" onclick="tutupModal('modalBukuPanduan'); bukaModal('modalGambarRealiti')">🔍 LIHAT SKEMATIK LITAR SEBENAR</button>
+        </div>
+    </div>
+
+    <!-- 🔥 SKEMATIK V2 MODAL (GAMBAR) 🔥 -->
+    <div id="modalGambarRealiti" class="modal-bantuan">
+        <div class="kandungan-bantuan lebar">
+            <button class="btn-tutup-modal" onclick="tutupModal('modalGambarRealiti')">×</button>
+            <h2 style="text-align: center;">Skematik Pemasangan & Skala Rujukan</h2>
+            
+            <div class="ruang-kanvas" id="ruangKanvas">
+                <!-- GAMBAR LITAR MANUAL DARI CANVA -->
+                <img src="assets/picture/iot_misi1_1b_buzzer.jpg" class="imej-litar" id="imejLitar" onerror="this.onerror=null; this.src='https://via.placeholder.com/1200x800/2c3e50/ffffff?text=SILA+LETAK+GAMBAR+BUZZER+BARU+DALAM+ASSETS/PICTURE';">
+                
+                <div class="nota-zoom">🔍 Guna Mouse Wheel untuk Zoom | Klik & Tarik untuk Gerak</div>
+            </div>
+
+            <button class="btn-aksi" style="background: #27ae60; color: #fff; margin-top: 15px;" onclick="tutupModal('modalGambarRealiti')">SAYA FAHAM & LITAR TELAH DIPASANG</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3" preload="none"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3" preload="none"></audio>
+
+    <script>
+        // ==========================================
+        // 🔥 ENJIN ZOOM & PAN GAMBAR (DIBAIKI) 🔥
+        // ==========================================
+        const kanvas = document.getElementById('ruangKanvas');
+        const imej = document.getElementById('imejLitar');
+        let imgScale = 1; let panning = false;
+        let pointX = 0; let pointY = 0; let startX = 0; let startY = 0;
+
+        function setTransform() { imej.style.transform = `translate(${pointX}px, ${pointY}px) scale(${imgScale})`; }
+
+        kanvas.onmousedown = function (e) {
+            e.preventDefault();
+            startX = e.clientX - pointX; startY = e.clientY - pointY;
+            panning = true;
+        }
+
+        kanvas.onmouseup = function (e) { panning = false; }
+        kanvas.onmouseleave = function (e) { panning = false; }
+
+        kanvas.onmousemove = function (e) {
+            e.preventDefault();
+            if (!panning) return;
+            pointX = e.clientX - startX; pointY = e.clientY - startY;
+            setTransform();
+        }
+
+        // Mouse Wheel (Zoom Statik di Tengah)
+        kanvas.onwheel = function (e) {
+            e.preventDefault();
+            
+            // Tentukan arah scroll
+            const delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY);
+            if (delta > 0) { imgScale *= 1.1; } else { imgScale /= 1.1; } // 1.1x supaya lebih smooth
+            
+            // Hadkan Zoom (Minimum 1x, Maksimum 5x)
+            if (imgScale <= 1) { 
+                imgScale = 1; 
+                pointX = 0; // Reset ke posisi asal bila zoom out penuh
+                pointY = 0; 
+            }
+            if (imgScale > 5) { imgScale = 5; }
+
+            setTransform();
+        }
+
+        // ==========================================
+        // 🔥 KAWALAN MODAL 🔥
+        // ==========================================
+        function bukaModal(id) { 
+            document.getElementById(id).classList.add('aktif'); 
+            if(id === 'modalGambarRealiti') { imgScale = 1; pointX = 0; pointY = 0; setTransform(); }
+        }
+        function tutupModal(id) { document.getElementById(id).classList.remove('aktif'); }
+
+        // ==========================================
+        // 🔥 KAWALAN ESP32 WEB SERIAL 🔥
+        // ==========================================
+        let port; let writer; let isConnected = false;
+        const btnConnect = document.getElementById("btnConnect");
+        const statusUSB = document.getElementById("statusUSB");
+        const maklumBalas = document.getElementById("maklumBalas");
+        const teksAnimasi = document.getElementById("teksAnimasi");
+        const buzzerMaya = document.getElementById("buzzerMaya");
+        const sfxBetul = document.getElementById("bunyiBetul");
+        const sfxSalah = document.getElementById("bunyiSalah");
+
+        btnConnect.addEventListener("click", async () => {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                const textEncoder = new TextEncoderStream();
+                textEncoder.readable.pipeTo(port.writable);
+                writer = textEncoder.writable.getWriter();
+                
+                isConnected = true;
+                btnConnect.innerHTML = "✅ MCU DISAMBUNGKAN";
+                btnConnect.classList.add("connected");
+                statusUSB.innerHTML = "Status: 🟢 Aktif (Baud 115200)";
+                statusUSB.style.color = "#00ff66";
+                maklumBalas.innerHTML = "Sistem: Pangkalan data terhubung. Anda boleh mula menaip kod amaran.";
+                maklumBalas.style.borderLeftColor = "#00ff66";
+                teksAnimasi.innerHTML = "Simulasi: Sistem sedia menerima arahan fizikal.";
+            } catch (err) {
+                console.error("Gagal menyambung:", err);
+                statusUSB.innerHTML = "Status: 🔴 Gagal / Batal";
+                statusUSB.style.color = "#ff5e57";
+            }
+        });
+
+        async function laksanaArahanIoT() {
+            let input = document.getElementById("arahanInput").value.toLowerCase().replace(/\s+/g, '');
+            if (!isConnected) {
+                maklumBalas.innerHTML = "Ralat: Anda belum menyambungkan kabel dan klik butang HUBUNGKAN CIP ESP32!";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                if(sfxSalah) { sfxSalah.pause(); sfxSalah.currentTime = 0; sfxSalah.play(); }
+                return;
+            }
+
+            if (input === "amaran.bunyi()") {
+                await writer.write("BUZON\n");
+                buzzerMaya.classList.add("bunyi-aktif");
+                maklumBalas.innerHTML = "Berjaya: Isyarat dihantar. Siren amaran diaktifkan!";
+                maklumBalas.style.borderLeftColor = "#00ff66";
+                teksAnimasi.innerHTML = "Simulasi: Modul Buzzer fizikal sedang berbunyi!";
+                if(sfxBetul) { sfxBetul.pause(); sfxBetul.currentTime = 0; sfxBetul.play(); }
+                
+            } else if (input === "amaran.senyap()") {
+                await writer.write("BUZOFF\n");
+                buzzerMaya.classList.remove("bunyi-aktif");
+                maklumBalas.innerHTML = "Berjaya: Arus isyarat diputuskan. Siren dimatikan.";
+                maklumBalas.style.borderLeftColor = "#00ff66";
+                teksAnimasi.innerHTML = "Simulasi: Modul Buzzer fizikal kembali senyap.";
+                if(sfxBetul) { sfxBetul.pause(); sfxBetul.currentTime = 0; sfxBetul.play(); }
+                
+            } else if (input !== "") {
+                maklumBalas.innerHTML = "Ralat Sintaks: Semak ejaan arahan. Gunakan amaran.bunyi() atau amaran.senyap()";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                if(sfxSalah) { sfxSalah.pause(); sfxSalah.currentTime = 0; sfxSalah.play(); }
+            }
+            document.getElementById("arahanInput").value = "";
+        }
+    </script>
+</body>
+</html>

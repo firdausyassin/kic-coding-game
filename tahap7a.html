@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 7A: Kilang Kargo Pintar</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KILANG */
+        .tema-kilang {
+            background: linear-gradient(to bottom, #bdc3c7 0%, #2c3e50 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 🔥 KELAS PAUSE GLOBAL 🔥 */
+        .paused * {
+            animation-play-state: paused !important;
+        }
+
+        /* KOTAK STATUS PUTIH RASMI */
+        #teksAnimasi {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            z-index: 100; background: rgba(255, 255, 255, 0.95); color: #c0392b; 
+            border: 2px solid #e74c3c; padding: 8px 20px; border-radius: 8px; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); width: 85%; text-align: center;
+            font-size: 14px; transition: all 0.3s;
+        }
+
+        /* TINGKAP KILANG & LATAR */
+        .tingkap {
+            position: absolute; top: 70px; width: 80px; height: 100px;
+            background: rgba(255, 255, 255, 0.1); border: 4px solid #34495e;
+            border-radius: 5px; z-index: 1; display: flex; flex-wrap: wrap;
+        }
+        .tingkap::before {
+            content: ''; width: 100%; height: 4px; background: #34495e; position: absolute; top: 50%; transform: translateY(-50%);
+        }
+        .tingkap::after {
+            content: ''; width: 4px; height: 100%; background: #34495e; position: absolute; left: 50%; transform: translateX(-50%);
+        }
+        #t1 { left: 15%; } #t2 { left: 45%; } #t3 { right: 15%; }
+
+        /* 🔥 LORI KARGO (Z-INDEX 20) 🔥 */
+        #lori {
+            position: absolute; bottom: 85px; left: 120%; 
+            font-size: 150px; z-index: 20; 
+            line-height: 1; margin: 0; filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.5));
+            transition: left 2s ease-in-out; 
+        }
+
+        /* TALI SAWAT (CONVEYOR BELT) */
+        #mesin-tali {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 90px;
+            background: #7f8c8d; border-top: 10px solid #95a5a6; z-index: 10;
+            overflow: hidden; box-shadow: inset 0 15px 20px rgba(0,0,0,0.3);
+        }
+        .garis-sawat {
+            position: absolute; top: 0; width: 200%; height: 100%;
+            background: repeating-linear-gradient(
+                90deg, transparent, transparent 40px, rgba(0,0,0,0.2) 40px, rgba(0,0,0,0.2) 50px
+            );
+            animation: gerakSawat 3s linear infinite;
+        }
+        @keyframes gerakSawat { 0% { transform: translateX(0); } 100% { transform: translateX(-50px); } }
+
+        /* ZON KOTAK MAGIS */
+        #zon-kotak {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+            z-index: 15; pointer-events: none;
+        }
+        
+        .kotak { 
+            position: absolute; 
+            bottom: 95px; 
+            font-size: 50px; line-height: 1; margin: 0; 
+            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.4)); 
+            transition: left 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                        bottom 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+                        opacity 0.4s ease-in;
+            z-index: 15; 
+        }
+
+        /* 🔥 DIALOG BARU (KALIS PENYEK 100%) 🔥 */
+        .dialog-khas-kilang {
+            position: absolute; 
+            top: 50px; 
+            left: 50%; 
+            width: 260px; 
+            height: auto !important; /* Wajib auto supaya membesar ke bawah */
+            padding: 15px; 
+            background: rgba(255,255,255,0.95); 
+            color: #1c2833; 
+            font-size: 14px; 
+            font-weight: bold; 
+            text-align: center; 
+            line-height: 1.5; 
+            border: 3px solid #e67e22; 
+            border-radius: 12px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 90; 
+            pointer-events: none;
+            /* Setup Animasi */
+            transform: translateX(-50%) scale(0);
+            transform-origin: top center;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        .dialog-khas-kilang::after {
+            content: '';
+            position: absolute;
+            bottom: -13px; /* Ekor/Jarum ke bawah */
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0 10px;
+            border-style: solid;
+            border-color: #e67e22 transparent transparent transparent;
+        }
+        .tunjuk-dialog-lori {
+            transform: translateX(-50%) scale(1) translateY(10px) !important;
+        }
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom { background: #1a1a2e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; text-align: center; color: #fff; box-shadow: 0 0 30px rgba(230, 126, 34, 0.3); border: 2px solid #e67e22; }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(231, 76, 60, 0.4); border: 2px solid #e74c3c; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #e67e22; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Pengiraan<br><span style="font-size: 16px; color: #e67e22;">(Misi 7A - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #e67e22; color: #fff; border-color: #d35400; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #e67e22; color: #fff; border-color: #d35400; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 8px; font-size: 13px; line-height: 1.3;">Lori Kargo perlukan jumlah kotak yang tepat! Gunakan simbol <strong>+</strong> untuk menyuruh komputer mengira jumlah tersebut.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; border-left: 3px solid #e67e22;">
+                <strong>Operator Tambah:</strong> <code style="color: #f1c40f; font-size: 16px;">+</code><br><br>
+                <strong style="color: #e67e22;">Format Kod:</strong><br>
+                <code style="color: #fff;">sistem.kira(x + y)</code><br><br>
+                <span style="color: #bdc3c7; font-size: 12px;">Contoh: Jika diminta 3 kotak oren dan 2 biru, taipkan <code>sistem.kira(3+2)</code></span>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip kod pengiraan di sini..." spellcheck="false" style="width: 100%; height: 110px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 16px; resize: vertical; margin-bottom: 5px;" autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap7a()"></textarea>
+            
+            <button onclick="laksanaArahanTahap7a()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);">LAKSANAKAN PENGIRAAN 🧮</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #e67e22; padding: 10px; font-size: 13px;">
+                Sistem memulakan enjin. Bersedia untuk menerima tugasan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Tali Sawat Kargo</h2>
+            
+            <div id="ruangAnimasi" class="tema-kilang">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.9); color: #c0392b; border: 2px solid #e74c3c; z-index: 100;">
+                    Menjana maklumat kargo...
+                </div>
+                
+                <!-- TINGKAP KILANG -->
+                <div id="t1" class="tingkap"></div>
+                <div id="t2" class="tingkap"></div>
+                <div id="t3" class="tingkap"></div>
+
+                <!-- 🔥 GUNA ID DAN CLASS BARU 🔥 -->
+                <div id="dialogLori" class="dialog-khas-kilang"></div>
+                
+                <!-- LORI & KOTAK -->
+                <div id="lori">🚛</div>
+                <div id="zon-kotak"></div>
+
+                <!-- CONVEYOR BELT -->
+                <div id="mesin-tali">
+                    <div class="garis-sawat"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🧮🤖</div>
+            <h2 style="color: #e67e22;">Matematik Mesin</h2>
+            <p style="text-align: left;">Komputer sangat pantas mengira! Anda tidak perlu mengira di dalam kepala, sebaliknya masukkan sahaja operasi matematik ke dalam parameter.</p>
+            
+            <div style="background: rgba(230, 126, 34, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #e67e22;">
+                <strong>Cara Menggunakan Parameter Pengiraan:</strong><br><br>
+                Jika skrin meminta <strong>4 kotak Oren</strong> dan <strong>5 kotak Biru</strong>, anda tidak perlu menaip jawapan <code>9</code>.<br><br>
+                Sebaliknya, taip operasi sebenar supaya komputer yang mengiranya:<br>
+                <code>sistem.kira(4 + 5)</code> atau <code>sistem.kira(4+5)</code>
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #e67e22; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- MODAL KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🚛📦</div>
+            <h2 style="color: #27ae60;">Penghantaran Berjaya!</h2>
+            <p style="color: #d2dae2;">Hebat! Anda telah belajar bagaimana parameter di dalam kurungan <code>()</code> boleh memproses operasi matematik (+). Ini adalah asas kepada pengiraan yang lebih rumit!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #2ecc71; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KALAH / RALAT -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;">⚠️❌</div>
+            <h2 style="color: #e74c3c;">Sistem Tergendala!</h2>
+            <p style="color: #d2dae2;" id="pesan-kalah-teks">Terdapat ralat pada arahan pengiraan matematik anda! Lori tidak dapat bergerak kerana jumlah kargo tidak tepat.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #e74c3c; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap7a.js"></script>
+</body>
+</html>

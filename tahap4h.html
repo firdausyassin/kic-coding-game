@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 4H: Kitaran Air Bumi</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA ALAM SEMULAJADI */
+        .tema-alam {
+            background: linear-gradient(to bottom, #87CEFA 0%, #e0f7fa 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* SUNGAI & TANAH */
+        #tanah-daratan {
+            position: absolute; bottom: 0; left: 0; width: 60%; height: 130px;
+            background: #2ecc71; border-top: 10px solid #27ae60; z-index: 5;
+            border-radius: 0 40px 0 0;
+        }
+        #sungai-air {
+            position: absolute; bottom: 0; right: 0; width: 45%; height: 120px;
+            background: #0984e3; border-top: 5px solid #74b9ff; z-index: 4;
+            transition: height 0.5s ease, width 0.5s ease;
+        }
+
+        /* ZON POKOK & BALAK (Statik di tempat asal) */
+        #zon-pokok-balak {
+            position: absolute; bottom: 115px; left: 25%;
+            z-index: 10; width: 150px; height: 150px;
+            display: flex; justify-content: center; align-items: flex-end;
+            pointer-events: none;
+        }
+
+        /* POKOK TUMBESARAN */
+        #pokok-kitaran {
+            position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px; line-height: 1; margin: 0;
+            transition: all 1s ease-in-out;
+            transform-origin: bottom center; 
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+
+        /* KAYU BALAK (Tersadai baring bersilang dengan saiz sepadan) */
+        #kayu-balak {
+            position: absolute; bottom: 0; left: calc(50% - 20px);
+            font-size: 0px; line-height: 1; margin: 0; opacity: 0;
+            transition: all 1s ease-in-out;
+            transform-origin: bottom center; 
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
+            z-index: 9;
+        }
+
+        /* MATAHARI */
+        #matahari {
+            position: absolute; top: 10%; right: 10%; font-size: 80px;
+            filter: drop-shadow(0 0 20px #f1c40f); transition: opacity 1s ease;
+        }
+
+        /* AWAN DINAMIK (Bergerak) */
+        #awan-kitaran {
+            position: absolute; top: 10%; left: 65%; 
+            z-index: 20; transition: left 1.5s ease-in-out;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        
+        #awan-ikon {
+            font-size: 90px; line-height: 1;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
+            transition: all 1s ease-in-out;
+        }
+        
+        .awan-gelap #awan-ikon { filter: brightness(0.4) drop-shadow(0 10px 10px rgba(0,0,0,0.5)); transform: scale(1.2); }
+
+        /* ZON PENYEJATAN (Atas Sungai) */
+        #zon-sejat {
+            position: absolute; bottom: 120px; left: 65%; 
+            width: 100px; height: 0; overflow: hidden; z-index: 15;
+            background-image: linear-gradient(to top, rgba(255,255,255,0) 50%, rgba(223, 230, 233, 0.6) 50%);
+            background-size: 15px 30px; animation: naikSejat 0.6s linear infinite;
+            transition: height 1.5s ease-in-out; opacity: 0;
+        }
+        .aktif-sejat { height: 220px !important; opacity: 1 !important; }
+
+        @keyframes naikSejat { 0% { background-position: 0 0; } 100% { background-position: 0 -30px; } }
+
+        /* ZON HUJAN */
+        #zon-hujan {
+            position: absolute; top: 80px; width: 100px; height: 220px;
+            display: none; overflow: hidden; pointer-events: none;
+        }
+        .hujan-lebat { display: block !important; }
+
+        .titisan-hujan {
+            position: absolute; font-size: 20px; top: -30px;
+            animation: jatuhSuperb 0.6s ease-in infinite;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
+        .t1 { left: 10%; animation-delay: 0s; font-size: 18px; }
+        .t2 { left: 50%; transform: translateX(-50%); animation-delay: 0.2s; font-size: 24px; }
+        .t3 { right: 10%; animation-delay: 0.4s; font-size: 20px; }
+
+        @keyframes jatuhSuperb {
+            0% { top: -20px; opacity: 0; transform: scale(0.8) stretch(1); }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { top: 220px; opacity: 0; transform: scale(0.5) stretch(1.5); }
+        }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 8px 12px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; 
+            white-space: nowrap !important; min-width: max-content !important;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #3498db; margin-bottom: 5px;
+            transform-origin: bottom center;
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #3498db transparent transparent transparent;
+        }
+        .awan-dialog::before { display: none !important; }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+
+        .dialog-kanan { left: 80%; transform: translateX(0) scale(0); transform-origin: bottom left; }
+        .dialog-kanan.tunjuk-dialog { transform: translateX(0) scale(1) !important; }
+        .dialog-kanan::after { left: 20%; }
+
+        .dialog-kiri { left: 20%; transform: translateX(-100%) scale(0); transform-origin: bottom right; }
+        .dialog-kiri.tunjuk-dialog { transform: translateX(-100%) scale(1) !important; }
+        .dialog-kiri::after { left: 80%; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Pengulangan<br><span style="font-size: 16px; color: #3498db;">(Misi 4H - Zon 1)</span></h2>
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 6px 8px; font-size: 12px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Benih pokok ini memerlukan <strong>3 kitaran air yang lengkap</strong> untuk membesar menjadi pokok dewasa.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Gabungkan dua arahan Sains ini ke dalam satu gelung dengan memisahkannya menggunakan koma bertitik ( <strong>;</strong> ).</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Dua Arahan Alam:</strong><br>
+                1. <code>bumi.sejat()</code><br>
+                2. <code>awan.hujan()</code><br><br>
+                <strong style="color: #0be881; font-family: sans-serif;">Format Loop Pelbagai Arahan:</strong><br>
+                <span style="color: #fff;">ulang(?) { arahan1(); arahan2() }</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod kitaran di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap4h()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap4h()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%;">MULAKAN KITARAN ⛈️</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Sistem cuaca sedia. Menunggu gabungan arahan pengulangan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-alam">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 30;">
+                    Status: Cuaca panas terik. Pokok belum bercambah.
+                </div>
+                
+                <div id="matahari">☀️</div>
+                <div id="zon-sejat"></div> 
+                
+                <div id="awan-kitaran">
+                    <span id="awan-ikon">☁️</span>
+                    <div id="zon-hujan">
+                        <span class="titisan-hujan t1">💦💦</span>
+                        <span class="titisan-hujan t2">💦💦💦</span>
+                        <span class="titisan-hujan t3">💦💦</span>
+                    </div>
+                </div>
+                
+                <div id="tanah-daratan"></div>
+                <div id="sungai-air"></div>
+                
+                <!-- ZON POKOK & BALAK BERSILANG DI TITIK TETAP -->
+                <div id="zon-pokok-balak">
+                    <div id="pokok-kitaran">
+                        <div id="dialogPokok" class="awan-dialog"></div>
+                        <span id="ikonPokok">🌱</span>
+                    </div>
+                    <div id="kayu-balak">🪵</div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🌧️🔁</div>
+            <h2>Loop Pelbagai Arahan</h2>
+            <p style="text-align: left;">Satu gelung (Loop) tidak terhad kepada satu arahan sahaja. Anda boleh menyumbat seberapa banyak arahan yang anda mahu ke dalam kurungan kurawal <code>{ }</code>.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Peraturan Penting:</strong><br><br>
+                Jika terdapat lebih daripada satu arahan, anda **WAJIB** meletakkan koma bertitik (<code>;</code>) untuk memisahkan arahan tersebut.<br><br>
+                ✅ Betul: <code>ulang(3) { bumi.sejat(); awan.hujan() }</code><br>
+                ❌ Salah: <code>ulang(3) { bumi.sejat() awan.hujan() }</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🌳✅</div>
+            <h2 style="color: #0be881;">Kitaran Sempurna!</h2>
+            <p>Tahniah! Anda berjaya menggabungkan dua arahan kompleks ke dalam satu gelung. Pokok telah menerima air yang cukup untuk membesar menjadi pokok dewasa yang megah.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🥀❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Krisis Cuaca!</h2>
+            <p id="pesan-kalah">Ralat sistem ekologi dikesan.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <!-- 🔥 JAVASCRIPT DISATUKAN (INLINE) 🔥 -->
+    <script>
+        let adakahTamat = false;
+        let adakahSibuk = false;
+        let pemasaDialog; 
+
+        function mainBunyi(audioElemen, mulaMasa = 0) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = mulaMasa;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function cakap(mesej, masa, posisi = "kanan") {
+            let kotakDialog = document.getElementById("dialogPokok");
+            if(kotakDialog) {
+                kotakDialog.innerHTML = mesej;
+                kotakDialog.className = "awan-dialog"; 
+                
+                if (posisi === "kanan") kotakDialog.classList.add("dialog-kanan");
+                else if (posisi === "kiri") kotakDialog.classList.add("dialog-kiri");
+                
+                kotakDialog.classList.add("tunjuk-dialog");
+                
+                clearTimeout(pemasaDialog); 
+                pemasaDialog = setTimeout(() => { 
+                    kotakDialog.classList.remove("tunjuk-dialog"); 
+                }, masa);
+            }
+        }
+
+        async function laksanaArahanTahap4h() {
+            let input = document.getElementById("arahanInput").value.replace(/\s+/g, '');
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            if (adakahTamat) {
+                maklumBalas.innerHTML = "Ralat: Eksperimen tamat. Sila muat semula (Refresh) halaman.";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                return;
+            }
+
+            if(adakahSibuk) return;
+
+            let salahSintaks = input.match(/^ulang\(\d+\)\{bumi\.sejat\(\)awan\.hujan\(\)\}$/);
+            if (salahSintaks) {
+                maklumBalas.innerHTML = "Ralat Kritical: Dua arahan berbeza WAJIB dipisahkan dengan koma bertitik ( ; )";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                cakap("Eh! Komputer keliru. Jangan lupa letak ( ; ) di antara arahan!", 4000, "kanan");
+                return;
+            }
+
+            let padanan = input.match(/^ulang\((\d+)\)\{(bumi\.sejat\(\);awan\.hujan\(\)|awan\.hujan\(\);bumi\.sejat\(\))\}$/);
+
+            if (padanan) {
+                let kaliUlang = parseInt(padanan[1]);
+
+                if (kaliUlang === 0) {
+                    maklumBalas.innerHTML = "Ralat Gelung: Jika kitaran ialah 0, tiada cuaca yang berlaku!";
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    mainBunyi(sfxSalah);
+                    cakap("Tolong... aku perlukan air...", 2500, "kanan");
+                    return;
+                }
+
+                let kitaranEfektif = kaliUlang;
+                if (kitaranEfektif > 4) {
+                    kitaranEfektif = 4; // Had maksimum paras 4 untuk banjir
+                }
+
+                adakahSibuk = true;
+                
+                maklumBalas.innerHTML = `Sistem Cuaca diaktifkan: Menjalankan ${kitaranEfektif} kitaran...`;
+                maklumBalas.style.borderLeftColor = "#f1c40f";
+
+                let saizPokok = 40; // Mula dari benih saiz 40px
+                let zonSejat = document.getElementById("zon-sejat");
+                let awanDiv = document.getElementById("awan-kitaran");
+                let awanIkon = document.getElementById("awan-ikon");
+                let zonHujan = document.getElementById("zon-hujan");
+                let pokok = document.getElementById("pokok-kitaran");
+                let ikonPokok = document.getElementById("ikonPokok");
+
+                for (let i = 1; i <= kitaranEfektif; i++) {
+                    
+                    // FASA 1: SEJATAN
+                    teksAnimasi.innerHTML = `Kitaran ${i}: Matahari menyejat air sungai...`;
+                    zonSejat.classList.add("aktif-sejat");
+                    mainBunyi(sfxBetul);
+                    
+                    await tunggu(1500); 
+                    zonSejat.classList.remove("aktif-sejat");
+
+                    awanIkon.style.transform = "scale(1.2)";
+                    await tunggu(500);
+
+                    // FASA 2: AWAN BERGERAK & GELAP
+                    teksAnimasi.innerHTML = `Kitaran ${i}: Awan berat bergerak ke daratan...`;
+                    awanDiv.style.left = "25%"; 
+                    awanDiv.classList.add("awan-gelap");
+                    
+                    await tunggu(1500); 
+
+                    // FASA 3: HUJAN
+                    teksAnimasi.innerHTML = `Kitaran ${i}: Hujan turun menyirami bumi!`;
+                    zonHujan.classList.add("hujan-lebat");
+                    mainBunyi(sfxBetul);
+                    
+                    await tunggu(2000); 
+
+                    zonHujan.classList.remove("hujan-lebat");
+                    awanDiv.classList.remove("awan-gelap");
+                    awanIkon.style.transform = "scale(1)";
+                    awanDiv.style.left = "65%"; 
+                    
+                    // FASA 4: POKOK MEMBESAR BERPERINGKAT (Statik setempat & saiz bertambah cantik)
+                    if(i === 1) {
+                        saizPokok = 60;
+                        ikonPokok.innerHTML = "🌿"; 
+                    } else if(i === 2) {
+                        saizPokok = 90;
+                        ikonPokok.innerHTML = "🌳"; 
+                    } else if(i === 3 && kaliUlang === 3) {
+                        saizPokok = 130; // Pokok besar megah (bukan pokok krismas)
+                        ikonPokok.innerHTML = "🌳"; 
+                    } else if(i === 4) {
+                        saizPokok = 140; 
+                        ikonPokok.innerHTML = "🌳";
+                    }
+                    
+                    pokok.style.fontSize = `${saizPokok}px`;
+                    await tunggu(1500); 
+                }
+
+                // ==========================================
+                // PENILAIAN EKSPERIMEN
+                // ==========================================
+                if (kaliUlang === 3) {
+                    // TEPAT
+                    adakahTamat = true;
+                    ikonPokok.innerHTML = "🌳";
+                    pokok.style.fontSize = "130px";
+                    
+                    maklumBalas.innerHTML = "Berjaya: Pokok mendapat air yang cukup untuk menjadi pokok dewasa yang megah!";
+                    maklumBalas.style.borderLeftColor = "#0be881";
+                    teksAnimasi.innerHTML = `Status: Ekosistem stabil dan subur megah!`;
+                    
+                    mainBunyi(sfxMenang);
+                    cakap("Segarnya! Aku dah jadi pokok besar yang megah!", 3000, "kanan");
+                    
+                    setTimeout(() => {
+                        document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+
+                } else if (kaliUlang > 3 || kitaranEfektif >= 4) {
+                    // BANJIR
+                    adakahTamat = true;
+                    
+                    // Pokok hidup rebah senget baring ke tepi
+                    pokok.style.transform = "translateX(-50%) rotate(-75deg)";
+                    
+                    // Kayu balak muncul BERSILANG menyandar di pangkal pokok, dengan saiz yang SEPADAN dengan saiz pokok tersebut
+                    let kayuBalak = document.getElementById("kayu-balak");
+                    kayuBalak.style.fontSize = "80px"; // Saiz sama sebati dengan pokok
+                    kayuBalak.style.opacity = "1";
+                    kayuBalak.style.transform = "rotate(35deg)"; // Bersilang dengan pokok senget
+                    
+                    document.getElementById("sungai-air").style.height = "180px";
+                    document.getElementById("sungai-air").style.width = "100%";
+                    
+                    let pesananBanjir = kaliUlang > 4 ? `Anda menaip <strong>${kaliUlang} kali</strong>. Sistem automatik berhenti pada paras 4 dan mencetuskan banjir!` : `Anda ulang <strong>${kaliUlang} kali</strong>. Air berlebihan menyebabkan banjir kilat!`;
+
+                    maklumBalas.innerHTML = `Gagal: Banjir besar berlaku!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Terlalu banyak hujan! Pokok rebah dihanyutkan air.";
+                    mainBunyi(sfxSalah);
+                    
+                    setTimeout(() => {
+                        document.getElementById("ikon-kalah").innerHTML = "🌊🪵";
+                        document.getElementById("tajuk-kalah").innerHTML = "Banjir Besar!";
+                        document.getElementById("pesan-kalah").innerHTML = `${pesananBanjir} Semak semula bilangan *Loop* anda kepada tepat 3 kali sahaja!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2000);
+
+                } else {
+                    // KEMARAU
+                    adakahTamat = true;
+                    
+                    ikonPokok.innerHTML = "🥀";
+                    document.getElementById("sungai-air").style.height = "20px"; 
+                    
+                    maklumBalas.innerHTML = `Gagal: Anda cuma ulang ${kaliUlang} kali. Kemarau!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Kurang air. Pokok terbantut dan mati layu.";
+                    mainBunyi(sfxSalah);
+                    cakap("Air tak cukup... aku haus...", 3000, "kanan");
+                    
+                    setTimeout(() => {
+                        document.getElementById("ikon-kalah").innerHTML = "🥀🏜️";
+                        document.getElementById("tajuk-kalah").innerHTML = "Krisis Kemarau!";
+                        document.getElementById("pesan-kalah").innerHTML = `Kitaran terhenti pada pusingan ke-<strong>${kaliUlang}</strong>. Pokok memerlukan air dari 3 kitaran lengkap untuk terus hidup. Cuba lagi!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+                }
+
+            } else if (input !== "") {
+                maklumBalas.innerHTML = "Ralat Sintaks: Arahan tidak tepat atau salah letak koma bertitik (;)";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+            }
+            
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById("modalInfo").classList.add("tunjuk-modal-kustom"); }
+        function tutupInfo() { document.getElementById("modalInfo").classList.remove("tunjuk-modal-kustom"); }
+
+    </script>
+</body>
+</html>

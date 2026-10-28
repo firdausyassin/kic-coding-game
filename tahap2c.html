@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 2C: Kemahiran Kumpul Data</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA TAMAN EPAL */
+        .tema-taman {
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* RUMPUT */
+        #rumput {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 140px;
+            background: linear-gradient(to bottom, #7CFC00, #32CD32);
+            z-index: 5; border-top: 5px solid #228B22;
+        }
+
+        /* POKOK & AWAN LATAR */
+        #pokok-latar { position: absolute; bottom: 113px; left: -5%; font-size: 250px; z-index: 4; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
+        #awan-gerak { position: absolute; top: 10%; left: 50%; font-size: 80px; animation: awanLalu 40s linear infinite alternate; z-index: 1;}
+        @keyframes awanLalu { 0% { transform: translateX(-100px); } 100% { transform: translateX(200px); } }
+
+        /* PAPAN PIKTOGRAF */
+        #papan-carta {
+            position: absolute; top: 15%; right: 5%; width: 280px; height: auto;
+            background: rgba(255, 255, 255, 0.9); border: 4px solid #8B4513;
+            border-radius: 12px; z-index: 5; padding: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .tajuk-carta { font-weight: bold; color: #8B4513; font-size: 16px; margin-bottom: 10px; text-decoration: underline; }
+        
+        .slot-carta {
+            width: 100%; height: 50px; border-bottom: 2px dashed #ccc;
+            display: flex; align-items: center; justify-content: flex-start;
+            padding-left: 10px; position: relative;
+        }
+        .slot-nombor { font-weight: bold; font-size: 20px; color: #555; width: 30px; }
+
+        /* OBJEK BERTABURAN (EPAL) */
+        .epal-tabur {
+            position: absolute; z-index: 10; font-size: 40px; line-height: 1;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); /* Transisi animasi terbang */
+        }
+        
+        /* Kedudukan Rawak Atas Rumput */
+        #epal1 { bottom: 30px; left: 15%; }
+        #epal2 { bottom: 80px; left: 30%; transform: rotate(15deg); }
+        #epal3 { bottom: 50px; left: 45%; transform: rotate(-20deg); }
+        #epal4 { bottom: 90px; left: 60%; transform: rotate(10deg); }
+        #epal5 { bottom: 20px; left: 75%; transform: rotate(-10deg); }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; transform: scale(0); background: #ffffff; color: #1c2833;
+            padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; width: max-content; 
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); pointer-events: none; border: 2px solid #3498db;
+        }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Matematik<br><span style="font-size: 16px; color: #3498db;">(Misi 2C - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div> 
+            </div>
+            
+            <p style="margin-top: 20px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Kira jumlah buah epal yang bertaburan di atas rumput dengan teliti.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Masukkan nilai (angka) ke dalam kod parameter carta piktograf. Tanpa tanda petik!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Parameter Berangka:</strong><br>
+                <span style="color: #fff;">carta.masuk(nilai_angka)</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Contoh Kod:</strong><br>
+                <span style="color: #fff;">carta.masuk(2)</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod data di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap2c()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap2c()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">REKOD DATA 📊</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Sistem piktograf kosong. Menunggu input nombor...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-taman">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 20;">
+                    Status: Epal belum direkodkan.
+                </div>
+                
+                <div id="awan-gerak">☁️</div>
+                <div id="pokok-latar">🌳</div>
+                <div id="rumput"></div>
+                
+                <div id="papan-carta">
+                    <div class="tajuk-carta">PIKTOGRAF JUMLAH EPAL</div>
+                    <div class="slot-carta" id="target1"><span class="slot-nombor">1</span></div>
+                    <div class="slot-carta" id="target2"><span class="slot-nombor">2</span></div>
+                    <div class="slot-carta" id="target3"><span class="slot-nombor">3</span></div>
+                    <div class="slot-carta" id="target4"><span class="slot-nombor">4</span></div>
+                    <div class="slot-carta" id="target5"><span class="slot-nombor">5</span></div>
+                </div>
+
+                <div id="epal1" class="epal-tabur">🍎</div>
+                <div id="epal2" class="epal-tabur">🍎</div>
+                <div id="epal3" class="epal-tabur">🍎</div>
+                <div id="epal4" class="epal-tabur">🍎</div>
+                <div id="epal5" class="epal-tabur">🍎</div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🍎🔢</div>
+            <h2>Parameter Berangka (Nombor)</h2>
+            <p style="text-align: left;">Dalam sains komputer, nombor bulat dikenali sebagai <strong>INTEGER</strong>. Sistem carta ini memerlukan nilai Integer yang tepat untuk memproses taburan data.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Langkah-langkah:</strong><br><br>
+                1. Kira jumlah epal yang jatuh di atas rumput.<br>
+                2. Taip arahan sasaran: <code>carta.masuk(jumlah_epal)</code>.<br>
+                3. Masukkan angka sahaja di dalam kurungan (contoh: <code>carta.masuk(3)</code>).<br>
+                4. Jika nilai tepat, data epal akan direkodkan secara automatik ke dalam carta piktograf.
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">📊✅</div>
+            <h2 style="color: #0be881;">Data Direkodkan!</h2>
+            <p>Hebat! Anda berjaya memahami sintaks parameter angka (integer) dan merekod piktograf dengan jumlah yang sangat tepat.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">📉❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Kiraan Melencong!</h2>
+            <p id="pesan-kalah">Kiraan anda tidak sepadan dengan jumlah epal fizikal di taman. Sila kira dengan teliti sebelum memasukkan parameter.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script>
+        let adakahTamat = false;
+        let adakahSibuk = false;
+        let jumlahEpalSebenar = 5;
+
+        function mainBunyi(audioElemen) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = 0;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        async function laksanaArahanTahap2c() {
+            let inputAsal = document.getElementById("arahanInput").value;
+            let input = inputAsal.toLowerCase().replace(/\s+/g, ''); // Buang space
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            if (adakahTamat) {
+                maklumBalas.innerHTML = "Ralat: Piktograf telah lengkap direkod. Sila muat semula (Refresh).";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                return;
+            }
+
+            if (adakahSibuk) return;
+
+            // RegEx khas untuk menangkap NOMBOR SAHAJA dalam kurungan (cth: carta.masuk(5))
+            let padananAngkaSahaja = input.match(/^carta\.masuk\((\d+)\)$/);
+            
+            // RegEx khas untuk tangkap kalau budak tertulis text/string berpetik (cth: carta.masuk("5"))
+            let padananAdaPetik = input.match(/^carta\.masuk\((["'])\d+\1\)$/);
+
+            if (padananAdaPetik) {
+                // Kalau budak letak tanda petik untuk nombor
+                mainBunyi(sfxSalah);
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                maklumBalas.innerHTML = `Ralat Format: Parameter angka (nombor) TIDAK memerlukan tanda petik <code>" "</code>! Sila buang tanda petik tersebut.`;
+                document.getElementById("arahanInput").value = "";
+                return;
+            }
+
+            if (padananAngkaSahaja) {
+                let nilaiDimasukkan = parseInt(padananAngkaSahaja[1]); // Tukar jadi Number
+
+                adakahSibuk = true;
+
+                // JAWAPAN BETUL
+                if (nilaiDimasukkan === jumlahEpalSebenar) {
+                    mainBunyi(sfxBetul);
+                    maklumBalas.innerHTML = `Merekod ${nilaiDimasukkan} data epal ke dalam piktograf...`;
+                    maklumBalas.style.borderLeftColor = "#0be881";
+                    teksAnimasi.innerHTML = "Status: Mengumpul data...";
+
+                    let ruang = document.getElementById("ruangAnimasi").getBoundingClientRect();
+
+                    // ==============================================================
+                    // LANGKAH 1: KUNCI POSISI ASAL DI ATAS RUMPUT UNTUK SEMUA EPAL
+                    // ==============================================================
+                    for (let i = 1; i <= jumlahEpalSebenar; i++) {
+                        let epal = document.getElementById("epal" + i);
+                        let rectEpal = epal.getBoundingClientRect();
+                        
+                        // Cari posisi sebenar berdasarkan ruang animasi
+                        let startTop = rectEpal.top - ruang.top;
+                        let startLeft = rectEpal.left - ruang.left;
+
+                        epal.style.transition = "none"; // Matikan transition sekejap
+                        epal.style.bottom = "auto";     // Buang ikatan bawah
+                        epal.style.top = startTop + "px"; // Kunci koordinat Top
+                        epal.style.left = startLeft + "px"; // Kunci koordinat Left
+                        epal.style.transform = "rotate(0deg)"; // Luruskan buah
+                    }
+
+                    // Trik paksa browser 'baca' posisi baru sebelum animasi jalan
+                    void document.getElementById("ruangAnimasi").offsetHeight;
+
+                    // ==============================================================
+                    // LANGKAH 2: ANIMASI TERBANG SATU PER SATU + BUNYI KLING
+                    // ==============================================================
+                    for (let i = 1; i <= jumlahEpalSebenar; i++) {
+                        let epal = document.getElementById("epal" + i);
+                        let targetSlot = document.getElementById("target" + i);
+                        
+                        let targetRect = targetSlot.getBoundingClientRect();
+                        
+                        // Koordinat untuk sasaran dalam papan carta
+                        let endTop = (targetRect.top - ruang.top) + 5; 
+                        let endLeft = (targetRect.left - ruang.left) + 40; 
+
+                        // Buka balik transisi dengan durasi 0.6 saat (sama macam kod asal)
+                        epal.style.transition = "all 0.6s cubic-bezier(0.25, 1, 0.5, 1)";
+                        epal.style.zIndex = "25"; // Biar dia lalu depan papan
+                        
+                        // Gerak ke target carta
+                        epal.style.top = endTop + "px";
+                        epal.style.left = endLeft + "px";
+                        epal.style.transform = "scale(0.8) rotate(0deg)"; // Kecilkan sikit dalam papan
+                        
+                        mainBunyi(sfxBetul); // Bunyi 'pop/kling' setiap kali epal gerak
+                        
+                        // Tunggu masa yang tepat sebelum epal seterusnya terbang (600ms ikut kod asal)
+                        await tunggu(600); 
+                    }
+
+                    adakahTamat = true;
+                    teksAnimasi.innerHTML = "Status: Piktograf lengkap!";
+                    maklumBalas.innerHTML = "Sempurna: Nilai pembolehubah angka tepat!";
+                    
+                    await tunggu(800);
+                    mainBunyi(sfxMenang);
+                    
+                    setTimeout(() => {
+                        document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                    }, 1500);
+
+                } 
+                // JAWAPAN SALAH NOMBOR
+                else {
+                    mainBunyi(sfxSalah);
+                    maklumBalas.style.borderLeftColor = "#f1c40f";
+                    maklumBalas.innerHTML = `Ralat Matematik: Terdapat ${jumlahEpalSebenar} biji epal fizikal, bukan ${nilaiDimasukkan}!`;
+                    teksAnimasi.innerHTML = "Ralat: Data tidak sepadan dengan realiti.";
+                    
+                    setTimeout(() => {
+                        document.getElementById("ikon-kalah").innerHTML = "🔢❌";
+                        document.getElementById("pesan-kalah").innerHTML = `Anda memasukkan parameter nilai (${nilaiDimasukkan}). Jumlah ini tidak sama dengan taburan epal di atas padang. Sila hitung dengan betul.`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 1500);
+                    
+                    adakahSibuk = false;
+                }
+
+            } 
+            // JIKA SALAH SYNTAX TERUK
+            else {
+                mainBunyi(sfxSalah);
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                maklumBalas.innerHTML = "Ralat Sintaks: Guna format <code>carta.masuk(angka)</code> tanpa tanda petik.";
+            }
+
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById("modalInfo").classList.add("tunjuk-modal-kustom"); }
+        function tutupInfo() { document.getElementById("modalInfo").classList.remove("tunjuk-modal-kustom"); }
+    </script>
+</body>
+</html>

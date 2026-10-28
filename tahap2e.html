@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 2E: Benih Bercambah</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA MAKMAL BOTANI */
+        .tema-botani {
+            background: linear-gradient(to bottom, #d5f5e3 0%, #a9dfbf 100%);
+            overflow: hidden; position: relative;
+        }
+
+        /* PAPAN MEJA (3 Kotak Asing - z-index 8)  / Tambahan */
+        .papan-meja { 
+            position: absolute; z-index: 7; line-height: 1; margin: 0; font-size: 80px; 
+            filter: drop-shadow(0 8px 5px rgba(0,0,0,0.5)); 
+        }
+        #papan1 { left: 64.4%; bottom: 100px; }
+        #papan2 { left: 74.5%; bottom: 100px; }
+        
+
+        /* DASH MEJA (5 Palang Asing - z-index 7) / Tambahan */
+        .kaki-meja { 
+            position: absolute; z-index: 8; line-height: 1; margin: 0; font-size: 45px; 
+        }
+        #kaki1 { left: 65%; bottom: 154px; }
+        #kaki2 { left: 70%; bottom: 154px; }
+        #kaki3 { left: 75%; bottom: 154px; }
+        #kaki4 { left: 80%; bottom: 154px; }
+
+        /* MEJA MAKMAL */
+        #meja-makmal {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: linear-gradient(to bottom, #bdc3c7, #7f8c8d);
+            z-index: 5; border-top: 8px solid #95a5a6;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* PERALATAN MAKMAL (Latar Belakang) */
+        #buku1 { position: absolute; top: 52%; right: 15%; font-size: 50px; z-index: 1; opacity: 0.9; }
+        #microskop { position: absolute; top: 51%; right: 21%; font-size: 55px; z-index: 1; opacity: 0.9; }
+
+        /* 🔥 KUMPULAN TINGKAP & MATAHARI (Fix Windows 10/11) 🔥 */
+        #kumpulan-tingkap {
+            position: absolute; top: 10%; left: 20%; width: 120px; height: 120px; z-index: 2;
+        }
+        #tingkap { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 100px; opacity: 0.8; line-height: 1; margin: 0;
+        }
+        #matahari {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0); 
+            font-size: 85px; line-height: 1; margin: 0;
+            opacity: 0; transition: all 1.5s ease-in-out;
+            filter: drop-shadow(0 0 30px #f1c40f);
+        }
+        .matahari-terbit { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
+
+
+        /* PASU & TANAMAN */
+        #pasu {
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
+            font-size: 80px; z-index: 10; line-height: 1;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.4));
+        }
+
+        /* Benih yang akan berevolusi */
+        #tanaman {
+            position: absolute; bottom: 173px; left: 50%; transform: translateX(-50%);
+            font-size: 40px; z-index: 9; line-height: 1;
+            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efek melantun masa membesar */
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
+        }
+
+        /* ALATAN ANIMASI (Tersembunyi pada awalnya) */
+        #penyiram {
+            position: absolute; top: -100px; left: 20%; font-size: 90px; z-index: 15;
+            opacity: 0; transition: all 0.8s ease; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+        
+        #titisan-air {
+            position: absolute; bottom: 250px; left: 50%; transform: translateX(-50%);
+            font-size: 30px; opacity: 0; z-index: 12;
+        }
+
+        /* PAPARAN METER SUHU & AIR (HUD Makmal) */
+        .panel-meter {
+            position: absolute; top: 75px; background: rgba(255,255,255,0.9);
+            padding: 10px 15px; border-radius: 8px; border: 3px solid #2ecc71;
+            font-family: monospace; font-weight: bold; font-size: 14px; color: #2c3e50;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 20; display: flex; align-items: center; gap: 10px;
+        }
+        #meter-air { left: 15px; }
+        #meter-suhu { right: 15px; border-color: #f1c40f; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <!-- HEADER TERMINAL & BUTANG (DIKEMASKINI) -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Sains<br><span style="font-size: 16px; color: #3498db;">(Misi 2E - Zon 1)</span></h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Biji benih memerlukan udara, air, dan suhu yang sesuai untuk bercambah.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Beri benih ini <strong>5 unit air</strong> dan tetapkan suhu kepada <strong>30 darjah</strong> menggunakan DUA parameter!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Dua Parameter:</strong><br>
+                <span style="color: #fff;">objek.tambah("teks", angka)</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Contoh Fasa 1 (Air):</strong><br>
+                <span style="color: #fff;">benih.tambah("air", 5)</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod keperluan di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap2e()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap2e()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">AKTIFKAN ALATAN 🔬</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Fasa 1: Sila berikan 5 unit air kepada benih.
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-botani">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 30;">
+                    Status: Biji benih sedia untuk eksperimen.
+                </div>
+                
+                <!-- HUD METER -->
+                <div id="meter-air" class="panel-meter">💧 Air: <span id="nilai-air" style="color:#3498db;">0</span>/5</div>
+                <div id="meter-suhu" class="panel-meter">🌡️ Suhu: <span id="nilai-suhu" style="color:#e67e22;">20</span>°C</div>
+
+                <!-- 🔥 ALAM & MAKMAL (DIKEMASKINI DENGAN KUMPULAN) 🔥 -->
+                <div id="kumpulan-tingkap">
+                    <div id="tingkap">🪟</div>
+                    <div id="matahari">☀️</div>
+                </div>
+                
+                <div id="buku1">📖</div>
+                <div id="microskop">🔬</div>
+                <div id="meja-makmal"></div>
+                
+                <!-- ALATAN ANIMASI -->
+                <div id="penyiram">🚿</div>
+                <div id="titisan-air">💧</div>
+
+                <!-- Papan Meja -->
+                <div id="papan1" class="papan-meja">🟫</div>
+                <div id="papan2" class="papan-meja">🟫</div>
+                
+                <!-- Kaki/Dash Meja -->
+                <div id="kaki1" class="kaki-meja">➖</div>
+                <div id="kaki2" class="kaki-meja">➖</div>
+                <div id="kaki3" class="kaki-meja">➖</div>
+                <div id="kaki4" class="kaki-meja">➖</div>
+
+                <!-- PASU & BENIH -->
+                <div id="pasu">⬛</div>
+                <div id="tanaman">🌰</div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🌱🔬</div>
+            <h2>Panduan Dua Parameter (Multiple Arguments)</h2>
+            <p style="text-align: left;">Tahap kesukaran meningkat! Dalam dunia pengaturcaraan, anda boleh menghantar lebih daripada satu arahan (parameter) serentak di dalam kurungan. Pisahkan ia dengan tanda koma <code>,</code>.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Peraturan Penting:</strong><br><br>
+                1. Parameter PERTAMA ialah <strong>Teks (Keperluan)</strong> = Mesti ada tanda petik <code>"air"</code>.<br>
+                2. Parameter KEDUA ialah <strong>Angka (Nilai)</strong> = Mesti <strong>TANPA</strong> tanda petik <code>5</code>.<br>
+                3. Jangan lupa letak tanda koma di antara kedua-dua parameter tersebut!<br>
+                ✅ Betul: <code>benih.tambah("air", 5)</code>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🌿✨</div>
+            <h2 style="color: #0be881;">Eksperimen Berjaya!</h2>
+            <p>Tahniah! Benih telah membesar. Anda berjaya menguasai teknik menghantar Dua Parameter serentak ke dalam sistem kod.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🥀❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Eksperimen Gagal!</h2>
+            <p id="pesan-kalah">Terdapat ralat pada keperluan asas benih. Tumbuhan tidak dapat membesar kerana parameter tidak tepat.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script src="script-tahap2e.js"></script>
+</body>
+</html>

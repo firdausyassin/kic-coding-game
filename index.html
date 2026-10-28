@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Innovation Craft</title>
+    <link rel="stylesheet" href="style-utama.css">
+    
+    <style>
+        /* ========================================================
+           1. MESH GRADIENT BACKDROP (Asap Membuak & Melingkar)
+           ======================================================== */
+        body {
+            background-color: #030508; 
+            background-image: 
+                radial-gradient(circle at 20% 60%, rgba(0, 243, 255, 0.3) 0px, transparent 20%), 
+                radial-gradient(circle at 70% 50%, rgba(188, 19, 254, 0.3) 0px, transparent 11%), 
+                radial-gradient(circle at 35% 80%, rgba(0, 255, 102, 0.25) 0px, transparent 15%), 
+                radial-gradient(circle at 80% 50%, rgba(255, 78, 80, 0.3) 0px, transparent 28%);
+            background-size: 280% 300%;
+            animation: asapMelingkar 20s ease infinite;
+            background-attachment: fixed; 
+            margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #fff;
+        }
+
+        @keyframes asapMelingkar {
+            0%   { background-position: 0% 10%; }
+            25%  { background-position: 30% 80%; }
+            50%  { background-position: 100% 50%; }
+            75%  { background-position: 50% 0%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ========================================================
+           2. LATAR ANGKASA (KLIK TEMBUS)
+           ======================================================== */
+        .latar-angkasa {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: -1; 
+        }
+        .objek-angkasa { position: absolute; animation: terapung 4s ease-in-out infinite alternate; }
+        @keyframes terapung { 0% { transform: translateY(0px); } 100% { transform: translateY(-15px); } }
+
+        /* ========================================================
+           3. PAPAN PEMUKA & KAD SEKTOR UTAMA
+           ========================================= */
+        .papan-pemuka {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; 
+            padding: 20px; max-width: 1200px; margin: 0 auto;
+        }
+
+        .kad-modul {
+            background: rgba(15, 15, 35, 0.6); border: 2px solid transparent; border-radius: 15px;
+            padding: 25px 20px; width: 320px; text-align: center;
+            display: flex; flex-direction: column; align-items: center;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, background 0.3s ease;
+            position: relative; overflow: hidden; backdrop-filter: blur(5px);
+        }
+
+        .kad-modul:hover { transform: translateY(-12px); cursor: pointer;}
+        
+        .ikon-modul { font-size: 45px; margin-bottom: 10px; transition: transform 0.3s ease; }
+        .kad-modul:hover .ikon-modul { transform: scale(1.15); }
+        
+        .kad-modul h2 { margin: 10px 0; font-size: 20px; text-shadow: 0 0 10px currentColor; }
+        .kad-modul p { font-size: 13px; color: #bdc3c7; line-height: 1.5; margin-bottom: 25px; }
+
+        /* ========================================================
+           4. BUTANG NEON (AKSES SEKTOR)
+           ======================================================== */
+        .btn-sektor {
+            width: 100%; padding: 12px; font-size: 15px; font-weight: bold;
+            border-radius: 8px; background: transparent; cursor: pointer;
+            transition: all 0.3s ease; border: 2px solid transparent;
+            margin-top: auto; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        /* TEMA WARNA SEKTOR DENGAN NEON GLOW */
+        .kad-s1 { border-color: rgba(0, 243, 255, 0.4); background: rgba(0, 243, 255, 0.02); box-shadow: 0 0 10px rgba(0, 243, 255, 0.1); }
+        .kad-s1:hover { border-color: #00f3ff; background: rgba(0, 243, 255, 0.08); box-shadow: 0 10px 35px rgba(0, 243, 255, 0.6), inset 0 0 15px rgba(0, 243, 255, 0.2); }
+        .kad-s1 h2 { color: #00f3ff; }
+        .ikon-s1 { filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.5)); }
+        .kad-s1:hover .ikon-s1 { filter: drop-shadow(0 0 15px #00f3ff); }
+        .btn-s1 { border-color: #00f3ff; color: #00f3ff; background: transparent; }
+        .kad-s1:hover .btn-s1 { box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); }
+        .btn-s1:hover { background: #00f3ff !important; color: #000 !important; box-shadow: 0 0 25px #00f3ff, inset 0 0 10px #00f3ff !important; transform: scale(1.05); }
+
+        .kad-s2 { border-color: rgba(188, 19, 254, 0.4); background: rgba(188, 19, 254, 0.02); box-shadow: 0 0 10px rgba(188, 19, 254, 0.1); }
+        .kad-s2:hover { border-color: #bc13fe; background: rgba(188, 19, 254, 0.08); box-shadow: 0 10px 35px rgba(188, 19, 254, 0.6), inset 0 0 15px rgba(188, 19, 254, 0.2); }
+        .kad-s2 h2 { color: #bc13fe; }
+        .ikon-s2 { filter: drop-shadow(0 0 8px rgba(188, 19, 254, 0.5)); }
+        .kad-s2:hover .ikon-s2 { filter: drop-shadow(0 0 15px #bc13fe); }
+        .btn-s2 { border-color: #bc13fe; color: #bc13fe; background: transparent; }
+        .kad-s2:hover .btn-s2 { box-shadow: 0 0 15px rgba(188, 19, 254, 0.4); }
+        .btn-s2:hover { background: #bc13fe !important; color: #000 !important; box-shadow: 0 0 25px #bc13fe, inset 0 0 10px #bc13fe !important; transform: scale(1.05); }
+
+        .kad-s3 { border-color: rgba(241, 196, 15, 0.4); background: rgba(241, 196, 15, 0.02); box-shadow: 0 0 10px rgba(241, 196, 15, 0.1); }
+        .kad-s3:hover { border-color: #f1c40f; background: rgba(241, 196, 15, 0.08); box-shadow: 0 10px 35px rgba(241, 196, 15, 0.6), inset 0 0 15px rgba(241, 196, 15, 0.2); }
+        .kad-s3 h2 { color: #f1c40f; }
+        .ikon-s3 { filter: drop-shadow(0 0 8px rgba(241, 196, 15, 0.5)); }
+        .kad-s3:hover .ikon-s3 { filter: drop-shadow(0 0 15px #f1c40f); }
+        .btn-s3 { border-color: #f1c40f; color: #f1c40f; background: transparent; }
+        .kad-s3:hover .btn-s3 { box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
+        .btn-s3:hover { background: #f1c40f !important; color: #000 !important; box-shadow: 0 0 25px #f1c40f, inset 0 0 10px #f1c40f !important; transform: scale(1.05); }
+
+        .kad-s4 { border-color: rgba(255, 78, 80, 0.4); background: rgba(255, 78, 80, 0.02); box-shadow: 0 0 10px rgba(255, 78, 80, 0.1); }
+        .kad-s4:hover { border-color: #ff4e50; background: rgba(255, 78, 80, 0.08); box-shadow: 0 10px 35px rgba(255, 78, 80, 0.6), inset 0 0 15px rgba(255, 78, 80, 0.2); }
+        .kad-s4 h2 { color: #ff4e50; }
+        .ikon-s4 { filter: drop-shadow(0 0 8px rgba(255, 78, 80, 0.5)); }
+        .kad-s4:hover .ikon-s4 { filter: drop-shadow(0 0 15px #ff4e50); }
+        .btn-s4 { border-color: #ff4e50; color: #ff4e50; background: transparent; }
+        .kad-s4:hover .btn-s4 { box-shadow: 0 0 15px rgba(255, 78, 80, 0.4); }
+        .btn-s4:hover { background: #ff4e50 !important; color: #fff !important; box-shadow: 0 0 25px #ff4e50, inset 0 0 10px #ff4e50 !important; transform: scale(1.05); }
+
+        .kad-s5 { border-color: rgba(0, 255, 102, 0.4); background: rgba(0, 255, 102, 0.02); box-shadow: 0 0 10px rgba(0, 255, 102, 0.1); }
+        .kad-s5:hover { border-color: #00ff66; background: rgba(0, 255, 102, 0.08); box-shadow: 0 10px 35px rgba(0, 255, 102, 0.6), inset 0 0 15px rgba(0, 255, 102, 0.2); }
+        .kad-s5 h2 { color: #00ff66; }
+        .ikon-s5 { filter: drop-shadow(0 0 8px rgba(0, 255, 102, 0.5)); }
+        .kad-s5:hover .ikon-s5 { filter: drop-shadow(0 0 15px #00ff66); }
+        .btn-s5 { border-color: #00ff66; color: #00ff66; background: transparent; }
+        .kad-s5:hover .btn-s5 { box-shadow: 0 0 15px rgba(0, 255, 102, 0.4); }
+        .btn-s5:hover { background: #00ff66 !important; color: #000 !important; box-shadow: 0 0 25px #00ff66, inset 0 0 10px #00ff66 !important; transform: scale(1.05); }
+
+        /* 🔥 CSS UNTUK KAD ZON 6 (BIRU PEKAT NEON) 🔥 */
+        .kad-s6 { border-color: rgba(0, 85, 255, 0.4); background: rgba(0, 85, 255, 0.02); box-shadow: 0 0 10px rgba(0, 85, 255, 0.1); }
+        .kad-s6:hover { border-color: #0055ff; background: rgba(0, 85, 255, 0.08); box-shadow: 0 10px 35px rgba(0, 85, 255, 0.6), inset 0 0 15px rgba(0, 85, 255, 0.2); }
+        .kad-s6 h2 { color: #4da6ff; text-shadow: 0 0 10px #0055ff; }
+        .ikon-s6 { filter: drop-shadow(0 0 8px rgba(0, 85, 255, 0.5)); }
+        .kad-s6:hover .ikon-s6 { filter: drop-shadow(0 0 15px #0055ff); }
+        .btn-s6 { border-color: #4da6ff; color: #4da6ff; background: transparent; }
+        .kad-s6:hover .btn-s6 { box-shadow: 0 0 15px rgba(0, 85, 255, 0.4); }
+        .btn-s6:hover { background: #0055ff !important; color: #fff !important; box-shadow: 0 0 25px #0055ff, inset 0 0 10px #0055ff !important; border-color: #0055ff; transform: scale(1.05); }
+
+        /* ========================================================
+           5. MODAL POP-UP (SUB-DASHBOARD)
+           ======================================================== */
+        .modal-sub {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 1000;
+            background-image: 
+                radial-gradient(circle at 20% 60%, rgba(0, 243, 255, 0.3) 0px, transparent 20%), 
+                radial-gradient(circle at 70% 50%, rgba(188, 19, 254, 0.3) 0px, transparent 11%), 
+                radial-gradient(circle at 35% 80%, rgba(0, 255, 102, 0.25) 0px, transparent 15%), 
+                radial-gradient(circle at 80% 50%, rgba(255, 78, 80, 0.3) 0px, transparent 28%);
+            background-size: 280% 300%;
+            justify-content: center; align-items: center; backdrop-filter: blur(8px);
+        }
+        
+        .tunjuk-modal { display: flex; animation: fanaIn 0.3s ease-out forwards, asapGelapLuar 20s ease infinite; }
+
+        @keyframes asapGelapLuar {
+            0%   { background-position: 0% 10%; }
+            25%  { background-position: 30% 80%; }
+            50%  { background-position: 100% 50%; }
+            75%  { background-position: 50% 0%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .kandungan-sub {
+            background-color: rgba(10, 10, 20, 0.95); 
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.15) 0px, transparent 35%), 
+                radial-gradient(circle at 90% 80%, rgba(188, 19, 254, 0.15) 0px, transparent 35%), 
+                radial-gradient(circle at 20% 90%, rgba(0, 255, 102, 0.12) 0px, transparent 30%), 
+                radial-gradient(circle at 80% 10%, rgba(255, 78, 80, 0.15) 0px, transparent 35%);
+            background-size: 200% 200%;
+            animation: asapModal 15s ease infinite alternate;
+            padding: 40px; border-radius: 20px;
+            width: 90%; max-width: 750px; max-height: 85vh; overflow-y: auto; 
+            text-align: center; position: relative;
+        }
+
+        /* BORDER NEON HIERARKI VISUAL UNTUK KOTAK DALAMAN MODAL */
+        .modal-s1 { border: 2px solid #00f3ff; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); }
+        .modal-s2 { border: 2px solid #bc13fe; box-shadow: 0 0 30px rgba(188, 19, 254, 0.3); }
+        .modal-s3 { border: 2px solid #f1c40f; box-shadow: 0 0 30px rgba(241, 196, 15, 0.3); }
+        .modal-s4 { border: 2px solid #ff4e50; box-shadow: 0 0 30px rgba(255, 78, 80, 0.3); }
+        .modal-s5 { border: 2px solid #00ff66; box-shadow: 0 0 30px rgba(0, 255, 102, 0.3); }
+        .modal-s6 { border: 2px solid #0055ff; box-shadow: 0 0 30px rgba(0, 85, 255, 0.3); } /* TAMBAHAN ZON 6 */
+
+        @keyframes asapModal {
+            0%   { background-position: 0% 0%; }
+            50%  { background-position: 100% 100%; }
+            100% { background-position: 0% 100%; }
+        }
+        
+        .kandungan-sub::-webkit-scrollbar { width: 8px; }
+        .kandungan-sub::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .kandungan-sub::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
+
+        .butang-tutup {
+            position: absolute; top: 15px; right: 20px; background: transparent; border: none;
+            color: #ff0055; font-size: 32px; cursor: pointer; transition: transform 0.2s; z-index: 10;
+        }
+        .butang-tutup:hover { color: #ff00ff; transform: scale(1.2); }
+
+        .kumpulan-tahap { margin-top: 30px; text-align: left; position: relative; z-index: 5; }
+        .kumpulan-tahap h3 { font-size: 18px; border-bottom: 1px dashed; padding-bottom: 5px; margin-bottom: 15px; text-transform: uppercase; }
+
+        .menu-variasi { display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 5; }
+        .kad-pilihan-game {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px; border-radius: 10px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 15px; backdrop-filter: blur(4px);
+        }
+        .kad-pilihan-game:hover { background: rgba(255,255,255,0.15); transform: translateX(10px); }
+        
+        .modal-s1 .kad-pilihan-game:hover { border-color: #00f3ff; box-shadow: -5px 0 15px rgba(0, 243, 255, 0.3); }
+        .modal-s2 .kad-pilihan-game:hover { border-color: #bc13fe; box-shadow: -5px 0 15px rgba(188, 19, 254, 0.3); }
+        .modal-s3 .kad-pilihan-game:hover { border-color: #f1c40f; box-shadow: -5px 0 15px rgba(241, 196, 15, 0.3); }
+        .modal-s4 .kad-pilihan-game:hover { border-color: #ff4e50; box-shadow: -5px 0 15px rgba(255, 78, 80, 0.3); }
+        .modal-s5 .kad-pilihan-game:hover { border-color: #00ff66; box-shadow: -5px 0 15px rgba(0, 255, 102, 0.3); }
+        .modal-s6 .kad-pilihan-game:hover { border-color: #0055ff; box-shadow: -5px 0 15px rgba(0, 85, 255, 0.3); } /* TAMBAHAN ZON 6 */
+
+        .info-game h4 { margin: 0 0 5px 0; font-size: 16px; color: #fff; }
+        .info-game p { margin: 0; font-size: 13px; color: #bdc3c7; line-height: 1.4; }
+
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="latar-angkasa">
+        <div class="objek-angkasa" style="top: 10%; left: 15%; font-size: 45px; filter: drop-shadow(0 0 15px #ff00ff);">🪐</div>
+        <div class="objek-angkasa" style="top: 20%; left: 80%; font-size: 55px; filter: drop-shadow(0 0 15px #00f3ff);">🚀</div>
+        <div class="objek-angkasa" style="top: 70%; left: 8%; font-size: 50px; filter: drop-shadow(0 0 10px #ffffff);">👨‍🚀</div>
+        <div class="objek-angkasa" style="top: 60%; left: 85%; font-size: 65px; filter: drop-shadow(0 0 20px #00ff66);">🌎</div>
+        <div class="objek-angkasa" style="top: 85%; left: 45%; font-size: 35px; filter: drop-shadow(0 0 15px #f1c40f);">⭐</div>
+        <div class="objek-angkasa" style="top: 25%; left: 50%; font-size: 40px; filter: drop-shadow(0 0 20px #ff0055);">🛸</div>
+        <div class="objek-angkasa" style="top: 50%; left: 20%; font-size: 30px; filter: drop-shadow(0 0 10px #ff9900);">☄️</div>
+    </div>
+
+    <!-- 🔥 BAHAGIAN HEADER BARU (LOGO & NAMA) 🔥 -->
+    <div class="header-portal" style="text-align: center; margin-top: -20px; position: relative; z-index: 20; display: flex; flex-direction: column; align-items: center;">
+        <img src="assets/picture/Logo.png" alt="Logo Kids Innovation Craft" style="width: 280px; margin-bottom: -90px; filter: drop-shadow(0 0 15px rgba(52, 152, 219, 0.6));">
+        <h1 class="tajuk-neon" style="color: #fff; text-shadow: 0 0 15px #00f3ff, 0 0 30px #bc13fe; margin: 0; font-size: 3.2rem;">Kids Innovation Craft</h1>
+        <p style="color: #bdc3c7; font-size: 19px; margin-top: 10px; margin-bottom: 20px;">Pilih kluster pembelajaran galaksi anda hari ini!</p>
+    </div>
+
+    <!-- 🔥 PAPAN PEMUKA KOTAK MENU LUAR 🔥 -->
+    <div class="papan-pemuka" style="position: relative; z-index: 20;">
+        
+        <div class="kad-modul kad-s1">
+            <div class="ikon-modul ikon-s1">🧩🔍🚀</div>
+            <h2>Mod Pengembaraan Sintaks</h2>
+            <p>Darjah 1 - 3 (D1-D3). Membiasakan logik pengekodan visual dan pengulangan langkah.</p>
+            <button class="btn-sektor btn-s1" onclick="bukaSubDashboard('modalZon1')">Akses Pangkalan ➜</button>
+        </div>
+
+        <div class="kad-modul kad-s2">
+            <div class="ikon-modul ikon-s2">⚡🔀⚙️</div>
+            <h2>Mod Pengembaraan Lanjutan</h2>
+            <p>Darjah 4 - 6 (D4-D6). Membina logik bersyarat kompleks, rantaian algortima, dan pemikiran abstrak.</p>
+            <button class="btn-sektor btn-s2" onclick="bukaSubDashboard('modalZon2')">Akses Matriks ➜</button>
+        </div>
+
+        <div class="kad-modul kad-s3">
+            <div class="ikon-modul ikon-s3">🧮🧬🧠</div>
+            <h2>Mod Latih Tubi & Simulasi</h2>
+            <p>Darjah 1 - 6 (D1-D6). Integrasi penuh silibus Matematik & Sains bermula dari operasi asas sehingga ruang isipadu.</p>
+            <button class="btn-sektor btn-s3" onclick="bukaSubDashboard('modalZon3')">Jana Enjin Kognitif ➜</button>
+        </div>
+
+        <div class="kad-modul kad-s4">
+            <div class="ikon-modul ikon-s4">🌿🔌🪫</div>
+            <h2>Makmal Simulasi Perkakasan</h2>
+            <p>Integrasi Logik. Menterjemahkan arahan ke simulasi komponen ESP32, Input Digital, dan Analog.</p>
+            <button class="btn-sektor btn-s4" onclick="bukaSubDashboard('modalZon4')">Akses Makmal Siber ➜</button>
+        </div>
+
+        <!-- 🔥 KAD ZON 5: DIUBAH MENJADI ZON BONUS RBT 🔥 -->
+        <div class="kad-modul kad-s5">
+            <div class="ikon-modul ikon-s5">🎁🔌🤖</div>
+            <h2>ZON BONUS: Makmal Integrasi I.O.T</h2>
+            <p>Modul Lanjutan RBT! Terokai dunia kejuruteraan sebenar dengan pengaturcaraan C++ dan simulasi litar ESP32.</p>
+            <button class="btn-sektor btn-s5" onclick="bukaSubDashboard('modalZon5')">Akses Makmal Bonus ➜</button>
+        </div>
+
+        <!-- 🔥 KAD ZON 6: PUSAT SUMBER DIGITAL (DUDUK DI LUAR) 🔥 -->
+        <div class="kad-modul kad-s6">
+            <div class="ikon-modul ikon-s6">📘🤖✨</div>
+            <h2>Pusat Sumber Digital</h2>
+            <p>Bukan sekadar buku teks bosan! Selami nota interaktif, rujukan koding, sains & I.O.T dengan visual animasi santai tahap dewa.</p>
+            <button class="btn-sektor btn-s6" onclick="bukaSubDashboard('modalSumberDigital')">Buka Terminal Nota ➜</button>
+        </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 🔥 MODAL POP-UP ZON 1 (DIKEKALKAN SUSUNAN) 🔥 -->
+    <!-- ============================================== -->
+    <div id="modalZon1" class="modal-sub">
+        <div class="kandungan-sub modal-s1">
+            <button class="butang-tutup" onclick="tutupSubDashboard('modalZon1')">×</button>
+            <h2 style="color: #00f3ff; text-shadow: 0 0 10px #00f3ff; margin-top: 0; position: relative; z-index: 5;">Mod Pengembaraan Sintaks</h2>
+            <p style="color: #b3e5fc; font-size: 14px; position: relative; z-index: 5;">Objektif: Pengenalan kepada logik kod baris-demi-baris (Darjah 1 - 3).</p>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 1: Asas Tindak Balas Objek (Teks)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1a.html'">
+                        <span style="font-size: 35px;">🐦</span>
+                        <div class="info-game">
+                            <h4>Misi 1A: Tindak Balas Objek</h4>
+                            <p>Asas. Sang Gagak minum air. Pengenalan fungsi kod asas tanpa angka.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1b.html'">
+                        <span style="font-size: 35px;">🐒</span>
+                        <div class="info-game">
+                            <h4>Misi 1B: Operasi Berjujukan</h4>
+                            <p>Asas. Monyet petik kelapa berurutan. Belajar menyusun urutan logik langkah demi langkah.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1c.html'">
+                        <span style="font-size: 35px;">🍔</span>
+                        <div class="info-game">
+                            <h4>Misi 1C: Algoritma Kulinari</h4>
+                            <p>Asas. Chef susun burger. Belajar mengekod algoritma mengikut urutan spesifik.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1d.html'">
+                        <span style="font-size: 35px;">🚀</span>
+                        <div class="info-game">
+                            <h4>Misi 1D: Penalaan Orbit</h4>
+                            <p>Asas. Susun fungsi roket dengan tepat untuk melancarkan angkasawan ke angkasa.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1e.html'">
+                        <span style="font-size: 35px;">🦅</span>
+                        <div class="info-game">
+                            <h4>Misi 1E: Rantaian Ekosistem</h4>
+                            <p>Sains D2. Susun kod hidupan pemangsa dan mangsa mengikut urutan yang betul.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1f.html'">
+                        <span style="font-size: 35px;">🧲</span>
+                        <div class="info-game">
+                            <h4>Misi 1F: Tarikan Magnetik</h4>
+                            <p>Sains D2. Asingkan bahan magnetik dan bukan magnetik menggunakan kod tarikan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1g.html'">
+                        <span style="font-size: 35px;">🤖</span>
+                        <div class="info-game">
+                            <h4>Misi 1G: Kenal Bentuk 2D</h4>
+                            <p>Math D1. Arahkan robot pengecaman ruang mengecap bentuk geometri yang betul.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1h.html'">
+                        <span style="font-size: 35px;">🧬</span>
+                        <div class="info-game">
+                            <h4>Misi 1H: Hidup vs Bukan Hidup</h4>
+                            <p>Sains D1. Gunakan imbasan makmal untuk mengasingkan entiti bernafas.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1i.html'">
+                        <span style="font-size: 35px;">🌖</span>
+                        <div class="info-game">
+                            <h4>Misi 1I: Fasa Siang & Malam</h4>
+                            <p>Sains D2. Set masa putaran bumi untuk melihat interaksi kemunculan bintang.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap1j.html'">
+                        <span style="font-size: 35px;">👶</span>
+                        <div class="info-game">
+                            <h4>Misi 1J: Tumbesaran Manusia</h4>
+                            <p>Sains D2. Kenal pasti keperluan asas urutan fasa tumbesaran tubuh manusia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 2: Parameter Berangka (Nombor)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2a.html'">
+                        <span style="font-size: 35px;">🌱</span>
+                        <div class="info-game">
+                            <h4>Misi 2A: Had Pusingan Kuantiti</h4>
+                            <p>Asas. Pengurus kebun halang serangga dengan menetapkan pusingan halangan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2b.html'">
+                        <span style="font-size: 35px;">🤖</span>
+                        <div class="info-game">
+                            <h4>Misi 2B: Robot Kebun Pintar</h4>
+                            <p>Asas. Letak kuantiti air di dalam parameter untuk fungsi penyiraman tanaman.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2c.html'">
+                        <span style="font-size: 35px;">📊</span>
+                        <div class="info-game">
+                            <h4>Misi 2C: Kemahiran Kumpul Data</h4>
+                            <p>Math D1. Masukkan nilai objek bertaburan ke dalam carta piktograf.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2d.html'">
+                        <span style="font-size: 35px;">🪙</span>
+                        <div class="info-game">
+                            <h4>Misi 2D: Mesin Wang Syiling</h4>
+                            <p>Math D1. Kenali nilai duit sen/ringgit untuk beroperasi dengan mesin siber.</p>
+                        </div>
+                    </div>          
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2e.html'">
+                        <span style="font-size: 35px;">🌱</span>
+                        <div class="info-game">
+                            <h4>Misi 2E: Benih Bercambah</h4>
+                            <p>Sains D2. Beri keperluan asas yang seimbang dengan menggabungkan dua parameter.</p>
+                        </div>
+                    </div> 
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2f.html'">
+                        <span style="font-size: 35px;">⏰</span>
+                        <div class="info-game">
+                            <h4>Misi 2F: Bacaan Muka Jam</h4>
+                            <p>Math D1/D2. Set jarum jam dan minit kepada bacaan yang tepat mengikut arahan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2g.html'">
+                        <span style="font-size: 35px;">🐔</span>
+                        <div class="info-game">
+                            <h4>Misi 2G: Haiwan Membiak</h4>
+                            <p>Sains D2. Kelaskan cara membiak dan tentukan kuantiti spesies.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2h.html'">
+                        <span style="font-size: 35px;">🪚</span>
+                        <div class="info-game">
+                            <h4>Misi 2H: Unit Ukuran Jengkal</h4>
+                            <p>Math D1. Guna ukuran tidak piawai untuk mengawal peralatan pertukangan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2i.html'">
+                        <span style="font-size: 35px;">💡</span>
+                        <div class="info-game">
+                            <h4>Misi 2I: Litar Sel Kering</h4>
+                            <p>Sains D2. Bina litar elektrik asas bersama gabungan komponen dan nilai bateri.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap2j.html'">
+                        <span style="font-size: 35px;">🍕</span>
+                        <div class="info-game">
+                            <h4>Misi 2J: Konsep Pecahan Suku/Setengah</h4>
+                            <p>Math D1. Lakukan operasi memotong pizza visual untuk mendapatkan pecahan suku.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 3: Logik Visual & Kiraan Terkumpul</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3a.html'">
+                        <span style="font-size: 35px;">🐊</span>
+                        <div class="info-game">
+                            <h4>Misi 3A: Lompatan Mutlak</h4>
+                            <p>Asas. Kancil & Buaya. Lompat satu nilai serentak melepasi sungai.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3b.html'">
+                        <span style="font-size: 35px;">🦌</span>
+                        <div class="info-game">
+                            <h4>Misi 3B: Penambahan Terkumpul</h4>
+                            <p>Asas. Kancil menyeberang dengan menambah jarak X sedikit demi sedikit.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3c.html'">
+                        <span style="font-size: 35px;">🐒</span>
+                        <div class="info-game">
+                            <h4>Misi 3C: Paksi Ketinggian Y</h4>
+                            <p>Asas. Kawalan manipulasi paksi untuk membolehkan monyet memanjat pokok.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3d.html'">
+                        <span style="font-size: 35px;">🐍</span>
+                        <div class="info-game">
+                            <h4>Misi 3D: Monyet vs Ular Sawa</h4>
+                            <p>Asas. Laksanakan operasi tolak Y terkumpul untuk menyelamatkan diri ke tanah.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3e.html'">
+                        <span style="font-size: 35px;">🧪</span>
+                        <div class="info-game">
+                            <h4>Misi 3E: Keterlarutan Bahan</h4>
+                            <p>Sains D2. Uji sifat bahan di dalam air menggunakan dua parameter teks serentak.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3f.html'">
+                        <span style="font-size: 35px;">📡</span>
+                        <div class="info-game">
+                            <h4>Misi 3F: Pencarian Koordinat Grid</h4>
+                            <p>Math D2. Belajar kesan titik X dan Y sebenar menggunakan sistem radar digital.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3g.html'">
+                        <span style="font-size: 35px;">🦁</span>
+                        <div class="info-game">
+                            <h4>Misi 3G: Pengelasan Diet Haiwan</h4>
+                            <p>Sains D3. Padankan klasifikasi spesies & jenis makanan di zoo.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3h.html'">
+                        <span style="font-size: 35px;">📦</span>
+                        <div class="info-game">
+                            <h4>Misi 3H: Asas Darab Visual</h4>
+                            <p>Math D2. Konsep pemahaman kumpulan & ahli beroperasi di dalam kilang.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3i.html'">
+                        <span style="font-size: 35px;">🎨</span>
+                        <div class="info-game">
+                            <h4>Misi 3I: Campuran Warna Sekunder</h4>
+                            <p>Sains D2. Hasilkan larutan warna baharu dengan mencampurkan nilai warna primer.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap3j.html'">
+                        <span style="font-size: 35px;">🍕</span>
+                        <div class="info-game">
+                            <h4>Misi 3J: Asas Bahagi Sama Rata</h4>
+                            <p>Math D2. Kongsi dan agihkan makanan sama rata menggunakan dwi-parameter angka.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 4: Corak Pengulangan Terkawal (Loop)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4a.html'">
+                        <span style="font-size: 35px;">🐛</span>
+                        <div class="info-game">
+                            <h4>Misi 4A: Kitaran Ulat Beluncas</h4>
+                            <p>Asas. Ulang langkah memakan daun berturut-turut sehingga membentuk kepompong.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4b.html'">
+                        <span style="font-size: 35px;">🐰</span>
+                        <div class="info-game">
+                            <h4>Misi 4B: Susun Bentuk Jambatan</h4>
+                            <p>Asas. Pengecaman corak dan blok geometri untuk membentuk jambatan selamat.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4c.html'">
+                        <span style="font-size: 35px;">🐸</span>
+                        <div class="info-game">
+                            <h4>Misi 4C: Sifir Meloncat</h4>
+                            <p>Math D2. Memahami sifir gandaan dengan memerhati pola kitaran lompatan katak.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4d.html'">
+                        <span style="font-size: 35px;">🦖</span>
+                        <div class="info-game">
+                            <h4>Misi 4D: Pola Nombor Menaik</h4>
+                            <p>Math D2/D3. Hasilkan corak tangga menaik dengan nilai penambahan konsisten.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4e.html'">
+                        <span style="font-size: 35px;">🧮</span>
+                        <div class="info-game">
+                            <h4>Misi 4E: Pecahan Setara</h4>
+                            <p>Math D3. Ulang arahan lorek warna pada blok grid visual untuk melihat pecahan setara.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4f.html'">
+                        <span style="font-size: 35px;">🪐</span>
+                        <div class="info-game">
+                            <h4>Misi 4F: Susunan Sistem Suria</h4>
+                            <p>Sains D3. Mengarahkan susunan planet untuk mengelilingi matahari di ruang orbit.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4g.html'">
+                        <span style="font-size: 35px;">🐅</span>
+                        <div class="info-game">
+                            <h4>Misi 4G: Tabiat Makan Haiwan</h4>
+                            <p>Sains D3. Laksanakan kitaran memberi diet yang sepadan kepada penghuni zoo.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4h.html'">
+                        <span style="font-size: 35px;">🌧️</span>
+                        <div class="info-game">
+                            <h4>Misi 4H: Kitaran Air Bumi</h4>
+                            <p>Sains D2. Laksanakan pengulangan fasa kejadian hujan dan sejatan ke ruang udara.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4i.html'">
+                        <span style="font-size: 35px;">🔬</span>
+                        <div class="info-game">
+                            <h4>Misi 4I: Peraturan Bilik Sains</h4>
+                            <p>Sains D2/D3. Ulang prosedur SOP untuk membasuh dan menyimpan mikroskop ke rak.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap4j.html'">
+                        <span style="font-size: 35px;">⚙️</span>
+                        <div class="info-game">
+                            <h4>Misi 4J: Mesin Ringkas Takal</h4>
+                            <p>Sains D3. Mengulang daya tarikan roda takal untuk mengangkat beban fizikal berat.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 5: Kawalan Bersyarat Tunggal (If)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5a.html'">
+                        <span style="font-size: 35px;">🐉</span>
+                        <div class="info-game">
+                            <h4>Misi 5A: Naga Elemen</h4>
+                            <p>Asas. Kenal pasti ancaman musuh rawak dan rangka keputusan melompat atau melawan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5b.html'">
+                        <span style="font-size: 35px;">🔐</span>
+                        <div class="info-game">
+                            <h4>Misi 5B: Kenal Bucu Objek</h4>
+                            <p>Math D1. Imbas jumlah bucu kotak siber untuk meluluskan akses pintu kebal.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5c.html'">
+                        <span style="font-size: 35px;">🔦</span>
+                        <div class="info-game">
+                            <h4>Misi 5C: Sumber Cahaya</h4>
+                            <p>Sains D2. Nilai keadaan tahap cahaya di dalam simulasi penerokaan gua gelap.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5d.html'">
+                        <span style="font-size: 35px;">💳</span>
+                        <div class="info-game">
+                            <h4>Misi 5D: Transaksi Wang</h4>
+                            <p>Math D2/D3. Benarkan atau sekat pembelian digital di mesin layan diri berasaskan baki.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5e.html'">
+                        <span style="font-size: 35px;">🧪</span>
+                        <div class="info-game">
+                            <h4>Misi 5E: Ujian Asid Alkali</h4>
+                            <p>Sains D3. Kenal pasti kod status asidik/alkali cecair berdasarkan warna kertas Litmus.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5f.html'">
+                        <span style="font-size: 35px;">🦒</span>
+                        <div class="info-game">
+                            <h4>Misi 5F: Pengelasan Habitat</h4>
+                            <p>Sains D2. Halakan haiwan ke kawasan jagaan yang betul bergantung pada fisiologinya.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5g.html'">
+                        <span style="font-size: 35px;">🚰</span>
+                        <div class="info-game">
+                            <h4>Misi 5G: Penilaian Isi Padu Cecair</h4>
+                            <p>Math D2. Tutup sistem pam air apabila isipadu tangki mencecah had takat perbandingan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5h.html'">
+                        <span style="font-size: 35px;">🌿</span>
+                        <div class="info-game">
+                            <h4>Misi 5H: Cara Tumbuhan Membiak</h4>
+                            <p>Sains D3. Klasifikasikan jenis pembiakan bergantung pada spesifikasi spora atau keratan batang.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5i.html'">
+                        <span style="font-size: 35px;">🚂</span>
+                        <div class="info-game">
+                            <h4>Misi 5I: Sistem Nombor Genap</h4>
+                            <p>Math D2. Berikan isyarat haluan yang tepat kepada sistem kereta api jika nombor genap dikesan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap5j.html'">
+                        <span style="font-size: 35px;">📏</span>
+                        <div class="info-game">
+                            <h4>Misi 5J: Pertukaran Unit Mudah</h4>
+                            <p>Math D2/D3. Kenal pasti meter ke sentimeter pada terminal mesin pemotong siber.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 6: Kawalan Bersyarat Berganda (If-Else)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6a.html'">
+                        <span style="font-size: 35px;">🛸</span>
+                        <div class="info-game">
+                            <h4>Misi 6A: Penjaga Pintu Galaksi</h4>
+                            <p>Asas. Buat keputusan pelbagai hala, membenarkan entiti rakan lalu atau musnahkan penceroboh.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6b.html'">
+                        <span style="font-size: 35px;">🦁</span>
+                        <div class="info-game">
+                            <h4>Misi 6B: Penjaga Zoo Pintar</h4>
+                            <p>Sains D3. Mengawal pangkalan diet, beri daging jika karnivor, jika selainnya berikan rumput.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6c.html'">
+                        <span style="font-size: 35px;">⚡</span>
+                        <div class="info-game">
+                            <h4>Misi 6C: Konduktor Elektrik</h4>
+                            <p>Sains D2/D3. Jika bahan di terminal adalah konduktor, litar disambung, atau teruskan terputus.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6d.html'">
+                        <span style="font-size: 35px;">🔢</span>
+                        <div class="info-game">
+                            <h4>Misi 6D: Bundar Nombor Puluh/Ratus</h4>
+                            <p>Math D2/D3. Gunakan cabang if-else untuk menilai algoritma sama ada harus naik atau turun.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6e.html'">
+                        <span style="font-size: 35px;">🌘</span>
+                        <div class="info-game">
+                            <h4>Misi 6E: Bayang-Bayang</h4>
+                            <p>Sains D2. Paparkan unjuran bayang sekiranya entiti skrin adalah legap, atau pantulan jika lutsinar.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6f.html'">
+                        <span style="font-size: 35px;">💹</span>
+                        <div class="info-game">
+                            <h4>Misi 6F: Kiraan Untung/Rugi</h4>
+                            <p>Math D3. Bandingkan kos dan laporkan status dagangan untung di terminal kewangan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6g.html'">
+                        <span style="font-size: 35px;">🔺</span>
+                        <div class="info-game">
+                            <h4>Misi 6G: Kenal Prisma</h4>
+                            <p>Math D3. Jika tapak objek sepadan, namakannya sebagai Prisma, dan sebaliknya diasingkan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6h.html'">
+                        <span style="font-size: 35px;">🐸</span>
+                        <div class="info-game">
+                            <h4>Misi 6H: Amfibia vs Darat</h4>
+                            <p>Sains D2/D3. Asingkan spesies habitat dua alam ke sistem kolam yang sewajarnya.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6i.html'">
+                        <span style="font-size: 35px;">📊</span>
+                        <div class="info-game">
+                            <h4>Misi 6I: Carta Palang Cuaca</h4>
+                            <p>Math D2. Hantar parameter bacaan biru untuk cuaca hujan, oren jika cuaca membahang.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap6j.html'">
+                        <span style="font-size: 35px;">⏳</span>
+                        <div class="info-game">
+                            <h4>Misi 6J: Tindakbalas Campuran</h4>
+                            <p>Sains D2. Gunakan kod untuk menapis campuran pasir di makmal, dan sejatkan larutan bebas partikel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 7: Operasi Matematik Bebas (+, -)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap7a.html'">
+                        <span style="font-size: 35px;">🏭</span>
+                        <div class="info-game">
+                            <h4>Misi 7A: Kilang Kargo Pintar</h4>
+                            <p>Asas. Gunakan operasi penambahan (+) bagi merekod nilai muatan kotak per kapita.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap7b.html'">
+                        <span style="font-size: 35px;">🚀</span>
+                        <div class="info-game">
+                            <h4>Misi 7B: Pelancaran Roket</h4>
+                            <p>Asas. Kurangkan rintangan orbit bumi melalui penolakan modul pendorong terpakai.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🌊</span>
+                        <div class="info-game">
+                            <h4>Misi 7C: Kapsul Dasar Laut</h4>
+                            <p>Asas. Kawal injap keseimbangan tolak dan tambah kapasiti air dalam tekanan serentak.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🚚</span>
+                        <div class="info-game">
+                            <h4>Misi 7D: Kilang Kargo Berkembar</h4>
+                            <p>Asas. Menyeimbangkan sistem koordinasi antara dua sistem angkutan automatik.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">✈️</span>
+                        <div class="info-game">
+                            <h4>Misi 7E: Tambah Tolak Masa</h4>
+                            <p>Math D2. Cipta garisan algoritma yang menterjemah ketibaan penerbangan antarabangsa berpandukan durasi.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🪐</span>
+                        <div class="info-game">
+                            <h4>Misi 7F: Jisim Angkasa</h4>
+                            <p>Math D3. Cari graviti tarikan relatif yang bertindak ke atas sebuah entiti berat.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">💸</span>
+                        <div class="info-game">
+                            <h4>Misi 7G: Kiraan Baki Wang</h4>
+                            <p>Math D3. Aturkan modul pendaraban dalam mesin transaksi digital dan dapatkan baki rasmi.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🍕</span>
+                        <div class="info-game">
+                            <h4>Misi 7H: Pecahan Sama Penyebut</h4>
+                            <p>Math D3. Laksanakan logik penambahan pada pengangka bagi blok-blok warna bersebelahan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">⚙️</span>
+                        <div class="info-game">
+                            <h4>Misi 7I: Bacaan Takal Angkut</h4>
+                            <p>Sains D3. Kenal pasti beban mekanikal sebenar di dalam logik mesin tuas.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🚰</span>
+                        <div class="info-game">
+                            <h4>Misi 7J: Isipadu Bercampur</h4>
+                            <p>Math D3. Menyatukan cecair di dalam ruang simulasi dan dapatkan keputusan jumlah bersih.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 8: Pengurusan Memori Data (Variables)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🤖</span>
+                        <div class="info-game">
+                            <h4>Misi 8A: Cipta Profil Robot</h4>
+                            <p>Asas. Tetapkan memori "let" yang merakam fail identiti, nama, dan unit operasi robot secara kekal.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🔋</span>
+                        <div class="info-game">
+                            <h4>Misi 8B: Meriam Plasma</h4>
+                            <p>Asas. Selaraskan tenaga pertahanan menara pengawal ke dalam pembolehubah (variable).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🕵️</span>
+                        <div class="info-game">
+                            <h4>Misi 8C: Ejen Penyamar</h4>
+                            <p>Asas. Menulis ganti (Overwrite) identiti atau maklumat nilai untuk menceroboh litar pengimbas.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🌉</span>
+                        <div class="info-game">
+                            <h4>Misi 8D: Jambatan Hologram</h4>
+                            <p>Asas. Menyiapkan jembatan putus dengan mengunjurkan "Variable X" kepada "Variable Y".</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🌡️</span>
+                        <div class="info-game">
+                            <h4>Misi 8E: Rekod Suhu Eksperimen</h4>
+                            <p>Sains D2. Isytihar variabel "suhu_didih" bagi cecair makmal dan aktifkan bacaan terma penggera.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">📉</span>
+                        <div class="info-game">
+                            <h4>Misi 8F: Carta Pai Data</h4>
+                            <p>Math D3. Simpan dan kategorikan pembolehubah peratus taburan haiwan di tapak habitat berbeza.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🌱</span>
+                        <div class="info-game">
+                            <h4>Misi 8G: Formula Tumbesaran</h4>
+                            <p>Sains D2. Simpan formula pengiraan untuk kadar ketinggian berterusan tumbuhan ke dalam satu rujukan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🟩</span>
+                        <div class="info-game">
+                            <h4>Misi 8H: Pengiraan Luas Segiempat</h4>
+                            <p>Math D3. Membina kerangka pembolehubah darab di antara panjang paksi X dan sisi Y kotak simulasi.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">⚖️</span>
+                        <div class="info-game">
+                            <h4>Misi 8I: Pertukaran Unit Jisim</h4>
+                            <p>Math D3. Memprogram formula ringkas untuk pendaraban bacaan unit jisim yang tepat pada alat timbang.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🧪</span>
+                        <div class="info-game">
+                            <h4>Misi 8J: Data Asid/Alkali</h4>
+                            <p>Sains D3. Merekod data keputusan warna yang dikesan daripada analisis terminal ujian Kertas Litmus.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 9: Logik Perbandingan (&lt;, &gt;, ==, !=)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap9a.html'">
+                        <span style="font-size: 35px;">🚧</span>
+                        <div class="info-game">
+                            <h4>Misi 9A: Palang Tol Timbang</h4>
+                            <p>Asas. Menyemak keselamatan berat kenderaan pada mesin pengimbas kawalan menggunakan simbol Kurang Daripada (&lt;).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='tahap9b.html'">
+                        <span style="font-size: 35px;">🚁</span>
+                        <div class="info-game">
+                            <h4>Misi 9B: Dron Tinjauan</h4>
+                            <p>Asas. Menilai perbezaan had paras ketinggian dron untuk melepasi benteng radar dengan simbol Lebih Daripada (&gt;).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🍕</span>
+                        <div class="info-game">
+                            <h4>Misi 9C: Banding Pecahan</h4>
+                            <p>Math D3. Laksanakan keputusan membandingkan saiz relatif nilai suku dan nilai setengah blok ruang.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🪨</span>
+                        <div class="info-game">
+                            <h4>Misi 9D: Perbandingan Ketumpatan</h4>
+                            <p>Sains D3. Jika ketumpatan item melepasi ketumpatan paras cecair, laksanakan arahan tenggelam di terminal ujian.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">💵</span>
+                        <div class="info-game">
+                            <h4>Misi 9E: Kapasiti Had Pam Air</h4>
+                            <p>Math D3. Menilai aset kewangan di pasaran lelong dan memberikan isyarat ralat jika bidaan adalah setara (==).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🪐</span>
+                        <div class="info-game">
+                            <h4>Misi 9F: Perbandingan Saiz Planet</h4>
+                            <p>Sains D3. Membolehkan terminal mengenalpasti gergasi gas di paksi orbit berdasarkan radius berangka sfera angkasa.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">⏱️</span>
+                        <div class="info-game">
+                            <h4>Misi 9G: Masa Rekod Larian</h4>
+                            <p>Math D3. Membuka pintu kebal anugerah utama sekiranya masa balapan peserta menumpaskan tempoh asal (&lt;).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🏥</span>
+                        <div class="info-game">
+                            <h4>Misi 9H: Tumbesaran Sihat</h4>
+                            <p>Sains D2. Mencetak laporan imbasan rekod kanak-kanak bergantung kepada syarat ukuran berat ideal paras minima (&gt;=).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🌊</span>
+                        <div class="info-game">
+                            <h4>Misi 9I: Kapasiti Liter Maksima</h4>
+                            <p>Math D3. Menjalankan skrip penutupan loji jika unit pembuangan kumbahan menghampiri dan melepasi had isi perbandingan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🔌</span>
+                        <div class="info-game">
+                            <h4>Misi 9J: Syarat Litar Lengkap</h4>
+                            <p>Sains D2. Kombinasi operator Boolean 'And'. Litar akan hanya bernyala sekiranya sambungan dan suis dipenuhi kedua-duanya.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00f3ff; border-color: #00f3ff;">Tahap 10: Ujian Akhir Pengembaraan (Boss Fights)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">☢️</span>
+                        <div class="info-game">
+                            <h4>Misi 10A: Kalibrasi Mainframe</h4>
+                            <p>Asas. Menyelaraskan ralat logik teras kawalan dengan menggabungkan pembolehubah memori sebelum kemusnahan.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🔥</span>
+                        <div class="info-game">
+                            <h4>Misi 10B: Overclock Mainframe</h4>
+                            <p>Asas. Mematikan penggera terminal sebelum ia mencapai had siling lebur secara sistematik.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🔐</span>
+                        <div class="info-game">
+                            <h4>Misi 10C: Godam Bilik Kebal Pola Nombor</h4>
+                            <p>Math D3. Menghafal corak kod penggera rawak dan menganalisis nilai Variable pemecah peti besi peribadi.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">💀</span>
+                        <div class="info-game">
+                            <h4>Misi 10D: Krisis Ekosistem Runtuh</h4>
+                            <p>Sains D2/D3. Mengekod rantaian haiwan untuk membendung wabak dan menjaga populasi daripada melepasi radar.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🛒</span>
+                        <div class="info-game">
+                            <h4>Misi 10E: Misi Resit Beli Belah Cyber</h4>
+                            <p>Math D3. Cipta skrip pengiraan kalkulator yang menggabungkan tambah/tolak serentak di mesin layan diri.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🪐</span>
+                        <div class="info-game">
+                            <h4>Misi 10F: Ekspedisi Rover Musytari</h4>
+                            <p>Sains D3. Mengawal penderia navigasi rover meredah rintangan ketumpatan gas berbahaya (Gabungan Sains 100%).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🏢</span>
+                        <div class="info-game">
+                            <h4>Misi 10G: Arkitek Bandar Pintar</h4>
+                            <p>Math D3. Arahkan program pengulangan (Loop) menyusun corak grid tapak pembinaan dan menterjemah bentangan blok prisma maya.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🌿</span>
+                        <div class="info-game">
+                            <h4>Misi 10H: Penyelamat Botani Perubatan</h4>
+                            <p>Sains D2/D3. Asing dan kategorikan ekstrak spora di dalam makmal makro untuk menghasilkan ramuan rawatan genetik kritikal.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">⚡</span>
+                        <div class="info-game">
+                            <h4>Misi 10I: Litar Elektrik Kawalan Suhu</h4>
+                            <p>Sains D2 + Math D3. Operasi menyusun skematik bersiri dengan tahap takat mendidih, diseimbangkan dengan isipadu muatan loji pam.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">👑</span>
+                        <div class="info-game">
+                            <h4>Misi 10J: GRAND MASTER - Ujian Titik Akhir</h4>
+                            <p>Cabaran Epik Pangkalan Zon 1! Tulis algoritma terpanjang untuk membersihkan ralat memori, Loop susunan, dan operator perbandingan yang serabut demi membuka gerbang ke Sektor 2 secara mutlak!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 🔥 MODAL POP-UP ZON 2 (DIKEKALKAN SUSUNAN) 🔥 -->
+    <!-- ============================================== -->
+    <div id="modalZon2" class="modal-sub">
+        <div class="kandungan-sub modal-s2">
+            <button class="butang-tutup" onclick="tutupSubDashboard('modalZon2')">×</button>
+            <h2 style="color: #bc13fe; text-shadow: 0 0 10px #bc13fe; margin-top: 0; position: relative; z-index: 5;">Mod Pengembaraan Lanjutan</h2>
+            <p style="color: #e1bee7; font-size: 14px; position: relative; z-index: 5;">Fokus: Rantaian logik bersarang dan struktur data berbilang (Darjah 4 - 6).</p>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #bc13fe; border-color: #bc13fe;">Tahap 1: Logik Bersyarat Bersarang (Nested If)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='bandar1a.html'">
+                        <span style="font-size: 35px;">🚑</span>
+                        <div class="info-game">
+                            <h4>Misi 1A: Laluan Ambulans</h4>
+                            <p>Kawalan trafik bandar pintar untuk kecemasan menggunakan syarat bersarang.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='bandar1b.html'">
+                        <span style="font-size: 35px;">🚶</span>
+                        <div class="info-game">
+                            <h4>Misi 1B: Pejalan Kaki</h4>
+                            <p>Mengawal lintasan pengguna awam dengan logik pelbagai sensor serentak.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #bc13fe; border-color: #bc13fe;">Tahap 2: Rantaian Bersyarat (Else-If)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='bola2a.html'">
+                        <span style="font-size: 35px;">⚽</span>
+                        <div class="info-game">
+                            <h4>Misi 2A: Penalti Pintar</h4>
+                            <p>Tewaskan penjaga gol menggunakan rantaian arahan pelbagai keputusan Else-If.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='gajah2b.html'">
+                        <span style="font-size: 35px;">🐘</span>
+                        <div class="info-game">
+                            <h4>Misi 2B: Gajah Bijak</h4>
+                            <p>Sistem hidraulik bijak yang membezakan muatan ringan, sederhana, dan berat secara berangkai.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #bc13fe; border-color: #bc13fe;">Tahap 3: Gelung Bersyarat (While Loop)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='angkasa3a.html'">
+                        <span style="font-size: 35px;">🛸</span>
+                        <div class="info-game">
+                            <h4>Misi 3A: Pertahanan Angkasa</h4>
+                            <p>Aktifkan gelung berterusan untuk memusnahkan ancaman selagi musuh dikesan di radar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #bc13fe; border-color: #bc13fe;">Tahap 4: Gerbang Logik Boolean (AND / OR)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🔐</span>
+                        <div class="info-game">
+                            <h4>Misi 4A: Pengesahan Keselamatan</h4>
+                            <p>Gunakan operator logik AND/OR di mana akses peti besi hanya dibuka jika kedua-dua syarat kunci dipenuhi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #bc13fe; border-color: #bc13fe;">Tahap 5: Pengurusan Data Berbilang (Array)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🗄️</span>
+                        <div class="info-game">
+                            <h4>Misi 5A: Loker Memori Digital</h4>
+                            <p>Merekod dan memanggil semula senarai data yang panjang dari sebuah loker memori (Array).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 🔥 MODAL POP-UP ZON 3 BARU (GABUNGAN LAMA Z3 & Z4) 🔥 -->
+    <!-- ============================================== -->
+    <div id="modalZon3" class="modal-sub">
+        <div class="kandungan-sub modal-s3">
+            <button class="butang-tutup" onclick="tutupSubDashboard('modalZon3')">×</button>
+            <h2 style="color: #f1c40f; text-shadow: 0 0 10px #f1c40f; margin-top: 0; position: relative; z-index: 5;">Mod Latih Tubi & Simulasi</h2>
+            <p style="color: #fef9e7; font-size: 14px; position: relative; z-index: 5;">Darjah 1 - 6 (D1-D6). Soal jawab rawak (RNG) berasaskan silibus sekolah KPM.</p>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #f1c40f; border-color: #f1c40f;">Modul 3.1: Asas Nombor & Tambah/Tolak</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🧪</span>
+                        <div class="info-game">
+                            <h4>Misi: Reaktor Bio-Jisim</h4>
+                            <p>Selesaikan logik persamaan pengiraan tambah dan tolak bagi menyeimbangkan suhu reaktor eksperimen.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🍪</span>
+                        <div class="info-game">
+                            <h4>Misi: Operasi Atas Meja</h4>
+                            <p>Kira manual jumlah biskut atau guli siber, dan hantar jawapan rasmi menggunakan pengekodan sistem.jawab().</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #f1c40f; border-color: #f1c40f;">Modul 3.2: Darab Asas & Keperluan Hidup</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">⚙️</span>
+                        <div class="info-game">
+                            <h4>Misi: Kilang Pemprosesan</h4>
+                            <p>Praktikkan ingatan sifir dengan menaip dan menghantar arahan kod pendaraban produk tepat pada skrin.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🌱</span>
+                        <div class="info-game">
+                            <h4>Misi: Ekosistem Hijau</h4>
+                            <p>Analisis keadaan pokok layu di skrin dan bekalkan parameter kod "air" atau "cahaya" secara konsisten.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #f1c40f; border-color: #f1c40f;">Modul 3.3: Pecahan & Klasifikasi Haiwan</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🍕</span>
+                        <div class="info-game">
+                            <h4>Misi: Piza Maya</h4>
+                            <p>Kenalpasti rupa bentuk potongan objek, kemudian catatkan pecahan pengangka dan penyebut melalui memori (Variables).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🦷</span>
+                        <div class="info-game">
+                            <h4>Misi: Rahang Pemangsa</h4>
+                            <p>Latih tubi berulang untuk memadankan jenis pembentukan gigi mamalia dengan struktur diet haiwan yang terpapar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GABUNGAN MODUL ZON 4 LAMA KE DALAM ZON 3 BARU -->
+            <div class="kumpulan-tahap">
+                <h3 style="color: #f1c40f; border-color: #f1c40f;">Modul 4.1: Operasi Bergabung & Sistem Tubuh</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🔐</span>
+                        <div class="info-game">
+                            <h4>Misi: Penggodaman Peti Besi</h4>
+                            <p>Bina formula matematik sebaris untuk merungkaikan jujukan operasi bergabung bersyarat (BODMAS).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🩸</span>
+                        <div class="info-game">
+                            <h4>Misi: Nanobot Perubatan</h4>
+                            <p>Menyusun langkah logik dalam jujukan laluan sistem pernafasan manusia yang betul bagi melepasi halangan antibodi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #f1c40f; border-color: #f1c40f;">Modul 4.2: Ruang, Isipadu & Pantulan Cahaya</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">📏</span>
+                        <div class="info-game">
+                            <h4>Misi: Arkitek Gudang</h4>
+                            <p>Latih tubi logik mencipta kerangka algoritma isipadu (panjang x lebar x tinggi) untuk tapak binaan secara konsisten.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🔦</span>
+                        <div class="info-game">
+                            <h4>Misi: Pantulan Laser</h4>
+                            <p>Memasukkan nilai sudut darjah yang selari dengan garis rujukan untuk melantunkan panahan cahaya ke sasaran penamat.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #f1c40f; border-color: #f1c40f;">Modul 4.3: Makmal Elektrik & Ekosistem Lanjutan</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">⚡</span>
+                        <div class="info-game">
+                            <h4>Misi: Litar Siber Terputus</h4>
+                            <p>Analisis logik litar dan baiki sistem skematik gabungan selari/bersiri yang terbakar menggunakan kawalan `if/else`.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='#'">
+                        <span style="font-size: 35px;">🦅</span>
+                        <div class="info-game">
+                            <h4>Misi: Rantaian Kawalan Ekosistem</h4>
+                            <p>Selesaikan logik rantaian antara pengguna primer, sekunder dan tertier tanpa meruntuhkan keseimbangan habitat maya.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 🔥 MODAL ZON 4 BARU (MAKMAL SIMULASI PERKAKASAN) 🔥 -->
+    <!-- ============================================== -->
+    <div id="modalZon4" class="modal-sub">
+        <div class="kandungan-sub modal-s4">
+            <button class="butang-tutup" onclick="tutupSubDashboard('modalZon4')">×</button>
+            <h2 style="color: #ff4e50; text-shadow: 0 0 10px #ff4e50; margin-top: 0; position: relative; z-index: 5;">Makmal Simulasi Perkakasan</h2>
+            <p style="color: #ffebee; font-size: 14px; position: relative; z-index: 5;">Integrasi Fizikal: Menterjemahkan logik skrin ke atas simulasi papan litar (Hardware-in-the-Loop).</p>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #ff4e50; border-color: #ff4e50;">Tahap 1: Kawalan Output Asas (Teks & Nombor)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp1.1a.html'">
+                        <span style="font-size: 35px;">💡</span>
+                        <div class="info-game">
+                            <h4>Misi 1.1A: Asas ON/OFF (LED)</h4>
+                            <p>Mengekod arahan untuk menghidupkan komponen fizikal Red/Green/Yellow LED.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp1.1b.html'">
+                        <span style="font-size: 35px;">🔊</span>
+                        <div class="info-game">
+                            <h4>Misi 1.1B: Amaran Bunyi (Buzzer)</h4>
+                            <p>Mengekod arahan untuk mengaktifkan gelombang bunyi pada modul Active Buzzer.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp1.1c.html'">
+                        <span style="font-size: 35px;">🎛️</span>
+                        <div class="info-game">
+                            <h4>Misi 1.1C: Paparan Angka (7-Segment)</h4>
+                            <p>Mengekod untuk menghantar data nombor bulat kepada modul paparan 1 Digit 7-Segment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #ff4e50; border-color: #ff4e50;">Tahap 2: Input Digital & Syarat (If/Else)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp2.1a.html'">
+                        <span style="font-size: 35px;">🔘</span>
+                        <div class="info-game">
+                            <h4>Misi 2.1A: Suis Fizikal (Button)</h4>
+                            <p>Membina kawalan syarat. Jika Button Switch ditekan, hidupkan modul LED.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp2.1b.html'">
+                        <span style="font-size: 35px;">📐</span>
+                        <div class="info-game">
+                            <h4>Misi 2.1B: Suis Condong (Tilt Switch)</h4>
+                            <p>Memantau sudut baring mikropengawal. Jika Tilt Switch senget, aktifkan penggera Buzzer.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp2.1c.html'">
+                        <span style="font-size: 35px;">📡</span>
+                        <div class="info-game">
+                            <h4>Misi 2.1C: Kesan Halangan (IR Sensor)</h4>
+                            <p>Menggunakan Infrared (IR) Sensor untuk mengesan sebarang lintasan objek dan mencetuskan tindakan skrin.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #ff4e50; border-color: #ff4e50;">Tahap 3: Input Analog & Perbandingan (&lt;, &gt;)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp3.1a.html'">
+                        <span style="font-size: 35px;">📻</span>
+                        <div class="info-game">
+                            <h4>Misi 3.1A: Tombol Kawalan (Potentiometer)</h4>
+                            <p>Guna Potentiometer 10k untuk melaraskan nilai pembolehubah bagi melajukan atau melambatkan kelipan LED.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp3b.html'">
+                        <span style="font-size: 35px;">🌤️</span>
+                        <div class="info-game">
+                            <h4>Misi 3.1B: Peka Cahaya (LDR Sensor)</h4>
+                            <p>Bina logik siang dan malam. Jika LDR mengesan cuaca gelap (&lt;), hidupkan lampu secara automatik.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp3c.html'">
+                        <span style="font-size: 35px;">🔥</span>
+                        <div class="info-game">
+                            <h4>Misi 3.1C: Peka Suhu (Thermistor)</h4>
+                            <p>Pantau bacaan terma. Jika suhu yang dibaca oleh Thermistor melepasi tahap kritikal (&gt;), aktifkan penyejukan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #ff4e50; border-color: #ff4e50;">Tahap 4: Pengurusan Data Kompleks (Variables)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp4a.html'">
+                        <span style="font-size: 35px;">🌡️</span>
+                        <div class="info-game">
+                            <h4>Misi 4.1A: Stesen Cuaca (DHT11)</h4>
+                            <p>Gabungkan bacaan Suhu dan Kelembapan (Temp & Humi) serentak daripada modul DHT11 ke paparan skrin terminal.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp4b.html'">
+                        <span style="font-size: 35px;">🌱</span>
+                        <div class="info-game">
+                            <h4>Misi 4.1B: Penderia Tanah (Soil Moisture)</h4>
+                            <p>Sistem kebun siber. Pantau nilai kadar resapan air (Soil Moisture) bagi mengawal siraman automatik.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp4c.html'">
+                        <span style="font-size: 35px;">🌊</span>
+                        <div class="info-game">
+                            <h4>Misi 4.1C: Penderia Paras Air (Water Level)</h4>
+                            <p>Letakkan sensor pada tangki fizikal untuk memberikan isyarat penggera jika bacaan melebihi takat banjir.</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp4d.html'">
+                        <span style="font-size: 35px;">🔊</span>
+                        <div class="info-game">
+                            <h4>Misi 4.1D: Penderia Bunyi (Sound Sensor)</h4>
+                            <p>Latih kepekaan gelombang bunyi (Sound Sensor Module) supaya sistem bertindak balas kepada tepukan fizikal.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #ff4e50; border-color: #ff4e50;">Tahap 5: Projek Automasi Bersepadu</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='esp5.html'">
+                        <span style="font-size: 35px;">🏰</span>
+                        <div class="info-game">
+                            <h4>Misi 5.1: Sistem Keselamatan Pintar</h4>
+                            <p>Ujian Kemuncak! Gabungkan bacaan IR Sensor, kawalan Buzzer, warna RGB LED, dan Button menjadi satu projek Automasi Bilik Kebal!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 🔥 MODAL ZON 5 BARU (ZON BONUS RBT I.O.T) 🔥 -->
+    <!-- ============================================== -->
+    <div id="modalZon5" class="modal-sub">
+        <div class="kandungan-sub modal-s5">
+            <button class="butang-tutup" onclick="tutupSubDashboard('modalZon5')">×</button>
+            <h2 style="color: #00ff66; text-shadow: 0 0 10px #00ff66; margin-top: 0; position: relative; z-index: 5;">ZON BONUS: Makmal Integrasi I.O.T</h2>
+            <p style="color: #c8e6c9; font-size: 14px; position: relative; z-index: 5;">Silibus Lanjutan RBT. Belajar struktur pengekodan C++ dan pemasangan litar fizikal sebenar secara berperingkat dari asas hingga pakar.</p>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00ff66; border-color: #00ff66;">Tahap 1: Asas Anatomi Kod C++</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='akademi_misi1a.html'">
+                        <span style="font-size: 35px;">🏗️</span>
+                        <div class="info-game">
+                            <h4>Misi 1A: Setup & Loop</h4>
+                            <p>Fahami fungsi dua ruang wajib bagi menghidupkan mikropengawal (Bilik Persediaan vs Bilik Ulang Kerja).</p>
+                        </div>
+                    </div>
+                    <div class="kad-pilihan-game" onclick="window.location.href='akademi_misi1b.html'">
+                        <span style="font-size: 35px;">📦</span>
+                        <div class="info-game">
+                            <h4>Misi 1B: Isytihar Pembolehubah (Variables)</h4>
+                            <p>Bina memori ruang global untuk menamakan fungsi setiap pin pada papan ESP32 sebelum setup().</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00ff66; border-color: #00ff66;">Tahap 2: Tetapan Laluan Komponen (pinMode)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='akademi_misi2.html'">
+                        <span style="font-size: 35px;">🔌</span>
+                        <div class="info-game">
+                            <h4>Misi 2: Set Pintu Output</h4>
+                            <p>Arahkan terminal pin untuk bertindak sebagai pintu laluan untuk mengeluarkan kuasa ke komponen (OUTPUT).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00ff66; border-color: #00ff66;">Tahap 3: Suntikan Arus Elektrik (digitalWrite)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='akademi_misi3.html'">
+                        <span style="font-size: 35px;">💡</span>
+                        <div class="info-game">
+                            <h4>Misi 3: Isyarat Menyalakan LED</h4>
+                            <p>Akhirnya! Sambungkan litar fizikal dan lepaskan kuasa arus penuh (HIGH) untuk menyalakan komponen fizikal.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00ff66; border-color: #00ff66;">Tahap 4: Kawalan Syarat Bersama Litar (digitalRead)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='akademi_misi4.html'">
+                        <span style="font-size: 35px;">🔘</span>
+                        <div class="info-game">
+                            <h4>Misi 4: Suis Butang Pintar</h4>
+                            <p>Bina arahan If/Else dengan membaca input (0 atau 1) dari penderia butang fizikal untuk mengawal nyalaan litar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00ff66; border-color: #00ff66;">Tahap 5: Deria Halus Persekitaran (analogRead)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='akademi_misi5.html'">
+                        <span style="font-size: 35px;">🌤️</span>
+                        <div class="info-game">
+                            <h4>Misi 5: Sensor Pintar (LDR & Suhu)</h4>
+                            <p>Kumpul data isyarat bacaan halus dari persekitaran (skala 0-4095) dan hantarkan logik ke konsol monitor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kumpulan-tahap">
+                <h3 style="color: #00ff66; border-color: #00ff66;">Tahap 6: Projek Kotak Pasir (Sandbox)</h3>
+                <div class="menu-variasi">
+                    <div class="kad-pilihan-game" onclick="window.location.href='akademi_misi6.html'">
+                        <span style="font-size: 35px;">🛠️</span>
+                        <div class="info-game">
+                            <h4>Misi 6: Integrasi Komponen Lebihan</h4>
+                            <p>Zon eksplorasi bebas! Bina logik koding dan pasangkan mana-mana lebihan sensor yang ada di dalam kit perkakasan RBT anda secara rawak.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 🔥 MODAL PUSAT SUMBER DIGITAL (ZON 6) 🔥 -->
+    <!-- ============================================== -->
+    <div id="modalSumberDigital" class="modal-sub">
+        <div class="kandungan-sub modal-s6">
+            <button class="butang-tutup" onclick="tutupSubDashboard('modalSumberDigital')">×</button>
+            <h2 style="color: #4da6ff; text-shadow: 0 0 10px #0055ff; margin-top: 0; position: relative; z-index: 5;">Pusat Sumber Digital</h2>
+            <p style="color: #d2dae2; font-size: 14px; position: relative; z-index: 5;">Koleksi nota interaktif untuk rujukan pengekodan, asas kejuruteraan litar, dan logik automasi I.O.T.</p>
+            
+            <div class="kumpulan-tahap">
+                <h3 style="color: #4da6ff; border-color: #0055ff;">MODUL PEMBELAJARAN K.I.C</h3>
+                <div class="menu-variasi">
+                    
+                    <!-- MENU 1: KAMUS KODING BARU -->
+                    <div class="kad-pilihan-game" onclick="window.location.href='nota_kamus.html'">
+                        <span style="font-size: 35px;">📖</span>
+                        <div class="info-game">
+                            <h4>Menu 1: Kamus Pengekodan (Istilah)</h4>
+                            <p>Rujukan pantas bagi menterjemah dan memahami maksud di sebalik sintaks pengaturcaraan Inggeris ke Bahasa Melayu.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- MENU 2: NOTA KODING -->
+                    <div class="kad-pilihan-game" onclick="window.location.href='nota_terminal.html'">
+                        <span style="font-size: 35px;">💻</span>
+                        <div class="info-game">
+                            <h4>Menu 2: Kronologi Algoritma</h4>
+                            <p>Modul pembelajaran asas sintaks koding, pembolehubah (Variables), dan syarat perbandingan (If/Else).</p>
+                        </div>
+                    </div>
+                    
+                    <!-- MENU 3: NOTA HARDWARE -->
+                    <div class="kad-pilihan-game" onclick="window.location.href='nota_perkakasan.html'">
+                        <span style="font-size: 35px;">⚡</span>
+                        <div class="info-game">
+                            <h4>Menu 3: Asas Kejuruteraan Elektrik</h4>
+                            <p>Pengenalan visual mengenai pergerakan arus elektrik, Papan Litar (Breadboard), dan anatomi otak ESP32.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- MENU 4: NOTA MISI IOT -->
+                    <div class="kad-pilihan-game" onclick="window.location.href='nota_misi_iot.html'">
+                        <span style="font-size: 35px;">🤖</span>
+                        <div class="info-game">
+                            <h4>Menu 4: Evolusi Penciptaan (Zon 4 & 5)</h4>
+                            <p>Penerangan terperinci mengenai fungsi Deria (Input) dan Otot (Output) bagi membina sistem pintar berantai.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function bukaSubDashboard(idModal) {
+            document.getElementById(idModal).classList.add('tunjuk-modal');
+        }
+
+        function tutupSubDashboard(idModal) {
+            document.getElementById(idModal).classList.remove('tunjuk-modal');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-sub')) {
+                event.target.classList.remove('tunjuk-modal');
+            }
+        }
+    </script>
+</body>
+</html>

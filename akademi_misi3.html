@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akademi C++ : Misi 3</title>
+    <style>
+        body { margin: 0; padding: 0; background: #050a15; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .latar-kelas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #0a192f 0%, #02050a 100%); z-index: 1; }
+        .grid-maya { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px); background-size: 40px 40px; z-index: 2; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+
+        .kanvas-game { position: relative; z-index: 10; display: flex; flex-direction: column; background: rgba(10, 15, 20, 0.95); border: 2px solid #00ff66; border-radius: 12px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.2), inset 0 0 20px rgba(0,0,0,0.8); width: 95%; max-width: 1300px; height: 95vh; margin: 2vh auto; box-sizing: border-box; overflow: hidden; }
+        .header-zon { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; background: rgba(0, 255, 102, 0.1); border-bottom: 1px solid #00ff66; }
+        .header-zon h1 { margin: 0; font-size: 20px; color: #00ff66; text-transform: uppercase; letter-spacing: 2px; }
+        .btn-kembali { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 12px; }
+        .btn-kembali:hover { background: #c0392b; transform: scale(1.05);}
+        .ruang-kerja { display: flex; width: 100%; height: calc(100% - 50px); }
+
+        /* PANEL KIRI */
+        .panel-arahan { width: 30%; padding: 25px; background: rgba(0,0,0,0.4); border-right: 2px solid #333; overflow-y: auto; box-sizing: border-box; text-align: left; }
+        .panel-arahan::-webkit-scrollbar { width: 6px; }
+        .panel-arahan::-webkit-scrollbar-thumb { background: #00ff66; border-radius: 10px; }
+        .tajuk-misi { color: #f1c40f; margin-top: 0; font-size: 20px; border-bottom: 1px dashed #f1c40f; padding-bottom: 10px; text-transform: uppercase;}
+        .panel-arahan p { font-size: 13.5px; color: #d2dae2; line-height: 1.6; margin-bottom: 15px;}
+        .panel-arahan strong { color: #f1c40f; font-weight: bold; }
+        .karakter-container { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: rgba(0, 255, 102, 0.1); border: 1px dashed #00ff66; padding: 15px; border-radius: 10px;}
+        .img-bot { width: 55px; height: auto; filter: drop-shadow(0 0 10px rgba(0, 255, 102, 0.5)); animation: floatBot 2s ease-in-out infinite alternate;}
+        .tutor-bubble { font-size: 13px; line-height: 1.5; color: #fff;}
+
+        /* PANEL TENGAH (IDE) */
+        .panel-ide { width: 40%; display: flex; flex-direction: column; background: #1e1e1e; border-right: 2px solid #333; box-sizing: border-box; }
+        .ide-toolbar { background: #00878f; padding: 10px 15px; display: flex; gap: 10px; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 2;}
+        .btn-ide { border: none; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold; padding: 8px 12px; border-radius: 4px; transition: 0.2s; font-size: 12px;}
+        .btn-upload { background: #e74c3c; border: 1px solid #c0392b; } .btn-upload:hover { background: #c0392b; transform: scale(1.05); }
+        .btn-panduan { background: #3498db; border: 1px solid #2980b9; margin-left: auto;} .btn-panduan:hover { background: #2980b9; transform: scale(1.05); }
+        .btn-video { background: #9b59b6; border: 1px solid #8e44ad; } .btn-video:hover { background: #8e44ad; transform: scale(1.05); }
+
+        .ide-tabs { background: #111; padding: 5px 20px 0 20px; display: flex; border-bottom: 1px solid #333; }
+        .tab-aktif { background: #1e1e1e; color: #fff; padding: 8px 20px; font-size: 13px; font-family: monospace; border-top: 2px solid #00979d; border-radius: 5px 5px 0 0; }
+
+        /* EDITOR KOD */
+        textarea.kod-editor { flex: 1; padding: 20px; font-family: 'Consolas', monospace; font-size: 16px; line-height: 1.6; background: #1e1e1e; color: #dcdcaa; border: none; outline: none; resize: none; width: 100%; box-sizing: border-box;}
+        
+        .ide-console-container { height: 180px; background: #000; border-top: 2px solid #333; display: flex; flex-direction: column;}
+        .konsol-header { background: #2d2d2d; color: #ccc; padding: 5px 15px; font-size: 12px; font-family: sans-serif; text-align: left;}
+        .ide-console { padding: 15px; font-family: 'Consolas', monospace; font-size: 13px; overflow-y: auto; text-align: left; flex: 1;}
+
+        /* 🔥 PANEL KANAN: LUKISAN HARDWARE LENGKAP & WAYAR LALU LUAR 🔥 */
+        .panel-hardware { width: 30%; background: #1a252f; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box;}
+        .tajuk-hardware { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; font-size: 12px; color: #f1c40f; font-weight: bold; z-index: 20;}
+        
+        /* Kanvas Litar 500px */
+        .litar-maya { position: relative; width: 100%; height: 500px; display: flex; justify-content: center; align-items: center;}
+        
+        /* CIP ESP32 (Duduk kat bawah tengah) */
+        .kotak-esp32 { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); width: 140px; height: 180px; background: #111; border: 2px solid #444; border-radius: 8px; box-shadow: inset 0 0 20px #000, 0 10px 20px rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 10; transition: 0.3s;}
+        .kotak-esp32::before { content: "ESP32"; color: #555; font-weight: bold; font-size: 22px; font-family: monospace; letter-spacing: 2px;}
+
+        /* Mentol LED (Atas) - Gelap & Berlabel */
+        .kotak-led { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; background: #111; border: 3px solid #333; border-radius: 50%; z-index: 10; display: flex; justify-content: center; align-items: center; transition: 0.5s all ease-in-out;}
+        .teks-led { font-size: 15px; font-weight: bold; color: #555; font-family: sans-serif; transition: 0.3s;}
+        
+        /* Kaki Mentol LED */
+        .kaki-positif { position: absolute; top: 120px; left: 50%; transform: translateX(10px); width: 4px; height: 20px; background: #bdc3c7; z-index: 9;}
+        .label-kaki-p { position: absolute; top: 122px; left: 50%; transform: translateX(20px); font-size: 12px; color: #e74c3c; font-weight: bold; }
+        
+        .kaki-negatif { position: absolute; top: 120px; left: 50%; transform: translateX(-14px); width: 4px; height: 20px; background: #bdc3c7; z-index: 9;}
+        .label-kaki-n { position: absolute; top: 122px; left: 50%; transform: translateX(-35px); font-size: 12px; color: #7f8c8d; font-weight: bold; }
+
+        /* 🔥 LALUAN WAYAR MERAH (Kekal Merah sentiasa) 🔥 */
+        .w-merah-1 { position: absolute; top: 140px; left: 50%; transform: translateX(10px); width: 4px; height: 40px; background: #e74c3c; z-index: 5;}
+        .perintang { position: absolute; top: 180px; left: 50%; transform: translateX(5px); width: 14px; height: 30px; background: #e1b12c; border: 2px solid #bdc3c7; border-radius: 3px; z-index: 6;}
+        .label-resistor { position: absolute; top: 188px; left: 50%; transform: translateX(25px); font-size: 11px; color: #f1c40f; font-weight: bold;}
+        
+        .w-merah-2 { position: absolute; top: 210px; left: 50%; transform: translateX(10px); width: 4px; height: 30px; background: #e74c3c; z-index: 5;}
+        .w-merah-3 { position: absolute; top: 240px; left: 50%; transform: translateX(10px); width: 90px; height: 4px; background: #e74c3c; z-index: 5;} 
+        .w-merah-4 { position: absolute; top: 240px; left: 50%; transform: translateX(100px); width: 4px; height: 76px; background: #e74c3c; z-index: 5;} 
+        .w-merah-5 { position: absolute; top: 314px; left: 50%; transform: translateX(70px); width: 34px; height: 4px; background: #e74c3c; z-index: 5;} 
+
+        /* Label Titik PIN 13 ESP32 */
+        .pin-13 { position: absolute; top: 312px; left: 50%; transform: translateX(66px); width: 8px; height: 8px; background: #e74c3c; border-radius: 50%; z-index: 11;}
+        /* Patuh S.O.P: Latar kelabu pada awalnya */
+        .label-fokus { position: absolute; top: 322px; left: 42%; transform: translateX(110px); font-size: 11px; font-weight: bold; color: #fff; background: #555; padding: 2px 6px; border-radius: 3px; font-family: sans-serif; transition: 0.3s; white-space: nowrap;}
+
+        /* 🔥 LALUAN WAYAR HITAM (Kekal Hitam sentiasa) 🔥 */
+        .w-hitam-1 { position: absolute; top: 140px; left: 50%; transform: translateX(-14px); width: 4px; height: 60px; background: #222; box-shadow: inset 0 0 2px #000; z-index: 5;}
+        .w-hitam-2 { position: absolute; top: 200px; left: 50%; transform: translateX(-100px); width: 86px; height: 4px; background: #222; box-shadow: inset 0 0 2px #000; z-index: 5;} 
+        .w-hitam-3 { position: absolute; top: 200px; left: 50%; transform: translateX(-100px); width: 4px; height: 156px; background: #222; box-shadow: inset 0 0 2px #000; z-index: 5;} 
+        .w-hitam-4 { position: absolute; top: 352px; left: 50%; transform: translateX(-100px); width: 30px; height: 4px; background: #222; box-shadow: inset 0 0 2px #000; z-index: 5;}
+
+        /* Label Titik PIN GND ESP32 */
+        .pin-gnd { position: absolute; top: 350px; left: 50%; transform: translateX(-74px); width: 8px; height: 8px; background: #7f8c8d; border-radius: 50%; z-index: 11;}
+        .label-gnd { position: absolute; top: 360px; left: 48%; transform: translateX(-110px); font-size: 11px; font-weight: bold; color: #fff; background: #7f8c8d; padding: 2px 5px; border-radius: 3px; font-family: sans-serif;}
+
+        /* MODAL PANDUAN */
+        .modal-panduan { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .kandungan-panduan { background: #111; border: 2px solid #00f3ff; border-radius: 15px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); text-align: left;}
+        .kandungan-panduan h2 { margin-top: 0; color: #00f3ff; border-bottom: 1px dashed #00f3ff; padding-bottom: 10px;}
+        .kandungan-panduan p { color: #d2dae2; font-size: 14.5px; line-height: 1.6; }
+        .kod-box { background: #000; color: #00ff66; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 14px; white-space: pre;}
+        .btn-tutup-modal { background: #00f3ff; color: #000; border: none; padding: 10px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 20px; width: 100%; font-size: 15px; }
+
+        .teks-putih { color: #fff; display: block; margin-bottom: 4px;}
+        .teks-kuning { color: #f1c40f; display: block; margin-bottom: 4px; font-weight: bold;}
+        .teks-merah { color: #ff4757; display: block; margin-bottom: 4px;}
+        .teks-hijau { color: #00ff66; font-weight: bold; display: block; margin-bottom: 4px;}
+    </style>
+</head>
+<body>
+
+    <div class="latar-kelas"></div><div class="grid-maya"></div>
+
+    <div class="kanvas-game">
+        <div class="header-zon">
+            <button class="btn-kembali" onclick="window.location.href='index.html'">◀ KEMBALI MENU</button>
+            <h1>ZON BONUS: PENGKODAN SEBENAR</h1>
+            <div style="width: 80px;"></div>
+        </div>
+
+        <div class="ruang-kerja">
+            <div class="panel-arahan">
+                <h2 class="tajuk-misi">Misi 3: Isyarat Menyalakan LED</h2>
+                <div class="karakter-container">
+                    <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar">
+                    <div class="tutor-bubble">"Akhirnya! Pintu pinLED sudah bersedia. Kini tiba masanya untuk mengepam kuasa elektrik ke dalam litar."</div>
+                </div>
+                <p>Tugas pin 13 (OUTPUT) kini jelas. Tetapi ia masih belum melepaskan sebarang kuasa. Untuk menghidupkan LED, kita perlu menulis arahan kuasa (Tulis Digital).</p>
+                <p>Di dalam bahasa C++, <strong>HIGH</strong> bermaksud 'Kuasa Penuh (On)', manakala <strong>LOW</strong> bermaksud 'Tutup Kuasa (Off)'.</p>
+                <p><strong>Di manakah patut ia ditaip?</strong><br>Oleh kerana ini adalah tindakan operasi, ia mesti diletakkan <strong>di dalam</strong> bilik <code>void loop()</code> supaya ia sentiasa berjalan.</p>
+                <p>Klik butang <strong>Panduan Misi</strong> di atas untuk melihat contoh kod lengkap menyalakan LED.</p>
+            </div>
+
+            <div class="panel-ide">
+                <div class="ide-toolbar">
+                    <button class="btn-ide btn-upload" id="btnUpload" onclick="semakKod()">➔ Upload Kod</button>
+                    <button class="btn-ide btn-panduan" onclick="bukaPanduan()">📘 Panduan Misi</button>
+                    <button class="btn-ide btn-video" onclick="bukaVideo()">▶️ Video Tutor</button>
+                </div>
+                <div class="ide-tabs"><div class="tab-aktif">misi_3_digitalwrite.ino</div></div>
+                
+                <!-- EDITOR PRE-FILLED DENGAN KOD DARI MISI 2 -->
+                <textarea id="editorKod" class="kod-editor" spellcheck="false">
+int pinLED = 13;
+
+void setup() {
+  pinMode(pinLED, OUTPUT);
+}
+
+void loop() {
+
+}
+</textarea>
+
+                <div class="ide-console-container">
+                    <div class="konsol-header">Output Console</div>
+                    <div class="ide-console" id="paparanKonsol"><span class="teks-putih">Sistem sedia. Tuliskan kod digitalWrite di dalam bilik loop.</span></div>
+                </div>
+            </div>
+
+            <div class="panel-hardware">
+                <div class="tajuk-hardware">PAPAN LITAR MAYA</div>
+                <div class="litar-maya">
+                    
+                    <!-- Mentol LED -->
+                    <div class="kotak-led" id="lampuFizikal">
+                        <span class="teks-led" id="teksStatusLed">LED</span>
+                    </div>
+                    
+                    <!-- Kaki LED -->
+                    <div class="kaki-positif"></div><div class="label-kaki-p">(+)</div>
+                    <div class="kaki-negatif"></div><div class="label-kaki-n">(-)</div>
+
+                    <!-- Wayar & Resistor -->
+                    <div class="w-merah-1"></div>
+                    <div class="perintang"></div><div class="label-resistor">Resistor</div>
+                    <div class="w-merah-2"></div><div class="w-merah-3"></div><div class="w-merah-4"></div><div class="w-merah-5"></div>
+                    
+                    <div class="w-hitam-1"></div><div class="w-hitam-2"></div><div class="w-hitam-3"></div><div class="w-hitam-4"></div>
+
+                    <!-- Cip ESP32 -->
+                    <div class="kotak-esp32" id="cipESP"></div>
+                    <div class="pin-13"></div><div class="label-fokus" id="teksPin">pinLED [OUTPUT]</div>
+                    <div class="pin-gnd"></div><div class="label-gnd">GND</div>
+                    
+                </div>
+            </div>
+        </div>
+    </div> 
+
+    <!-- 🔥 MODAL PANDUAN MISI 3 🔥 -->
+    <div id="modalPanduan" class="modal-panduan">
+        <div class="kandungan-panduan">
+            <h2>📘 Panduan Misi 3</h2>
+            <p>Masukkan arahan melepaskan kuasa (HIGH) <strong>di dalam</strong> kurungan beralun bilik <code>void loop()</code>. Pastikan huruf W adalah huruf besar, dan perkataan HIGH juga huruf besar.</p>
+            <div class="kod-box">int pinLED = 13;
+
+void setup() {
+  pinMode(pinLED, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(pinLED, HIGH);
+}</div>
+            <button class="btn-tutup-modal" onclick="tutupPanduan()">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <script>
+        function bukaPanduan() { document.getElementById('modalPanduan').style.display = 'flex'; }
+        function tutupPanduan() { document.getElementById('modalPanduan').style.display = 'none'; }
+        function bukaVideo() { alert("Video tutorial Uncle Mat & Faiq akan datang dalam kemaskini seterusnya!"); }
+
+        function semakKod() {
+            const kodDitaip = document.getElementById('editorKod').value;
+            const konsol = document.getElementById('paparanKonsol');
+            const teksPin = document.getElementById('teksPin');
+            const butang = document.getElementById('btnUpload');
+            
+            // DOM Komponen Visual
+            const lampu = document.getElementById('lampuFizikal');
+            const teksLampu = document.getElementById('teksStatusLed');
+            const cip = document.getElementById('cipESP');
+
+            butang.disabled = true; butang.style.opacity = "0.5";
+            konsol.innerHTML = "<span class='teks-putih'>Kompilasi bermula... Menyemak arahan digitalWrite...</span><br>";
+
+            const kodBersih = kodDitaip.replace(/\s+/g, '');
+            const wujudVar = kodBersih.includes("intpinLED=13;");
+            const wujudPinMode = kodBersih.includes("pinMode(pinLED,OUTPUT);");
+            const wujudWrite = kodBersih.includes("digitalWrite(pinLED,HIGH);");
+            
+            // Check kedudukan dalam void loop()
+            let posisiBetulLoop = false;
+            if (wujudWrite && kodBersih.includes("voidloop(){")) {
+                const indeksLoopMula = kodBersih.indexOf("voidloop(){") + 11; 
+                const indeksLoopTamat = kodBersih.indexOf("}", indeksLoopMula); 
+                const isiDalamLoop = kodBersih.substring(indeksLoopMula, indeksLoopTamat);
+                if (isiDalamLoop.includes("digitalWrite(pinLED,HIGH);")) { posisiBetulLoop = true; }
+            }
+
+            // Check kedudukan pinMode dlm void setup (in case bdk terpadam)
+            let posisiBetulSetup = false;
+            if (wujudPinMode && kodBersih.includes("voidsetup(){")) {
+                const indeksSetupMula = kodBersih.indexOf("voidsetup(){") + 12; 
+                const indeksSetupTamat = kodBersih.indexOf("}", indeksSetupMula); 
+                const isiDalamSetup = kodBersih.substring(indeksSetupMula, indeksSetupTamat);
+                if (isiDalamSetup.includes("pinMode(pinLED,OUTPUT);")) { posisiBetulSetup = true; }
+            }
+
+            setTimeout(() => {
+                if (wujudVar && posisiBetulSetup && posisiBetulLoop) {
+                    konsol.innerHTML += "<span class='teks-hijau'>[BERJAYA] Litar lengkap diaktifkan!</span><br>";
+                    konsol.innerHTML += "<span class='teks-hijau'>Pin 13 sedang mengepam kuasa (HIGH) berterusan merentasi wayar merah.</span>";
+                    
+                    // S.O.P ESP32 Menyala hijau
+                    cip.style.borderColor = "#00ff66";
+                    cip.style.boxShadow = "inset 0 0 20px #000, 0 0 30px rgba(0, 255, 102, 0.4)";
+
+                    // S.O.P Label Pin Menyala hijau
+                    teksPin.style.background = "#00ff66";
+                    teksPin.style.color = "#000"; 
+                    teksPin.style.boxShadow = "0 0 10px #00ff66";
+                    
+                    // S.O.P Mentol LED Menyala Kuning Terang
+                    const warnaMenyala = "#f1c40f"; 
+                    lampu.style.background = warnaMenyala;
+                    lampu.style.boxShadow = "0 0 40px " + warnaMenyala + ", inset 0 0 10px #fff";
+                    lampu.style.borderColor = "#fff";
+                    teksLampu.style.color = "#000";
+
+                } else {
+                    konsol.innerHTML += "<span class='teks-merah'>[RALAT] Kompilasi GAGAL! Litar terputus.</span><br>";
+                    if (!wujudWrite) konsol.innerHTML += "<span class='teks-putih'>&#8226; Sintaks salah. Buka Panduan untuk ejaan <strong>digitalWrite(pinLED, HIGH);</strong> yang betul.</span><br>";
+                    else if (!posisiBetulLoop) konsol.innerHTML += "<span class='teks-kuning'>&#8226; Ralat Kedudukan! Letakkan arahan kuasa DI DALAM kurungan { } void loop().</span><br>";
+                    if (!wujudVar || !posisiBetulSetup) konsol.innerHTML += "<span class='teks-putih'>&#8226; Jangan padam atau rosakkan kod Misi sebelumnya! Pastikan pinMode dan pembolehubah masih ada.</span><br>";
+                    
+                    // S.O.P Padam Semua Efek (Merah & Kelabu)
+                    cip.style.borderColor = "#ff4757";
+                    cip.style.boxShadow = "inset 0 0 20px #000, 0 5px 20px rgba(255, 71, 87, 0.4)";
+                    
+                    teksPin.style.background = "#555";
+                    teksPin.style.color = "#fff"; 
+                    teksPin.style.boxShadow = "none";
+
+                    lampu.style.background = "#111";
+                    lampu.style.boxShadow = "none";
+                    lampu.style.borderColor = "#333";
+                    teksLampu.style.color = "#555";
+                }
+                konsol.scrollTop = konsol.scrollHeight;
+                butang.disabled = false; butang.style.opacity = "1";
+            }, 800); 
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 7C: Kapsul Dasar Laut</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA DASAR LAUT */
+        .tema-lautan {
+            background: linear-gradient(180deg, #3498db 0%, #094074 50%, #031526 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* OBJEK LATAR LAUT */
+        .buih-laut { position: absolute; font-size: 15px; color: rgba(255,255,255,0.4); animation: naikBuih 4s linear infinite; z-index: 1; }
+        @keyframes naikBuih { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
+        
+        #dasar-laut {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 80px;
+            background: #d35400; border-top: 15px solid #e67e22; z-index: 5;
+            box-shadow: inset 0 20px 20px rgba(0,0,0,0.5);
+            border-radius: 40% 40% 0 0; /* Bentuk bukit pasir */
+        }
+
+        #harta-karun {
+            position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
+            font-size: 80px; z-index: 6; line-height: 1; margin: 0;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8));
+        }
+
+        /* 🔥 KAPSUL SELAM & ZON TANGKI (Bergerak Sekali) 🔥 */
+        #kapsul-container {
+            position: absolute; top: 8%; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 20; transition: top 3s cubic-bezier(0.25, 0.1, 0.25, 1); /* Animasi Menyelam */
+        }
+        .kapsul-selam { top: 62% !important; } /* Koordinat dasar laut */
+
+        #ikon-kapsul {
+            font-size: 130px; line-height: 1; margin: 0; 
+            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.6));
+            animation: apung 3s ease-in-out infinite alternate;
+        }
+        @keyframes apung { 0% { transform: translateY(-5px); } 100% { transform: translateY(5px); } }
+
+        /* ZON TANGKI AIR */
+        #zon-tangki {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; 
+            margin-top: -25px; background: rgba(255,255,255,0.15);
+            padding: 8px 15px; border-radius: 20px; border: 2px solid #00f3ff;
+            max-width: 200px;
+        }
+        
+        .titisan { 
+            font-size: 35px; line-height: 1; margin: 0; 
+            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.6)); 
+            transition: all 0.5s ease-in-out;
+        }
+        
+        /* Animasi Khas Tangki */
+        .titisan-masuk { animation: dropMasuk 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes dropMasuk { 
+            0% { transform: translateY(-80px) scale(2); opacity: 0; } 
+            100% { transform: translateY(0) scale(1); opacity: 1; } 
+        }
+        
+        .titisan-buang { transform: translateY(150px) scale(0) !important; opacity: 0 !important; }
+
+        /* DIALOG SISTEM AI (ANTI-BOCOR) */
+        .awan-dialog {
+            position: absolute; top: 15px; left: 65%; 
+            width: 250px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: scale(0); transform-origin: top left;
+            background: rgba(255, 255, 255, 0.95) !important; color: #2c3e50 !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important; white-space: normal !important; 
+            word-wrap: break-word !important; text-align: left !important; 
+            border: 3px solid #00f3ff !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 15px; left: -16px;
+            border-width: 8px; border-style: solid; border-color: transparent #00f3ff transparent transparent;
+        }
+        .tunjuk-dialog { transform: scale(1) translateY(10px) !important; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <!-- PANEL KIRI -->
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Gabungan<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 7C)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Kapsul perlukan berat air yang seimbang untuk menyelam! Gabungkan operasi <strong>+</strong> (tambah) dan <strong>-</strong> (buang) dalam satu kod.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; border-left: 3px solid #00f3ff;">
+                <strong>Susunan Operasi:</strong><br>
+                <code>sistem.kira(Asal + Tambah - Buang)</code><br><br>
+                <strong style="color: #00f3ff;">Contoh Arahan:</strong><br>
+                Ada 3 tangki. Tambah 4, buang 2 bocor:<br>
+                <code>sistem.kira(3+4-2)</code>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod gabungan di sini..." spellcheck="false" style="width: 100%; height: 45px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;" autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap7c()">
+            
+            <button onclick="laksanaArahanTahap7c()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00f3ff, #0984e3); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);">SELAM KAPSUL ⚓</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00f3ff; padding: 10px; font-size: 13px;">
+                Radar sonar aktif. Menunggu kalibrasi tangki...
+            </div>
+        </div>
+
+        <!-- PANEL KANAN -->
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Lautan Marianna</h2>
+            
+            <div id="ruangAnimasi" class="tema-lautan">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(15, 25, 40, 0.9); color: #00f3ff; border: 2px solid #00f3ff; font-size: 14px;">
+                    Sistem: Menganalisis kedalaman dan tekanan...
+                </div>
+                
+                <!-- BUIH ANIMASI -->
+                <div class="buih-laut" style="left: 20%; animation-duration: 3s;">🫧</div>
+                <div class="buih-laut" style="left: 80%; animation-duration: 5s; animation-delay: 1s;">🫧</div>
+                <div class="buih-laut" style="left: 50%; animation-duration: 4s; animation-delay: 2s;">🫧</div>
+
+                <!-- KAPSUL DAN TANGKI -->
+                <div id="kapsul-container">
+                    <div id="dialogSistem" class="awan-dialog"></div>
+                    <div id="ikon-kapsul">🛸</div>
+                    <div id="zon-tangki"></div>
+                </div>
+
+                <div id="harta-karun">💎</div>
+                <div id="dasar-laut"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN DAN KEMENANGAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #00f3ff; box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);">
+            <h2 style="color: #00f3ff;">🧮 Matematik Gabungan</h2>
+            <p style="color: #ecf0f1; font-size: 15px;">Dunia komputer membenarkan kita menggabungkan pelbagai operasi dalam satu baris kod!</p>
+            
+            <div style="background: rgba(0, 243, 255, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #00f3ff;">
+                <strong>Cara Menggabungkan Kod:</strong><br><br>
+                Kapsul ini mempunyai pemberat asas. Untuk menyelam, kita perlu memasukkan tangki air tambahan (+), dan membuang tangki yang rosak (-).<br><br>
+                Jika skrin menyatakan:<br>
+                <i>"Kapsul ada 4 tangki. Tambah 5 tangki air, buang 2 tangki bocor"</i><br><br>
+                Taipkan semua turutan nombor tersebut dengan simbolnya:<br>
+                <code>sistem.kira(4 + 5 - 2)</code>
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00f3ff; color: #000; font-weight: bold;">SAYA BERSEDIA MENYELAM!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">🛸💎</div>
+            <h2 style="color: #2ecc71;">Harta Karun Ditemui!</h2>
+            <p style="color: #ecf0f1;">Luar biasa! Anda berjaya membuktikan kecekapan menggabungkan operator Tambah (+) dan Tolak (-) serentak untuk memanipulasi logik permainan!</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #000; font-weight: bold;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap7c.js"></script>
+</body>
+</html>

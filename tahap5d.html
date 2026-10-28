@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 5D: Transaksi Wang Siber</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA JALAN SIBER PADA WAKTU MALAM */
+        .tema-siber-mall {
+            background: linear-gradient(to bottom, #192a56 0%, #0f0f1a 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* 🔥 KOTAK STATUS PUTIH RASMI (DIKEMBALIKAN KE ASAL) 🔥 */
+        #teksAnimasi {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            z-index: 100; background: rgba(255, 255, 255, 0.95); color: #2c3e50; 
+            border: 2px solid #3498db; padding: 8px 20px; border-radius: 8px; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); width: 85%; text-align: center;
+            font-size: 15px;
+        }
+
+        /* LANTAI PEJALAN KAKI NEON */
+        #lantai-mall {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 90px;
+            background: #2f3640; border-top: 5px solid #bc13fe; z-index: 5;
+            box-shadow: inset 0 15px 30px rgba(188, 19, 254, 0.2);
+        }
+
+        /* MESIN LAYAN DIRI (VENDING MACHINE) */
+        #mesin-layan-diri {
+            position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 320px; background: #2c3e50; border-radius: 15px 15px 0 0;
+            border: 4px solid #34495e; box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+            z-index: 10; display: flex; flex-direction: column; align-items: center; padding-top: 15px;
+        }
+
+        /* 🔥 LABEL NEON SIBER DIPINDAHKAN ATAS MESIN 🔥 */
+        #label-siber {
+            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8); color: #00f3ff; 
+            border: 1px solid #00f3ff; padding: 3px 10px; border-radius: 5px; 
+            font-family: monospace; font-size: 10px; font-weight: bold;
+            white-space: nowrap; box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        /* SKRIN DIGITAL MESIN */
+        #skrin-digital {
+            width: 80%; height: 45px; background: #000; border: 2px solid #0be881;
+            border-radius: 5px; margin-bottom: 10px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; box-shadow: inset 0 0 10px rgba(11, 232, 129, 0.5);
+        }
+        .teks-skrin { color: #0be881; font-family: monospace; font-size: 11px; margin: 2px 0; font-weight: bold; text-shadow: 0 0 5px #0be881;}
+
+        /* CERMIN PAMERAN BARANG */
+        #cermin-pameran {
+            width: 85%; height: 160px; background: rgba(52, 152, 219, 0.2); border: 2px solid #3498db;
+            border-radius: 5px; position: relative; overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(52, 152, 219, 0.3);
+        }
+
+        /* RAK DAN MINUMAN */
+        .rak { width: 100%; height: 5px; background: #7f8c8d; position: absolute; left: 0; }
+        #rak1 { top: 70px; }
+        #rak2 { top: 140px; }
+
+        .item-minuman {
+            position: absolute; font-size: 40px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+            transition: transform 0.5s ease-in; z-index: 12;
+        }
+        #jus { top: 25px; left: 15%; }
+        #susu { top: 25px; left: 55%; }
+        #kopi { top: 95px; left: 35%; }
+
+        /* RUANG AMBIL BARANG (DISPENSER) */
+        #ruang-ambil {
+            width: 70%; height: 40px; background: #1e272e; border: 2px solid #7f8c8d;
+            border-radius: 5px; margin-top: 15px; position: relative;
+            box-shadow: inset 0 10px 10px rgba(0,0,0,0.8);
+        }
+
+        /* WATAK PELANGGAN */
+        #kotak-pelanggan {
+            position: absolute; bottom: 90px; left: 10%; z-index: 20;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        #ikonPelanggan {
+            font-size: 80px; line-height: 1; transition: transform 0.3s;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+        }
+
+        /* AWAN DIALOG GLOBAL */
+        .awan-dialog {
+            position: absolute; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 10px 15px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 90; text-align: center; 
+            width: max-content; max-width: 200px; white-space: normal !important; word-wrap: break-word;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #00f3ff; margin-bottom: 5px;
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #00f3ff transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); border: 2px solid #00f3ff;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #00f3ff; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Keputusan<br><span style="font-size: 16px; color: #00f3ff;">(Misi 5D - Zon 1)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #00f3ff; color: #000; border-color: #0097a7; font-weight: bold;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Saya haus! Bantu saya beli minuman di Mesin Layan Diri ini menggunakan konsep perbandingan.</p>
+            <p style="color: #0be881; font-weight: bold; font-size: 13px; line-height: 1.4;">Gunakan syarat <code>if</code> berserta simbol <code>&gt;=</code> (Lebih Besar atau Sama Dengan) untuk memastikan <code>baki</code> wang cukup untuk membayar <code>harga</code> barang!</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #00f3ff; font-family: monospace;">
+                <strong style="color: #00f3ff; font-family: sans-serif;">Pembolehubah (Variable) Sistem:</strong><br>
+                <span style="color: #bdc3c7;">baki</span> (Duit kita)<br>
+                <span style="color: #bdc3c7;">harga</span> (Harga minuman)<br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Format Kod Kelulusan:</strong><br>
+                <span style="color: #fff;">if (baki >= harga) { beli("nama_item") }</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip syarat IF di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap5d()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap5d()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00f3ff, #0097a7); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);">BELI SEKARANG 💳</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00f3ff; padding: 10px; font-size: 13px;">
+                Mesin sedia beroperasi. Menunggu arahan logik pembayaran...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-siber-mall">
+                
+                <!-- KOTAK STATUS PUTIH ASAL -->
+                <div id="teksAnimasi">Status: Memuatkan sistem mesin...</div>
+                
+                <div id="lantai-mall"></div>
+
+                <!-- MESIN LAYAN DIRI -->
+                <div id="mesin-layan-diri">
+                    <!-- LABEL NEON DIPINDAHKAN ATAS MESIN -->
+                    <div id="label-siber">Sistem Pembayaran Siber Aktif</div>
+
+                    <div id="skrin-digital">
+                        <p class="teks-skrin" id="teks-baki">BAKI: RM --</p>
+                        <p class="teks-skrin" id="teks-harga">HARGA: RM --</p>
+                    </div>
+
+                    <div id="cermin-pameran">
+                        <div class="rak" id="rak1"></div>
+                        <div class="rak" id="rak2"></div>
+                        <div class="item-minuman" id="jus">🧃</div>
+                        <div class="item-minuman" id="susu">🥛</div>
+                        <div class="item-minuman" id="kopi">☕</div>
+                    </div>
+
+                    <div id="ruang-ambil"></div>
+                </div>
+                
+                <!-- PELANGGAN -->
+                <div id="kotak-pelanggan">
+                    <div id="dialogPelanggan" class="awan-dialog">Loading...</div>
+                    <span id="ikonPelanggan">👦</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">💳📊</div>
+            <h2>Perbandingan Baki & Harga</h2>
+            <p style="text-align: left;">Dalam sains komputer dan kehidupan harian, kita menggunakan simbol <code>&gt;=</code> (Lebih Besar atau Sama Dengan) untuk memeriksa kecukupan wang.</p>
+            <div style="background: rgba(0, 243, 255, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #00f3ff;">
+                <strong>Gunakan Pembolehubah (Variables):</strong><br><br>
+                Anda tidak perlu menaip nombor. Hanya gunakan perkataan <code>baki</code> dan <code>harga</code>.<br><br>
+                Tengok apa minuman yang watak mahukan, kemudian taip:<br>
+                <code>if (baki >= harga) { beli("jus") }</code><br><br>
+                <em>Nota: Pastikan nama item (contoh: "kopi", "susu", "jus") dieja dengan huruf kecil dan ada tanda petik "".</em>
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00f3ff; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🧃✅</div>
+            <h2 style="color: #0be881;">Transaksi Berjaya!</h2>
+            <p>Tahniah! Anda berjaya menggunakan konsep perbandingan nilai <code>&gt;=</code> dengan sempurna. Mesin mengesahkan baki anda mencukupi dan barang telah dikeluarkan.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #0be881; color: #000; font-weight: bold; width: 100%;">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💳❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Transaksi Ditolak!</h2>
+            <p id="pesan-kalah">Terdapat ralat pada logik perbandingan anda atau pilihan item salah.</p>
+            <button class="butang-menu" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold; width: 100%;">CUBA LAGI (REFRESH)</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap5d.js"></script>
+</body>
+</html>

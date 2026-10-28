@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 2B: Robot Kebun Pintar</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KEBUN SIANG */
+        .tema-kebun {
+            background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* TANAH KEBUN & BATAS METALLIK/KAYU */
+        #tanah-kebun {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: linear-gradient(to bottom, #8d6e63, #5d4037); z-index: 5;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
+            border-top: 10px solid #795548;
+        }
+        .batas-kayu {
+            position: absolute; bottom: 110px; width: 86%; left: 7%; height: 25px;
+            background: linear-gradient(to right, #ffb74d, #f57c00, #ffb74d);
+            border-radius: 5px; z-index: 4; border-bottom: 4px solid #e65100;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 🔥 BANJARAN GUNUNG CSS PREMIUM 🔥 */
+        .gunung-batu {
+            position: absolute;
+            bottom: 120px; 
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 2;
+        }
+        .gunung-batu::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 35%;
+            background: rgba(255,255,255,0.95); 
+        }
+        #g1 { left: -10%; width: 40%; height: 280px; background: #6d4c41; z-index: 2; }
+        #g2 { left: 15%; width: 35%; height: 350px; background: #8d6e63; z-index: 3; }
+        #g3 { left: 40%; width: 45%; height: 420px; background: #5d4037; z-index: 2; }
+        #g4 { left: 65%; width: 35%; height: 320px; background: #795548; z-index: 3; }
+        #g5 { left: 85%; width: 30%; height: 260px; background: #6d4c41; z-index: 2; }
+
+        /* AWAN & MATAHARI */
+        .objek-latar { position: absolute; z-index: 1; pointer-events: none; line-height: 1; margin: 0; }
+        #awan1 { top: 15%; left: 10%; font-size: 80px; animation: gerakAwan 20s linear infinite alternate; opacity: 0.9; }
+        #awan2 { top: 25%; right: 15%; font-size: 60px; animation: gerakAwan 25s linear infinite alternate-reverse; opacity: 0.8; }
+        #matahari { top: 8%; right: 10%; font-size: 90px; filter: drop-shadow(0 0 30px #f1c40f); animation: putarMatahari 20s linear infinite; }
+        
+        @keyframes gerakAwan { 0% { transform: translateX(0); } 100% { transform: translateX(40px); } }
+        @keyframes putarMatahari { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* POKOK BUNGA */
+        .pokok {
+            position: absolute; bottom: 130px; font-size: 65px; line-height: 1; margin: 0;
+            transform: translateX(-50%); transition: transform 0.4s ease, opacity 0.4s ease; z-index: 6;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+        .pokok-mekar { transform: translateX(-50%) scale(1.2) !important; filter: drop-shadow(0 0 15px #f1c40f); } 
+        #pokok-1 { left: 20%; }
+        #pokok-2 { left: 35%; }
+        #pokok-3 { left: 50%; }
+        #pokok-4 { left: 65%; }
+        #pokok-5 { left: 80%; }
+
+        /* 🔥 ROBOT BINAAN CSS CUSTOM 🔥 */
+        #kotak-robot {
+            position: absolute; bottom: 120px; left: -15%; z-index: 20; 
+            display: flex; flex-direction: column; align-items: center;
+            transform: translateX(-50%); 
+            transition: left 0.8s ease-in-out;
+        }
+        .kepala-robot { font-size: 55px; line-height: 1; z-index: 22; margin-bottom: -8px; filter: drop-shadow(0 0 5px #fff); }
+        
+        .badan-robot {
+            width: 55px; height: 60px; background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+            border-radius: 12px; border: 3px solid #2c3e50; z-index: 21;
+            display: flex; justify-content: center; align-items: center; position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+        .teras-robot { 
+            width: 20px; height: 20px; background: #e74c3c; border-radius: 50%; 
+            box-shadow: 0 0 15px #e74c3c; animation: nadi 0.8s infinite alternate; 
+        }
+        @keyframes nadi { 0% { transform: scale(0.8); opacity: 0.7; } 100% { transform: scale(1.1); opacity: 1; } }
+
+        .roda-robot { font-size: 40px; margin-top: -12px; z-index: 22; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));}
+        .roda-putar { animation: putarRoda 0.5s linear infinite; }
+        @keyframes putarRoda { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Tangan Robot Menembak Air */
+        .tangan-robot {
+            position: absolute; top: 15px; left: 35px; width: 45px; height: 12px;
+            background: #95a5a6; border-radius: 6px; border: 2px solid #2c3e50;
+            transform-origin: left center; transform: rotate(-20deg); z-index: 20;
+        }
+        
+        #paip-air {
+            position: absolute; top: -15px; right: -35px; font-size: 40px; 
+            opacity: 0; z-index: 21; transition: opacity 0.2s; line-height: 1;
+            transform: rotate(20deg); filter: drop-shadow(0 5px 10px #3498db);
+        }
+
+        #efek-banjir {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 0;
+            background: rgba(41, 128, 185, 0.85); z-index: 30;
+            transition: height 1.5s ease-in-out; pointer-events: none;
+            border-top: 5px solid rgba(255,255,255,0.5);
+        }
+
+        /* 🔥 AWAN DIALOG KHAS ROBOT (DIBAIKI: JARUM NORMAL & DUDUK DALAM SKRIN) 🔥 */
+        .dialog-khas-robot {
+            position: absolute !important; 
+            bottom: 110% !important; 
+            left: 50% !important; 
+            width: max-content !important; 
+            max-width: 240px !important;
+            height: auto !important; 
+            padding: 10px 15px !important; 
+            background: #ffffff !important; 
+            color: #1c2833 !important;
+            border-radius: 12px !important; 
+            font-size: 14px !important; 
+            font-weight: bold !important; 
+            line-height: 1.4 !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; 
+            border: 3px solid #00cec9 !important;
+            z-index: 40 !important; 
+            text-align: center !important; 
+            pointer-events: none !important;
+            box-sizing: border-box !important;
+            display: block !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            margin-bottom: 5px !important;
+            
+            /* Animasi Muncul: Kotak tolak sedikit ke kanan supaya masuk skrin */
+            transform: translateX(10px) scale(0);
+            transform-origin: bottom left;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        
+        /* JARUM NORMAL: Segi tiga kecil standard menghala ke bawah */
+        .dialog-khas-robot::after {
+            content: '' !important; 
+            position: absolute !important; 
+            top: 100% !important; 
+            left: 20px !important; /* Duduk di sebelah kiri bawah kotak */
+            margin-left: -8px !important;
+            border-width: 8px !important; 
+            border-style: solid !important; 
+            border-color: #00cec9 transparent transparent transparent !important; 
+            display: block !important;
+        }
+
+        .dialog-khas-robot::before {
+            display: none !important; /* BUNUH JARUM PUTIH ASAL */
+        }
+        
+        /* JS trigger buka-cakap (Di Kiri) */
+        .dialog-khas-robot.buka-cakap { 
+            transform: translateX(10px) scale(1) !important; 
+        }
+
+        /* BILA ROBOT DI KANAN (Class .dialog-tepi ditambah oleh JS bila banjir) */
+        .dialog-khas-robot.dialog-tepi {
+            transform-origin: bottom right;
+        }
+        
+        .dialog-khas-robot.dialog-tepi.buka-cakap { 
+            /* Tolak kotak ke KIRI supaya selamat dalam skrin */
+            transform: translateX(-100%) scale(1) !important; 
+        }
+
+        /* Alihkan jarum normal ke sebelah kanan bawah kotak bila robot di kanan */
+        .dialog-khas-robot.dialog-tepi::after {
+            left: auto !important;
+            right: 20px !important; 
+        }
+
+        .dialog-khas-robot.marah-border { border-color: #e74c3c !important; color: #c0392b !important; }
+        .dialog-khas-robot.marah-border::after { border-top-color: #e74c3c !important; }
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(0, 206, 201, 0.3); border: 2px solid #00cec9;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #00cec9; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Parameter<br><span style="font-size: 16px; color: #00cec9;">(Misi 2B - Zon 1)</span></h2>
+
+                <!-- BUTANG PANDUAN DAN MENU -->
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #00cec9; color: #000; border-color: #00b894; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #00cec9; color: #000; border-color: #00b894; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>    
+            </div>
+            
+            <p style="margin-top: 20px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Kira jumlah bunga yang sedang kehausan. Arahkan Robot untuk menyiram air dengan tepat!</p>
+            <p style="color: #f1c40f; font-size: 13px; line-height: 1.4;"><strong>Parameter Angka:</strong> Masukkan jumlah sasaran di dalam kurungan <code>()</code>.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #00cec9; font-family: monospace;">
+                <strong style="color: #00cec9; font-family: sans-serif;">Format Kod Arahan:</strong><br><br>
+                <span style="color: #fff;">robot.siram(kuantiti)</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Contoh Kod:</strong><br>
+                <span style="color: #fff;">robot.siram(2)</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod beserta nombor di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap2b()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap2b()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00cec9, #01a3a4); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 206, 201, 0.4);">JALANKAN ROBOT 🤖</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00cec9; padding: 10px; font-size: 13px;">
+                Sistem Droid sedia. Menunggu parameter siraman...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-kebun">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #00cec9; z-index: 30;">
+                    Status: Bunga kekeringan. Menunggu siraman air...
+                </div>
+                
+                <div id="g1" class="gunung-batu"></div>
+                <div id="g2" class="gunung-batu"></div>
+                <div id="g3" class="gunung-batu"></div>
+                <div id="g4" class="gunung-batu"></div>
+                <div id="g5" class="gunung-batu"></div>
+
+                <div id="awan1" class="objek-latar">☁️</div>
+                <div id="awan2" class="objek-latar">☁️</div>
+                <div id="matahari" class="objek-latar">☀️</div>
+
+                <div id="efek-banjir"></div>
+
+                <div class="batas-kayu"></div>
+                <div id="tanah-kebun"></div>
+                
+                <div id="pokok-1" class="pokok">🥀</div>
+                <div id="pokok-2" class="pokok">🥀</div>
+                <div id="pokok-3" class="pokok">🥀</div>
+                <div id="pokok-4" class="pokok">🥀</div>
+                <div id="pokok-5" class="pokok">🥀</div>
+
+                <div id="kotak-robot">
+                    <div id="dialogRobot" class="dialog-khas-robot"></div>
+                    <div class="kepala-robot">🤖</div>
+                    <div class="badan-robot">
+                        <div class="teras-robot"></div>
+                        <div class="tangan-robot">
+                            <span id="paip-air">💦</span>
+                        </div>
+                    </div>
+                    <div class="roda-robot" id="roda-robot">⚙️</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN KUSTOM PRO -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🤖🔢</div>
+            <h2>Parameter Berangka (Kuantiti)</h2>
+            <p style="text-align: left;">Kurungan <code>()</code> di hujung fungsi pengaturcaraan berfungsi sebagai 'bekas' untuk kita memasukkan data kuantiti sebagai sasaran robot.</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Cara Menggunakan Parameter:</strong><br><br>
+                1. Kira betul-betul ada berapa batang bunga layu 🥀 di atas batas.<br>
+                2. Gantikan perkataan <em>'kuantiti'</em> di dalam kod dengan nombor tersebut (Tanpa tanda petik!).<br>
+                3. Jika anda menaip <code>robot.siram(2)</code>, robot cuma siram 2 bunga terawal sahaja, bakinya mati.<br>
+                4. Awas! Jangan terlebih siram parameter, nanti kebun akan banjir! 🌊
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00cec9; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN KUSTOM PRO -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🤖🌻</div>
+            <h2 style="color: #0be881;">Kebun Mekar Berjaya!</h2>
+            <p>Hebat! Anda telah menguasai input <strong>Parameter Angka</strong>. Robot berjaya memproses nombor sasaran yang anda berikan dengan sangat tepat!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">🌊</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Misi Gagal!</h2>
+            <p id="pesan-kalah">Ralat logik pada angka input anda. Kebun telah dibanjiri atau pokok mati kekeringan.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap2b.js"></script>
+</body>
+</html>

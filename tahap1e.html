@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1E: Rantaian Ekosistem</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA PADANG RUMPUT TERBUKA */
+        .tema-padang {
+            background: linear-gradient(to bottom, #56CCF2 0%, #2F80ED 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        /* TANAH RUMPUT */
+        #tanah-belakang {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 130px;
+            background: linear-gradient(to bottom, #A8E063, #56AB2F);
+            z-index: 5; border-top: 8px solid #8BC34A;
+            box-shadow: inset 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        /* AWAN & MATAHARI */
+        .objek-latar { position: absolute; z-index: 1; pointer-events: none; }
+        #awan1 { top: 10%; left: 40%; font-size: 80px; animation: gerakAwan 25s linear infinite alternate; opacity: 0.9;}
+        #awan2 { top: 25%; left: 10%; font-size: 60px; animation: gerakAwan 30s linear infinite alternate-reverse; opacity: 0.8;}
+        #matahari { top: 8%; right: 15%; font-size: 90px; filter: drop-shadow(0 0 30px #f1c40f); animation: putarMatahari 20s linear infinite;}
+        
+        @keyframes gerakAwan { 0% { transform: translateX(0); } 100% { transform: translateX(50px); } }
+        @keyframes putarMatahari { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* BANJARAN GUNUNG */
+        .gunung-latar { 
+            position: absolute; bottom: 100px; z-index: 3; 
+            line-height: 1; margin: 0; pointer-events: none;
+        }
+        #bukit1 { left: -8%; font-size: 260px; filter: brightness(0.85); z-index: 2;}
+        #bukit2 { left: 12%; font-size: 320px; filter: brightness(0.75); z-index: 1;}
+        #bukit3 { left: 40%; font-size: 280px; filter: brightness(0.9); z-index: 2;}
+        #bukit4 { left: 65%; font-size: 350px; filter: brightness(0.8); z-index: 1;}
+        #bukit5 { right: -5%; font-size: 250px; filter: brightness(0.85); z-index: 2;}
+
+        /* 🔥 FIX Z-INDEX 1: Naikkan darjat ibu supaya anak boleh tembus 🔥 */
+        .entiti-ekosistem {
+            position: absolute; z-index: 30; /* Tukar dari 10 ke 30 */
+            display: flex; flex-direction: column; align-items: center;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+        
+        .ikon-haiwan { 
+            font-size: 55px; line-height: 1; 
+            transition: transform 0.3s ease; 
+        }
+        
+        .label-nama { 
+            background: rgba(0,0,0,0.6); color: white; padding: 2px 8px; 
+            border-radius: 10px; font-size: 11px; font-weight: bold; margin-top: 5px; 
+        }
+
+        #daun { bottom: 130px; left: 15%; z-index: 26; }
+        #belalang { bottom: 130px; left: 35%; z-index: 27; }
+        #tikus { bottom: 130px; left: 55%; z-index: 28; } 
+        #tikus .ikon-haiwan { transform: scaleX(-1); } 
+        #ular { bottom: 130px; left: 75%; z-index: 29; }
+        #ular .ikon-haiwan { transform: scaleX(-1); }
+        #helang { top: 90px; left: 75%; z-index: 40; } /* Helang paling berkuasa (z-index 40) */
+        #helang .ikon-haiwan { transform: scaleX(-1); } 
+
+        /* AWAN DIALOG KHAS HAIWAN */
+        .dialog-khas-haiwan {
+            position: absolute !important; 
+            bottom: 100% !important; 
+            left: 50% !important; 
+            width: max-content !important; 
+            max-width: 200px !important;
+            height: auto !important; 
+            padding: 8px 12px !important; 
+            background: #ffffff !important; 
+            color: #1c2833 !important;
+            border-radius: 8px !important; 
+            font-size: 13px !important; 
+            font-weight: bold !important; 
+            line-height: 1.3 !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important; 
+            border: 3px solid #3498db !important;
+            z-index: 50 !important; /* Dialog paling atas */
+            text-align: center !important; 
+            pointer-events: none !important;
+            box-sizing: border-box !important;
+            display: block !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            margin-bottom: 10px !important;
+            transform: translateX(-50%) scale(0);
+            transform-origin: bottom center;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        .dialog-khas-haiwan::after {
+            content: '' !important; 
+            position: absolute !important; 
+            top: 100% !important; 
+            left: 50% !important; 
+            margin-left: -8px !important;
+            border-width: 9px !important; 
+            border-style: solid !important; 
+            border-color: #3498db transparent transparent transparent !important; 
+            display: block !important;
+        }
+        .dialog-khas-haiwan::before {
+            display: none !important; 
+        }
+        .dialog-khas-haiwan.buka-cakap { 
+            transform: translateX(-50%) scale(1) !important; 
+        }
+
+        /* 🔥 FIX DIALOG HELANG KELUAR SKRIN: Tembak ke kiri 🔥 */
+        #dialog-helang {
+            left: auto !important;
+            right: -20px !important; /* Cangkuk di hujung kanan kepala helang */
+            transform: scale(0);
+            transform-origin: bottom right; /* Kembang dari kanan ke kiri */
+        }
+        #dialog-helang.buka-cakap {
+            transform: scale(1) !important; /* Tiada lagi translateX */
+        }
+        #dialog-helang::after {
+            left: auto !important;
+            right: 40px !important; /* Anak panah tuju tepat ke kepala helang */
+        }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(52, 152, 219, 0.3); border: 2px solid #3498db;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #3498db; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Sintaks<br><span style="font-size: 16px; color: #3498db;">(Misi 1E - Zon 1)</span></h2>
+
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Setiap hidupan bergantung antara satu sama lain untuk kelangsungan hidup. Siapa makan siapa?</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Bina kod mengikut urutan yang tepat: Daun ➔ Belalang ➔ Tikus ➔ Ular ➔ Helang.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Parameter Objek:</strong><br>
+                <span style="color: #fff;">pemangsa.makan(mangsa)</span><br><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Contoh Langkah 1:</strong><br>
+                <span style="color: #fff;">belalang.makan(daun)</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod rantaian di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap1e()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap1e()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">JALANKAN KOD 🧬</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Menunggu arahan rantaian makanan yang pertama...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-padang">
+                
+                <!-- 🔥 FIX Z-INDEX 2: Turunkan darjat kotak status ini 🔥 -->
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 10;">
+                    Status: Ekosistem sedang aman dan stabil.
+                </div>
+                
+                <div id="awan1" class="objek-latar">☁️</div>
+                <div id="awan2" class="objek-latar">☁️</div>
+                <div id="matahari" class="objek-latar">☀️</div>
+                
+                <div id="bukit1" class="gunung-latar">⛰️</div>
+                <div id="bukit2" class="gunung-latar">⛰️</div>
+                <div id="bukit3" class="gunung-latar">⛰️</div>
+                <div id="bukit4" class="gunung-latar">⛰️</div>
+                <div id="bukit5" class="gunung-latar">⛰️</div>
+                
+                <div id="tanah-belakang"></div>
+
+                <div id="daun" class="entiti-ekosistem">
+                    <div class="ikon-haiwan">🌿</div>
+                    <div class="label-nama">daun</div>
+                </div>
+                
+                <div id="belalang" class="entiti-ekosistem">
+                    <div id="dialog-belalang" class="dialog-khas-haiwan"></div>
+                    <div class="ikon-haiwan">🦗</div>
+                    <div class="label-nama">belalang</div>
+                </div>
+
+                <div id="tikus" class="entiti-ekosistem">
+                    <div id="dialog-tikus" class="dialog-khas-haiwan"></div>
+                    <div class="ikon-haiwan">🐀</div>
+                    <div class="label-nama">tikus</div>
+                </div>
+
+                <div id="ular" class="entiti-ekosistem">
+                    <div id="dialog-ular" class="dialog-khas-haiwan"></div>
+                    <div class="ikon-haiwan">🐍</div>
+                    <div class="label-nama">ular</div>
+                </div>
+
+                <div id="helang" class="entiti-ekosistem">
+                    <div id="dialog-helang" class="dialog-khas-haiwan"></div>
+                    <div class="ikon-haiwan">🦅</div>
+                    <div class="label-nama">helang</div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN KUSTOM PRO -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🧬🦅</div>
+            <h2>Parameter Objek (Pembolehubah)</h2>
+            <p style="text-align: left;">Dalam pengaturcaraan, kita boleh mengarahkan sesuatu subjek berinteraksi dengan sasaran. Sasaran di dalam kurungan ( ) ini dipanggil <strong>Parameter Objek</strong>!</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Cara Bermain:</strong><br><br>
+                1. Bina rantaian makanan mengikut urutan yang betul.<br>
+                2. Format kod: <code>pemangsa.makan(mangsa)</code><br>
+                3. Perkataan di dalam kurungan (contohnya daun, belalang) adalah <strong>Parameter</strong> yang memberitahu komputer 'siapa' yang kena makan!<br>
+                4. Jika anda tersalah masukkan parameter (contoh: Tikus makan Helang), sistem akan memaparkan ralat logik!
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🦅👑</div>
+            <h2 style="color: #0be881;">Kitaran Sempurna!</h2>
+            <p>Tahniah! Anda berjaya memahami sintaks <strong>Parameter Objek</strong> dan mempamerkan rantaian makanan ekosistem dengan tepat.</p>
+
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">⚠️❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Ralat Rantaian!</h2>
+            <p id="pesan-kalah">Terdapat ralat pada logik ekosistem anda. Haiwan tersebut tidak memakan hidupan parameter yang anda masukkan. Sila cuba lagi!</p>
+
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <!-- 🔥 SKRIP JAVASCRIPT DISATUKAN (INTERNAL SCRIPT) 🔥 -->
+    <script>
+        let tahapKitaran = 0; 
+        let adakahTamat = false;
+        let adakahSibuk = false;
+        let pemasaDialog;
+
+        function mainBunyi(audioElemen) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = 0;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // Urutan kod yang wajib ditaip oleh pengguna (Tikus digantikan katak)
+        const urutanRantaian = [
+            "belalang.makan(daun)",
+            "tikus.makan(belalang)",
+            "ular.makan(tikus)",
+            "helang.makan(ular)"
+        ];
+
+        async function laksanaArahanTahap1e() {
+            let inputAsal = document.getElementById("arahanInput").value;
+            let input = inputAsal.toLowerCase().replace(/\s+/g, '');
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            if (adakahTamat) {
+                maklumBalas.innerHTML = "Ralat: Ekosistem telah lengkap. Sila muat semula (Refresh).";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                return;
+            }
+
+            if (adakahSibuk) return;
+
+            // Check format sintaks: objek.makan(objek)
+            let padananSintaks = input.match(/^([a-z]+)\.makan\(([a-z]+)\)$/);
+
+            if (padananSintaks) {
+                let pemangsa = padananSintaks[1];
+                let mangsa = padananSintaks[2];
+                let kodSemasa = urutanRantaian[tahapKitaran]; // Kod yang sistem nak
+
+                // KES 1: JIKA KOD TEPAT DENGAN URUTAN
+                if (input === kodSemasa) {
+                    adakahSibuk = true;
+                    mainBunyi(sfxBetul);
+                    
+                    let elemenPemangsa = document.getElementById(pemangsa);
+                    let elemenMangsa = document.getElementById(mangsa);
+                    
+                    maklumBalas.innerHTML = `Berjaya: ${pemangsa} sedang memburu ${mangsa}...`;
+                    maklumBalas.style.borderLeftColor = "#0be881";
+                    
+                    cakap(pemangsa, `Nyam nyam! Sedapnya ${mangsa}!`, 2500);
+
+                    // LOGIK ANIMASI: Ambil posisi koordinat mangsa
+                    let gayaMangsa = window.getComputedStyle(elemenMangsa);
+                    let leftMangsa = gayaMangsa.left;
+                    let ikonPemangsa = elemenPemangsa.querySelector('.ikon-haiwan');
+
+                    // 🔥 ANIMASI HELANG MENJUNAM (SUPER EPIC!) 🔥
+                    if (pemangsa === "helang") {
+                        // Fasa 1: Melilau slow-slow ke tepi skrin kanan
+                        elemenPemangsa.style.transition = "top 2s ease-in-out, left 2s ease-in-out";
+                        elemenPemangsa.style.top = "220px";
+                        elemenPemangsa.style.left = "88%";
+                        ikonPemangsa.style.transform = "scaleX(-1) rotate(-15deg)"; // Muka condong ke bawah sikit
+                        
+                        await tunggu(2000); // Tunggu helang sedia di tepi
+
+                        // Fasa 2: Memecut menjunam ke arah ular!
+                        elemenPemangsa.style.transition = "top 0.4s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s cubic-bezier(0.25, 1, 0.5, 1)";
+                        elemenPemangsa.style.top = "calc(100% - 190px)"; // Turun ke level tanah
+                        elemenPemangsa.style.left = leftMangsa;
+                        ikonPemangsa.style.transform = "scaleX(-1) rotate(-45deg)"; // Dive mode!
+                        
+                        await tunggu(400); // Masa menjunam
+                    } 
+                    // Haiwan di darat berjalan biasa
+                    else {
+                        elemenPemangsa.style.transition = "left 0.6s cubic-bezier(0.25, 1, 0.5, 1)";
+                        elemenPemangsa.style.left = leftMangsa;
+                        ikonPemangsa.style.transform = "scaleX(1)"; // Pusing muka memburu ke kanan
+                        await tunggu(600); // Masa berjalan
+                    }
+
+                    // Mangsa ghaib (dimakan)
+                    elemenMangsa.style.opacity = "0";
+                    elemenMangsa.style.transform = "scale(0)";
+
+                    // Pemangsa membesar sikit tanda kenyang
+                    if (pemangsa === "helang") {
+                        ikonPemangsa.style.transform = "scaleX(-1) scale(1.3)";
+                    } else {
+                        ikonPemangsa.style.transform = "scaleX(1) scale(1.3)";
+                    }
+                    
+                    await tunggu(500);
+
+                    // Kembali saiz normal
+                    if (pemangsa === "helang") {
+                        ikonPemangsa.style.transform = "scaleX(-1) scale(1)";
+                        
+                        // Helang terbang balik ke langit (Posisi Kemenangan)
+                        elemenPemangsa.style.transition = "top 1.5s ease-out, left 1.5s ease-out";
+                        elemenPemangsa.style.top = "90px";
+                        elemenPemangsa.style.left = "75%";
+                        ikonPemangsa.style.transform = "scaleX(-1)"; // Tegak balik
+                        await tunggu(1500);
+                    } else {
+                        ikonPemangsa.style.transform = "scaleX(1) scale(1)";
+                    }
+
+                    tahapKitaran++; // Bergerak ke fasa seterusnya
+                    
+                    // CEK JIKA MENANG
+                    if (tahapKitaran >= urutanRantaian.length) {
+                        adakahTamat = true;
+                        teksAnimasi.innerHTML = "Status: Helang kekal sebagai pemangsa puncak!";
+                        maklumBalas.innerHTML = "Sempurna: Kitaran Rantaian Makanan selesai!";
+                        
+                        await tunggu(1000);
+                        cakap("helang", "Aku raja di ekosistem ni! 🦅", 4000);
+                        mainBunyi(sfxMenang);
+                        
+                        setTimeout(() => {
+                            document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                        }, 2000);
+                    } else {
+                        // UPDATE TEKS UNTUK MINTA NEXT KOD
+                        let kodSeterusnya = urutanRantaian[tahapKitaran];
+                        teksAnimasi.innerHTML = `Status: ${pemangsa} sedang menanti pemangsanya...`;
+                        maklumBalas.innerHTML = `Apakah rantaian seterusnya?`;
+                        adakahSibuk = false;
+                    }
+
+                } 
+                // KES 2: SALAH URUTAN ATAU LOGIK MENGARUT
+                else {
+                    mainBunyi(sfxSalah);
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    
+                    let senaraiSah = ["daun", "belalang", "tikus", "ular", "helang"];
+                    if (!senaraiSah.includes(pemangsa) || !senaraiSah.includes(mangsa)) {
+                        maklumBalas.innerHTML = `Ralat Objek: Komputer tidak menemui parameter "${pemangsa}" atau "${mangsa}" dalam ekosistem ini!`;
+                        return;
+                    }
+
+                    if (pemangsa === "helang" && mangsa === "daun") {
+                        maklumBalas.innerHTML = "Ralat Logik: Helang tak makan daun lah! Taip mengikut urutan yang betul.";
+                    } else if (mangsa === pemangsa) {
+                        maklumBalas.innerHTML = `Ralat Kanibal: ${pemangsa} takkan makan diri sendiri!`;
+                    } else if (input === "daun.makan(belalang)") {
+                        maklumBalas.innerHTML = "Ralat Ekosistem: Daun tak makan belalang, belalang yang makan daun!";
+                    } else {
+                        maklumBalas.innerHTML = `Ralat Rantaian: Urutan salah! Adakah ${pemangsa} makan ${mangsa} pada tahap ini? Sila ikut urutan.`;
+                    }
+                }
+
+            } else if (input !== "") {
+                maklumBalas.innerHTML = "Ralat Sintaks: Guna format <code>pemangsa.makan(mangsa)</code>.";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+            }
+
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById("modalInfo").classList.add("tunjuk-modal-kustom"); }
+        function tutupInfo() { document.getElementById("modalInfo").classList.remove("tunjuk-modal-kustom"); }
+
+        function cakap(idHaiwan, mesej, masa) {
+            let namaDialog = "dialog-" + idHaiwan;
+            let kotakDialog = document.getElementById(namaDialog);
+            
+            if(kotakDialog) {
+                kotakDialog.innerHTML = mesej;
+                kotakDialog.classList.add("buka-cakap");
+                
+                clearTimeout(pemasaDialog); 
+                pemasaDialog = setTimeout(() => { 
+                    kotakDialog.classList.remove("buka-cakap"); 
+                }, masa);
+            }
+        }
+    </script>
+</body>
+</html>

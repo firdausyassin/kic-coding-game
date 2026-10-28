@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makmal Asas Kejuruteraan Elektrik & I.O.T</title>
+    <style>
+        /* 🔥 ASAS TEMA KELAS MAYA 🔥 */
+        body { 
+            margin: 0; padding: 0; background: #050a15; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        
+        .latar-kelas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1a2a40 0%, #02050a 100%); z-index: 1; }
+        .grid-maya { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 102, 0.05) 1px, transparent 1px); background-size: 40px 40px; z-index: 2; animation: gridMove 20s linear infinite; }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+
+        /* 🔥 TERMINAL SKRIN SCROLL (SAIZ DISERAGAMKAN 100% TEPAT SEPERTI KAMUS) 🔥 */
+        .kanvas-terminal { 
+            position: relative; z-index: 10; 
+            background: rgba(10, 20, 15, 0.85); border: 2px solid #00ff66; border-radius: 15px; 
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.2), inset 0 0 20px rgba(0,0,0,0.8); 
+            width: 92%; max-width: 1100px; height: 92vh; margin: 4vh auto; 
+            overflow-y: auto; overflow-x: hidden; backdrop-filter: blur(10px); scroll-behavior: smooth; 
+        }
+        
+        .kanvas-terminal::-webkit-scrollbar { width: 8px; }
+        .kanvas-terminal::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+        .kanvas-terminal::-webkit-scrollbar-thumb { background: #00ff66; border-radius: 10px; box-shadow: 0 0 10px #00ff66; }
+
+        /* 🔥 HEADER TERMINAL 🔥 */
+        .header-nota { text-align: center; border-bottom: 2px dashed #00ff66; padding: 40px 30px 20px 30px; margin-bottom: 40px; position: relative; }
+        .header-nota h1 { color: #00ff66; margin: 0; font-size: 34px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(0, 255, 102, 0.5); }
+        .header-nota p { color: #bdc3c7; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; margin-top: 10px; }
+        
+        .btn-kembali { position: absolute; top: 20px; left: 20px; background: #e74c3c; color: white; border: none; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 0 10px rgba(231, 76, 60, 0.5); z-index: 50; }
+        .btn-kembali:hover { background: #c0392b; transform: scale(1.05); }
+
+        /* 🔥 RUANG KANDUNGAN PADDING (SEPERTI KAMUS) 🔥 */
+        .ruang-kandungan { padding: 0 40px 40px 40px; position: relative; }
+
+        /* 🔥 STRUKTUR MIND-MAP KRONOLOGI 🔥 */
+        .garis-masa { position: relative; width: 100%; margin: 0 auto; padding-bottom: 50px;}
+        .garis-masa::after { content: ''; position: absolute; width: 4px; background: rgba(0, 255, 102, 0.4); top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 5px; }
+
+        .nod-nota { padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box; margin-bottom: 60px; opacity: 0; animation: masukAtas 0.8s forwards; }
+        .nod-kiri { left: 0; text-align: right; }
+        .nod-kanan { left: 50%; text-align: left; }
+
+        .nod-nota::after { content: ''; position: absolute; width: 22px; height: 22px; right: -11px; background-color: #00ff66; border: 4px solid #1a2a40; top: 30px; border-radius: 50%; z-index: 1; box-shadow: 0 0 15px #00ff66; }
+        .nod-kanan::after { left: -11px; background-color: #00f3ff; box-shadow: 0 0 15px #00f3ff; }
+
+        /* Kotak Teks */
+        .kotak-info { text-align: left; padding: 25px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; border: 1px solid #27ae60; position: relative; transition: 0.3s; backdrop-filter: blur(5px); }
+        .kotak-info:hover { background: rgba(255, 255, 255, 0.08); border-color: #00ff66; box-shadow: 0 0 25px rgba(0, 255, 102, 0.2); transform: translateY(-5px); }
+        .kotak-info h3 { margin-top: 0; color: #00ff66; font-size: 21px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; letter-spacing: 1px;}
+        .nod-kanan .kotak-info h3 { color: #00f3ff; }
+        .kotak-info p { font-size: 14px; color: #d2dae2; line-height: 1.6; margin-bottom: 10px;}
+        
+        /* 🔥 HIGHLIGHT KUNING UTAMA 🔥 */
+        .kotak-info strong { color: #f1c40f; }
+        
+        .senarai-contoh { font-size: 13px; color: #bdc3c7; text-align: left; background: rgba(0,0,0,0.4); padding: 12px 25px; border-radius: 8px; border-left: 3px solid #2ecc71; margin-bottom: 15px; }
+        .senarai-contoh li { margin-bottom: 12px; line-height: 1.5; }
+        code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #00ff66; font-family: monospace; font-size: 14px;}
+
+        /* 🔥 GAMBAR KOMPONEN FIZIKAL 🔥 */
+        .img-komponen { display: block; width: 100%; max-width: 320px; height: auto; margin: 15px auto; border-radius: 10px; border: 2px dashed #3498db; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.3s; }
+        .img-komponen:hover { transform: scale(1.05); border-color: #00ff66; box-shadow: 0 5px 20px rgba(0, 255, 102, 0.4); }
+        .ruangan-gambar { text-align: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 15px; }
+        .label-gambar { font-size: 12px; color: #f1c40f; letter-spacing: 1px; text-transform: uppercase; font-weight: bold;}
+
+        /* 🔥 ANIMASI EMOJI ARUS MENGALIR 🔥 */
+        .animasi-paip { background: #111; border: 2px solid #555; height: 30px; border-radius: 15px; margin: 15px 0; position: relative; overflow: hidden; display: flex; align-items: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+        .animasi-paip::before { content: "🔋(+)"; position: absolute; left: 10px; font-size: 16px; z-index: 2; }
+        .animasi-paip::after { content: "(-) 🕳️"; position: absolute; right: 10px; font-size: 16px; z-index: 2; }
+        .arus-elektron { position: absolute; left: -50px; font-size: 18px; display: flex; gap: 15px; animation: arusGerak 3s linear infinite; }
+        @keyframes arusGerak { 0% { transform: translateX(0); } 100% { transform: translateX(350px); } }
+
+        /* 🔥 ANIMASI EMOJI LITAR PINTAS (TENGKORAK) 🔥 */
+        .box-litar-pintas { background: rgba(231, 76, 60, 0.15); border: 2px dashed #e74c3c; padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px; }
+        .box-litar-pintas h4 { margin: 0 0 10px 0; color: #ff4757; }
+        .animasi-renjatan { position: relative; height: 60px; font-size: 45px; display: flex; justify-content: center; align-items: center; }
+        
+        .orang, .kilat, .tengkorak { position: absolute; opacity: 0; }
+        .orang { animation: munculOrang 3s infinite; }
+        .kilat { animation: munculKilat 3s infinite; filter: drop-shadow(0 0 10px yellow); z-index: 10; font-size: 55px;}
+        .tengkorak { animation: munculTengkorak 3s infinite; filter: drop-shadow(0 0 10px red); }
+
+        @keyframes munculOrang { 0%, 30% { opacity: 1; transform: scale(1); } 31%, 100% { opacity: 0; } }
+        @keyframes munculKilat { 0%, 25% { opacity: 0; } 30%, 45% { opacity: 1; transform: scale(1.2) rotate(15deg); } 46%, 100% { opacity: 0; } }
+        @keyframes munculTengkorak { 0%, 40% { opacity: 0; } 45%, 80% { opacity: 1; transform: scale(1.1); } 85%, 100% { opacity: 0; transform: translateY(-10px); } }
+
+        /* 🔥 KELAS KARAKTER ANIMASI 🔥 */
+        .karakter-container { display: flex; align-items: flex-end; gap: 15px; margin-top: 20px; position: relative; z-index: 5;}
+        .k-kiri { justify-content: flex-end; }
+        .k-kanan { justify-content: flex-start; }
+        
+        .img-karakter { height: 180px; width: auto; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); }
+        .img-bot { height: 130px; width: auto; animation: floatBot 2.5s ease-in-out infinite alternate; filter: drop-shadow(0 0 20px rgba(0, 255, 102, 0.3)); }
+        
+        .dialog-bubble { background: rgba(0, 255, 102, 0.1); border: 1px dashed #00ff66; padding: 12px 18px; border-radius: 15px; font-size: 13px; color: #fff; max-width: 280px; text-align: left; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .k-kiri .dialog-bubble { border-bottom-right-radius: 0; }
+        .k-kanan .dialog-bubble { border-bottom-left-radius: 0; }
+        
+        /* TEMA BUBBLE MENGIKUT WATAK */
+        .bubble-faiq { border-color: #f1c40f; background: rgba(241, 196, 15, 0.1); }
+        .bubble-bot { border-color: #00f3ff; background: rgba(0, 243, 255, 0.1); }
+        .dialog-amaran { border-color: #ff4757; background: rgba(255, 71, 87, 0.15); }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes floatBot { 0% { transform: translateY(0px) rotate(-3deg); } 100% { transform: translateY(-20px) rotate(3deg); } }
+        @keyframes masukAtas { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media screen and (max-width: 768px) {
+            .garis-masa::after { left: 20px; }
+            .nod-nota { width: 100%; padding-left: 50px; padding-right: 0; text-align: left; }
+            .nod-kanan { left: 0; }
+            .nod-kiri::after, .nod-kanan::after { left: 10px; }
+            .karakter-container { justify-content: flex-start !important; flex-direction: row-reverse; }
+            .k-kiri .dialog-bubble { border-bottom-left-radius: 0; border-bottom-right-radius: 15px; }
+            .header-nota h1 { font-size: 24px; margin-top: 50px;}
+            .btn-kembali { position: relative; display: block; margin: 0 auto 20px auto; width: max-content; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="latar-kelas"></div>
+    <div class="grid-maya"></div>
+
+    <div class="kanvas-terminal">
+        <button class="btn-kembali" onclick="window.location.href='index.html'">◀ KEMBALI KEPADA MENU</button>
+        
+        <div class="header-nota">
+            <h1>MAKMAL ASAS KEJURUTERAAN</h1>
+            <p>ELEKTRIK, PAPAN LITAR & OTAK ESP32</p>
+        </div>
+
+        <div class="ruang-kandungan">
+            <div class="garis-masa">
+
+                <!-- BAB 1 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 0.1s;">
+                    <div class="kotak-info">
+                        <h3>BAB 1: Apa Sebenarnya 'Elektrik' Ni?</h3>
+                        <p>Senang je nak faham! Bayangkan elektrik ini macam <strong>air yang mengalir laju di dalam paip</strong>. Ia perlukan laluan yang betul untuk sampai ke tempatnya.</p>
+                        <ul class="senarai-contoh">
+                            <li>🔋 <strong>Bateri atau ESP32:</strong> Ini adalah <strong>"Tangki Air"</strong>. Tempat bermulanya tenaga elektrik.</li>
+                            <li>🔌 <strong>Wayar:</strong> Ini pula adalah <strong>"Paip Air"</strong>. Tempat laluan untuk elektrik bergerak.</li>
+                            <li>🔄 <strong>Pusingan Lengkap:</strong> Elektrik MESTI bergerak dalam satu bulatan penuh. Mula dari tangki, nyalakan mentol, dan <strong>wajib patah balik</strong> ke tempat asalnya!</li>
+                        </ul>
+
+                        <!-- ANIMASI EMOJI ARUS MENGALIR -->
+                        <div class="animasi-paip">
+                            <div class="arus-elektron">
+                                <span>⚡</span><span>🔵</span><span>⚡</span><span>🔵</span><span>⚡</span><span>🔵</span>
+                            </div>
+                        </div>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble">
+                                <strong>Uncle Mat:</strong> "Ingat tu kawan-kawan! Kalau wayar tercabut atau putus tengah jalan, ibarat paip air pecah. Lampu confirm takkan menyala sebab perjalanan elektrik terhenti!"
+                            </div>
+                            <img src="assets/picture/uncle_fakta.png" class="img-karakter" alt="Uncle Mat Fakta">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 2 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 0.3s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00f3ff;">BAB 2: Arah Laluan Kuasa Elektrik</h3>
+                        
+                        <div class="ruangan-gambar">
+                            <span class="label-gambar">Zarah Tenaga Elektrik</span>
+                            <img src="assets/picture/atom_elektron.png" alt="Gambar Animasi Elektron Atom" class="img-komponen">
+                        </div>
+
+                        <p>Dalam dunia elektronik, elektrik sentiasa bergerak mengikut jalan sehala. Macam jalan raya sehala!</p>
+                        <ul class="senarai-contoh" style="border-left-color: #00f3ff;">
+                            <li>🔴 <strong>Kutub Positif (+):</strong> Ini pintu <strong>KELUAR</strong>. Kita selalu gunakan wayar warna MERAH untuk ingatkan kita ini adalah laluan kuasa utama yang panas.</li>
+                            <li>⚫ <strong>Kutub Negatif (-):</strong> Ini pula pintu <strong>BALIK</strong> (Ground). Kita selalu guna wayar warna HITAM. Ingat, elektrik MESTI cari jalan balik.</li>
+                        </ul>
+
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar">
+                            <div class="dialog-bubble bubble-bot">
+                                <strong>Bot Pintar:</strong> "Bip! Semasa main cucuk-cucuk wayar nanti, ingat formula warna ni. Sentiasa mula dari wayar Merah (+) kemudian tamatkan dekat wayar Hitam (-)!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 3 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 0.5s;">
+                    <div class="kotak-info">
+                        <h3>BAB 3: Papan Mainan Jurutera (Breadboard)</h3>
+                        
+                        <div class="ruangan-gambar">
+                            <span class="label-gambar">PCB (Hijau) & Breadboard (Putih)</span>
+                            <img src="assets/picture/pcb_board.png" alt="Gambar Papan Litar PCB" class="img-komponen">
+                            <img src="assets/picture/breadboard.png" alt="Gambar Breadboard" class="img-komponen">
+                        </div>
+
+                        <p><strong>Komponen macam lampu LED sangat kecil. Kita perlukan "tapak binaan" supaya wayar tak bersepah.</strong></p>
+                        <ul class="senarai-contoh">
+                            <li>🏙️ <strong>Board Hijau (PCB):</strong> Ini <strong>Bandar Kekal</strong>. Laluan kat atas ni kilang dah pateri mati (gam besi). Kita tak boleh ubah laluan sesuka hati.</li>
+                            <li>🧱 <strong>Breadboard (Papan Roti):</strong> Haa, ini <strong>Tapak Mainan Lego Kita!</strong> Kamu bebas cucuk dan cabut wayar beratus kali sebab tak perlukan mesin pateri panas.</li>
+                            <li>📏 <strong>Nombor & Huruf (Koordinat):</strong> Breadboard ni direka macam peta harta karun. Ada <strong>huruf (A hingga J)</strong> dan <strong>nombor (1 hingga 30)</strong>. Senang nak ikut arahan misi!</li>
+                            <li>🔗 <strong>Rahsia Bawah Lubang:</strong> Rahsianya, lubang pada <strong>baris nombor yang sama</strong> (contoh: 1A, 1B, 1C) sebenarnya <strong>telah bersambung</strong> besi di bahagian bawahnya!</li>
+                            <li>➗ <strong>Parit Pemisah Tengah:</strong> Ada lubang panjang kat tengah-tengah tu? Ia sengaja dibuat supaya kaki robot ESP32 belah kiri tak bercantum dengan kaki belah kanan (nanti litar pintas!).</li>
+                            <li>⚡ <strong>Laluan Kuasa (+ dan -):</strong> Kat tepi sekali ada garisan Merah (+) dan Biru/Hitam (-). Itu laluan <strong>Paip Utama</strong> untuk salurkan elektrik ke seluruh papan!</li>
+                        </ul>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble bubble-faiq">
+                                <strong>Faiq:</strong> "Wah, patutlah kita guna Breadboard putih tu dalam misi ni! Boleh main cucuk dan cabut je, tak takut melecur. Macam main Lego!"
+                            </div>
+                            <img src="assets/picture/faiq_idea.png" class="img-karakter" alt="Faiq Idea">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 4 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 0.7s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00f3ff;">BAB 4: Apa Itu Robot ESP32?</h3>
+                        
+                        <div class="ruangan-gambar">
+                            <span class="label-gambar">Otak Pintar Moden: ESP32</span>
+                            <img src="assets/picture/esp32_board.png" alt="Gambar Cip ESP32" class="img-komponen">
+                        </div>
+
+                        <p>Kalau papan breadboard tu tapak kosong, papan ESP32 ini pula adalah <strong>Otak Robot Yang Sangat Bijak</strong>!</p>
+                        <p>Cip hitam segi empat kat tengah-tengah kepingan tu adalah otak utamanya. Dia sangat hebat sebab ada <strong>Wi-Fi dan Bluetooth</strong>, sama macam telefon pintar ayah atau ibu! Dia boleh bersembang dengan komputer kita.</p>
+                    </div>
+                </div>
+
+                <!-- BAB 5 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 0.9s;">
+                    <div class="kotak-info">
+                        <h3>BAB 5: Kenali Anggota Badan ESP32</h3>
+                        <p>Sebelum kita mula cucuk wayar, jom kenal bahagian-bahagian penting pada badan robot ESP32 ni:</p>
+                        <ul class="senarai-contoh">
+                            <li>📍 <strong>Pin Kaki Besi (Kiri & Kanan):</strong> Ini <strong>Pintu Letrik</strong>. Tempat kita cucuk wayar untuk sambung ke lampu atau motor.</li>
+                            <li>🔌 <strong>Port Kabel USB:</strong> Tempat kita cucuk kabel ke komputer. Fungsinya untuk bagi 'makanan' (elektrik) dan hantar <strong>mesej koding (arahan)</strong> ke dalam kepalanya.</li>
+                            <li>🚦 <strong>Perintang (Komponen Luar):</strong> Benda macam kacang kecil ni namanya Perintang (Resistor). Ia adalah <strong>"Bonggol Jalan Raya"</strong> untuk perlahankan letrik supaya lampu LED kita tak meletup terbakar.</li>
+                            <li>💡 <strong>Lampu Kecil (Built-in LED):</strong> Lampu merah kecil kat atas badan dia tu akan menyala untuk beritahu kita dia tengah hidup dan sihat.</li>
+                        </ul>
+
+                        <div class="karakter-container k-kiri">
+                            <div class="dialog-bubble bubble-faiq">
+                                <strong>Faiq:</strong> "Oh, maksudnya kabel USB tulah 'jambatan' rahsia nak hantar semua kod arahan yang saya taip dekat komputer masuk terus ke otak robot ni kan?"
+                            </div>
+                            <img src="assets/picture/faiq_tablet.png" class="img-karakter" alt="Faiq Tablet">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 6 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 1.1s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00f3ff;">BAB 6: Kod Arahan Rahsia (C++)</h3>
+                        <p>Robot ESP ni tak faham bahasa kawan-kawan. Jadi, bila kawan-kawan menaip kod, ia ada dua ruangan wajib yang kawan-kawan kena tahu:</p>
+                        <ul class="senarai-contoh" style="border-left-color: #00f3ff;">
+                            <li>⚙️ <strong>1. Bilik <code>void setup()</code> :</strong> Ini arahan waktu bangun pagi. Dia hanya akan baca arahan dalam bilik ini <strong>SEKALI SAHAJA</strong> sebaik saja suis dihidupkan.</li>
+                            <li>🔄 <strong>2. Bilik <code>void loop()</code> :</strong> Ini rutin kerja harian. Apa-apa arahan dalam bilik ini, dia akan buat <strong>BERULANG-ULANG KALI</strong> dengan sangat laju dan takkan berhenti!</li>
+                        </ul>
+                        
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/bot_pintar.png" class="img-bot" alt="Bot Pintar">
+                            <div class="dialog-bubble bubble-bot">
+                                <strong>Bot Pintar:</strong> "Bip! Walaupun kawan-kawan dah cabut kabel USB tu dari komputer dan guna bateri biasa (Powerbank), dia tetap ingat kod arahan yang kawan-kawan suruh tadi!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAB 7 -->
+                <div class="nod-nota nod-kiri" style="animation-delay: 1.3s;">
+                    <div class="kotak-info">
+                        <h3>BAB 7: Tugas 3 Jenis Pin Kaki (Pekerja)</h3>
+                        <p>Setiap batang pin besi dekat ESP32 tu ada tugas dia sendiri tau. Jom kenal 3 pekerja utamanya:</p>
+                        <ul class="senarai-contoh">
+                            <li>⚡ <strong>Pin 3V3 atau VIN (Warna Merah):</strong> Ini <strong>PAM UTAMA</strong>. Pintu untuk tembak kuasa elektrik keluar dari badan ESP32.</li>
+                            <li>🗑️ <strong>Pin GND (Ground / Warna Hitam):</strong> Ini <strong>LONGKANG PENAMAT</strong>. Lepas elektrik dah jalan lalu lampu, dia WAJIB balik dan masuk semula ke pin GND ini.</li>
+                            <li>🤖 <strong>Pin Digital (Bernombor):</strong> Ini <strong>PEKERJA BUKA/TUTUP</strong>. Kita boleh suruh dia keluarkan elektrik (ON) untuk nyalakan lampu, dan tarik balik elektrik (OFF) ikut suka kita!</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- BAB 8 -->
+                <div class="nod-nota nod-kanan" style="animation-delay: 1.5s;">
+                    <div class="kotak-info">
+                        <h3 style="color: #00f3ff;">BAB 8: Jom Buat Lampu Menyala!</h3>
+                        <p>Ini adalah jalan cerita macam mana lampu LED tu boleh menyala bila kita sambung wayar:</p>
+                        <ul class="senarai-contoh" style="border-left-color: #00f3ff;">
+                            <li><strong>1.</strong> Otak ESP baca koding kita, <em>"Buka pintu letrik nombor 2 sekarang!"</em></li>
+                            <li><strong>2.</strong> Elektrik melompat keluar ke breadboard, lepas tu langgar <strong>Perintang (Bonggol)</strong> untuk perlahankan kelajuannya.</li>
+                            <li><strong>3.</strong> Elektrik masuk ke <strong>Kaki Panjang (+)</strong> mentol LED, lampu terus menyala terang benderang.</li>
+                            <li><strong>4.</strong> Lepas tu, letrik keluar ikut <strong>Kaki Pendek (-)</strong>.</li>
+                            <li><strong>5.</strong> Elektrik jalan masuk ikut wayar hitam terus pulang ke lubang <strong>GND (-)</strong> pada ESP32. Misi kita berjaya!</li>
+                        </ul>
+
+                        <!-- KOTAK AMARAN LITAR PINTAS & ANIMASI EMOJI -->
+                        <div class="box-litar-pintas">
+                            <h4>⚠️ AMARAN! BAHAYA LITAR PINTAS</h4>
+                            <div class="animasi-renjatan">
+                                <span class="orang">🧍‍♂️</span>
+                                <span class="kilat">⚡</span>
+                                <span class="tengkorak">💀</span>
+                            </div>
+                            <p style="font-size:12px; margin-top:5px; color:#ff9f43;"><strong>JANGAN SESEKALI</strong> cantumkan wayar dari laluan Kuasa (+) terus masuk ke dalam lubang GND (-) tanpa ada sebarang komponen kat tengahnya. Ia akan jadi sangat panas dan robot ESP32 boleh terbakar berasap!</p>
+                        </div>
+
+                        <div class="karakter-container k-kanan">
+                            <img src="assets/picture/uncle_amaran.png" class="img-karakter" alt="Uncle Amaran">
+                            <div class="dialog-bubble dialog-amaran">
+                                <strong>PESANAN UNCLE:</strong> "Tengok nombor lubang elok-elok masa cucuk wayar ya! Kalau silap cucuk lubang positif dan negatif tersentuh, robot korang boleh rosak tau."
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> 
+        </div>
+    </div> 
+</body>
+</html>

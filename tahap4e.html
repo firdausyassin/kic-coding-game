@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 4E: Pecahan Setara</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KERTAS GRAF MATEMATIK */
+        .tema-graf {
+            background-color: #ecf0f1 !important;
+            background-image: 
+                linear-gradient(#bdc3c7 1px, transparent 1px),
+                linear-gradient(90deg, #bdc3c7 1px, transparent 1px) !important;
+            background-size: 20px 20px !important;
+            overflow: hidden; position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        /* PAPAN PECAHAN */
+        #papan-pecahan {
+            width: 80%; max-width: 500px; height: 220px;
+            background: #ffffff; border: 4px solid #34495e;
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 20px; position: relative; z-index: 5;
+        }
+
+        .zon-pecahan {
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
+        }
+
+        .label-pecahan {
+            font-size: 18px; font-weight: bold; color: #2c3e50;
+            background: #f1c40f; padding: 5px 15px; border-radius: 8px;
+            border: 2px solid #f39c12;
+        }
+
+        /* BLOK GEOMETRI */
+        .blok-induk {
+            width: 140px; height: 100px;
+            border: 4px solid #2c3e50; border-radius: 8px;
+            display: flex; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Blok Rujukan (1/2) */
+        .petak-rujukan { flex: 1; border-right: 2px solid #2c3e50; background: #ecf0f1; }
+        .petak-rujukan:last-child { border-right: none; }
+        .lorek-statik { background: #3498db !important; }
+
+        /* Blok Interaktif (0/4) */
+        .petak-uji {
+            flex: 1; border-right: 2px solid #2c3e50; background: #ecf0f1;
+            transition: background-color 0.5s ease;
+        }
+        .petak-uji:last-child { border-right: none; }
+        
+        /* 🔥 FIX: WARNA LOREKAN DITUKAR KEPADA BIRU SAMA SEPERTI RUJUKAN 🔥 */
+        .lorek-aktif { background: #3498db !important; }
+
+        /* BERUS AJAIB */
+        #berus-cat {
+            position: absolute; font-size: 45px; z-index: 20;
+            top: 60px; left: 10%; /* Kedudukan mula */
+            transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            filter: drop-shadow(2px 5px 5px rgba(0,0,0,0.3));
+            transform-origin: bottom left;
+        }
+
+        .animasi-berus { animation: sentalBerus 0.5s ease-in-out; }
+        @keyframes sentalBerus {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-30deg) translateY(10px); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* SIMBOL SAMA DENGAN (=) */
+        #simbol-sama {
+            font-size: 40px; font-weight: bold; color: #2c3e50;
+            opacity: 0.2; transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .simbol-aktif { opacity: 1 !important; transform: scale(1.5); color: #27ae60 !important; }
+        .simbol-salah { opacity: 1 !important; transform: scale(1.5); color: #e74c3c !important; }
+
+        /* 🔥 PROTOKOL STANDARDISASI: AWAN DIALOG GLOBAL 🔥 */
+        .awan-dialog {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 8px 12px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; 
+            white-space: nowrap !important; min-width: max-content !important;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #3498db; margin-bottom: 5px;
+            transform-origin: bottom center;
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #3498db transparent transparent transparent;
+        }
+        .awan-dialog::before { display: none !important; } /* Bunuh jarum sesat */
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+
+        /* Dialog Kanan Berus */
+        .dialog-kanan { left: 80%; transform: translateX(0) scale(0); transform-origin: bottom left; }
+        .dialog-kanan.tunjuk-dialog { transform: translateX(0) scale(1) !important; }
+        .dialog-kanan::after { left: 20%; }
+
+        /* Dialog Kiri Berus */
+        .dialog-kiri { left: 20%; transform: translateX(-100%) scale(0); transform-origin: bottom right; }
+        .dialog-kiri.tunjuk-dialog { transform: translateX(-100%) scale(1) !important; }
+        .dialog-kiri::after { left: 80%; }
+
+        /* MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(231, 76, 60, 0.3); border: 2px solid #e74c3c;
+        }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(11, 232, 129, 0.3); border: 2px solid #0be881; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(255, 94, 87, 0.4); border: 2px solid #ff5e57; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #e74c3c; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* BUTANG DWI-PILIHAN */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Pengulangan<br><span style="font-size: 16px; color: #e74c3c;">(Misi 4E - Zon 1)</span></h2>
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #e74c3c; color: #fff; border-color: #c0392b; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #e74c3c; color: #fff; border-color: #c0392b; font-weight: bold; padding: 6px 8px; font-size: 12px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Pecahan sasaran adalah <strong>1/2</strong> (Separuh). Blok di sebelah kanan telah dipotong kepada <strong>4 bahagian</strong>.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Arahkan berus cat menggunakan gelung (Loop) untuk melorek jumlah bahagian yang betul agar ia <strong>setara</strong> dengan nilai 1/2.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #e74c3c; font-family: monospace;">
+                <strong style="color: #e74c3c; font-family: sans-serif;">Logik Perbandingan:</strong><br>
+                <span style="color: #bdc3c7;">1/2 adalah sama luasnya dengan ?/4</span><br><br>
+                <strong style="color: #0be881; font-family: sans-serif;">Arahan Sasaran:</strong><br>
+                <span style="color: #fff;">ulang( ? ){blok.lorek()}</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod lorekan..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap4e()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap4e()" style="width: 100%; margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4); border: none; padding: 12px; border-radius: 8px; cursor: pointer;">MULA MELOREK 🖌️</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #e74c3c; padding: 10px; font-size: 13px;">
+                Kertas graf sedia. Menunggu parameter gelung...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-graf">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #e74c3c; z-index: 50; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);">
+                    Status: Berus menunggu arahan...
+                </div>
+                
+                <div id="papan-pecahan">
+                    
+                    <!-- PECAHAN ASAS (1/2) -->
+                    <div class="zon-pecahan">
+                        <div class="label-pecahan">1 / 2</div>
+                        <div class="blok-induk">
+                            <div class="petak-rujukan lorek-statik"></div>
+                            <div class="petak-rujukan"></div>
+                        </div>
+                    </div>
+
+                    <!-- SIMBOL PERBANDINGAN -->
+                    <div id="simbol-sama">=</div>
+
+                    <!-- PECAHAN UJIAN (?/4) -->
+                    <div class="zon-pecahan">
+                        <div class="label-pecahan" id="label-jawapan">? / 4</div>
+                        <div class="blok-induk">
+                            <!-- 4 Bahagian Kosong -->
+                            <div class="petak-uji" id="petak-1"></div>
+                            <div class="petak-uji" id="petak-2"></div>
+                            <div class="petak-uji" id="petak-3"></div>
+                            <div class="petak-uji" id="petak-4"></div>
+                        </div>
+                    </div>
+
+                    <!-- BERUS AJAIB KITA -->
+                    <div id="berus-cat">
+                        <div id="dialogBerus" class="awan-dialog"></div>
+                        🖌️
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🧮🖌️</div>
+            <h2>Pecahan Setara</h2>
+            <p style="text-align: left;">Pecahan setara ialah pecahan yang berbeza nombornya tetapi mewakili <strong>nilai atau saiz yang sama</strong>.</p>
+            <div style="background: rgba(231, 76, 60, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #e74c3c;">
+                <strong>Gunakan Formula Gelung:</strong><br><br>
+                <code>ulang(N) { blok.lorek() }</code><br><br>
+                N = Berapa banyak petak kecil yang perlu dilorek supaya saiz kawasan berlorek (kanan) sama besar dengan kawasan biru (kiri)?<br>
+                💡 Jika kiri adalah separuh (1/2), berapa banyak petak dari 4 bahagian yang mewakili separuh?
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #e74c3c; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🧮✅</div>
+            <h2 style="color: #0be881;">Setara Sempurna!</h2>
+            <p>Tahniah! Anda telah membuktikan secara visual bahawa <strong>1/2 adalah sama nilai dengan 2/4</strong> menggunakan fungsi pengulangan (Loop).</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">❌🎨</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Tidak Setara!</h2>
+            <p id="pesan-kalah">Kawasan lorekan tidak menyamai saiz pecahan rujukan.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <!-- 🔥 JAVASCRIPT DISATUKAN (INLINE) 🔥 -->
+    <script>
+        let adakahTamat = false;
+        let adakahSibuk = false;
+        let pemasaDialog;
+
+        function mainBunyi(audioElemen, mulaMasa = 0) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = mulaMasa;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // 🔥 PROTOKOL STANDARDISASI: FUNGSI DIALOG DINAMIK 🔥
+        function cakap(mesej, masa, posisi = "kanan") {
+            let kotakDialog = document.getElementById("dialogBerus");
+            if(kotakDialog) {
+                kotakDialog.innerHTML = mesej;
+                kotakDialog.className = "awan-dialog"; // Reset kelas asal
+                
+                if (posisi === "kanan") kotakDialog.classList.add("dialog-kanan");
+                else if (posisi === "kiri") kotakDialog.classList.add("dialog-kiri");
+                
+                kotakDialog.classList.add("tunjuk-dialog");
+                
+                clearTimeout(pemasaDialog); 
+                pemasaDialog = setTimeout(() => { 
+                    kotakDialog.classList.remove("tunjuk-dialog"); 
+                }, masa);
+            }
+        }
+
+        async function laksanaArahanTahap4e() {
+            if (adakahTamat) return;
+            if (adakahSibuk) return;
+
+            let inputRaw = document.getElementById("arahanInput").value;
+            let inputBersih = inputRaw.toLowerCase().replace(/\s+/g, '');
+            
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            let berus = document.getElementById("berus-cat");
+            let labelJawapan = document.getElementById("label-jawapan");
+            let simbolSama = document.getElementById("simbol-sama");
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            let padanan = inputBersih.match(/^ulang\((\d+)\)\{blok\.lorek\(\)\}$/);
+
+            if (padanan) {
+                let kaliUlang = parseInt(padanan[1]);
+                
+                if (kaliUlang === 0) {
+                    maklumBalas.innerHTML = "Ralat: Gelung sifar tidak akan melorek apa-apa!";
+                    mainBunyi(sfxSalah);
+                    cakap("Eh, taknak lorek ke?", 2000, "kanan");
+                    return;
+                }
+
+                adakahSibuk = true;
+                maklumBalas.innerHTML = `Sistem: Melorek ${kaliUlang} bahagian...`;
+                
+                let limitLorek = kaliUlang > 4 ? 4 : kaliUlang; 
+                
+                let posisiBerus = ["60%", "69%", "78%", "87%"];
+
+                cakap("Mari kita warnakan!", 1500, "kanan");
+                await tunggu(1000);
+
+                for (let i = 1; i <= limitLorek; i++) {
+                    let petak = document.getElementById(`petak-${i}`);
+                    
+                    berus.style.left = posisiBerus[i - 1];
+                    await tunggu(400); 
+                    
+                    berus.classList.add("animasi-berus");
+                    mainBunyi(sfxBetul);
+                    
+                    await tunggu(250); 
+                    petak.classList.add("lorek-aktif"); // Warna biru akan terpasang di sini
+                    labelJawapan.innerHTML = `${i} / 4`;
+                    
+                    await tunggu(250); 
+                    berus.classList.remove("animasi-berus");
+                    teksAnimasi.innerHTML = `Status: Melorek bahagian ke-${i}...`;
+                    
+                    await tunggu(300);
+                }
+
+                berus.style.left = "95%";
+                await tunggu(500);
+
+                // PENILAIAN KEPUTUSAN KANVAS
+                if (kaliUlang === 2) {
+                    // TEPAT! 2/4 = 1/2
+                    adakahTamat = true;
+                    simbolSama.classList.add("simbol-aktif");
+                    maklumBalas.innerHTML = "Berjaya: Pecahan Setara berjaya dibuktikan!";
+                    teksAnimasi.innerHTML = "Status: 1/2 adalah bersamaan dengan 2/4.";
+                    mainBunyi(sfxMenang);
+                    cakap("Yay! Saiz dia sama besar!", 2500, "kiri"); // Berus di hujung skrin, dialog ke kiri
+                    
+                    setTimeout(() => {
+                        document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                    }, 2000);
+
+                } else {
+                    // SALAH (Terlebih atau terkurang)
+                    adakahTamat = true;
+                    simbolSama.innerHTML = "≠";
+                    simbolSama.classList.add("simbol-salah");
+                    maklumBalas.innerHTML = "Gagal: Pecahan tidak setara!";
+                    mainBunyi(sfxSalah);
+                    
+                    let sebab = kaliUlang > 2 ? "Terlalu banyak bahagian yang dilorek." : "Lorekan tidak cukup untuk menyamai nilai 1/2.";
+                    teksAnimasi.innerHTML = `Status: ${sebab}`;
+                    cakap("Alamak, nampak macam tak sama saiz lah...", 3000, "kiri"); // Berus di hujung, dialog ke kiri
+                    
+                    setTimeout(() => {
+                        document.getElementById("pesan-kalah").innerHTML = `Arahan anda melorek <strong>${kaliUlang}/4</strong>. ${sebab} Sila kaji pecahan setara dan cuba lagi!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+                }
+
+            } else {
+                maklumBalas.innerHTML = "Ralat Sintaks: Ikut format -> <code>ulang(jumlah){blok.lorek()}</code>";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+            }
+            
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById("modalInfo").classList.add("tunjuk-modal-kustom"); }
+        function tutupInfo() { document.getElementById("modalInfo").classList.remove("tunjuk-modal-kustom"); }
+
+    </script>
+</body>
+</html>

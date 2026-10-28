@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 1A: Tindak Balas Objek</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KANVAS ALAM SEMULAJADI */
+        .tema-gagak-pintar {
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%) !important;
+            position: relative; overflow: hidden;
+        }
+
+        /* 1. LANTAI RUMPUT */
+        #tanah-rumput {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 150px;
+            background: linear-gradient(to bottom, #7cfc00, #32cd32);
+            z-index: 2; border-top: 4px solid #5ebd00;
+        }
+
+        /* 2. LATAR JAUH */
+        .objek-latar { position: absolute; z-index: 1; pointer-events: none; }
+        #gunung1 { bottom: 150px; left: -8%; font-size: 310px; line-height: 1; margin: 0; } 
+        #gunung2 { bottom: 150px; left: 20%; font-size: 250px; line-height: 1; margin: 0; }
+        #gunung3 { bottom: 150px; left: 40%; font-size: 320px; line-height: 1; margin: 0; }
+        #gunung4 { bottom: 150px; left: 73%; font-size: 250px; line-height: 1; margin: 0; }
+        #awan1 { top: 10%; left: 40%; font-size: 70px; animation: gerakAwan 20s linear infinite alternate; }
+        #awan2 { top: 20%; left: 10%; font-size: 50px; animation: gerakAwan 25s linear infinite alternate-reverse; }
+        #matahari { top: 5%; left: 80%; font-size: 90px; filter: drop-shadow(0 0 20px #f1c40f); }
+        
+        @keyframes gerakAwan { 0% { transform: translateX(0); } 100% { transform: translateX(50px); } }
+
+        /* 🔥 FIX: PENAWAR KOTAK HITAM (GPU WINDOWS 10 LAMA) 🔥 */
+        #pokok-gagak, #gagak, .batu-tanah, #tempayan {
+            filter: none !important;
+            -webkit-filter: none !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
+            will-change: transform, left, top, bottom !important;
+            transform-style: flat !important;
+            outline: 1px solid transparent; 
+        }
+
+        /* 3. OBJEK FIZIKAL */
+        #pokok-gagak { position: absolute; bottom: 135px; left: 2%; font-size: 250px; z-index: 3; line-height: 1; margin: 0;}
+        #tempayan { position: absolute; bottom: 135px; left: 75%; font-size: 130px; z-index: 5; line-height: 1; margin: 0;}
+
+        #air-tempayan {
+            position: absolute; bottom: 250px; left: 77%; font-size: 40px; 
+            z-index: 6; opacity: 0; transition: opacity 0.5s ease; line-height: 1; margin: 0;
+        }
+
+        /* 3 Biji Batu */
+        .batu-tanah { position: absolute; bottom: 145px; font-size: 40px; z-index: 4; transition: opacity 0.3s; line-height: 1; margin: 0;}
+        #batu1 { left: 42%; }
+        #batu2 { left: 48%; }
+        #batu3 { left: 54%; }
+
+        /* 4. SANG GAGAK */
+        #gagak {
+            position: absolute; bottom: 300px; left: 12%; font-size: 60px; z-index: 10;
+            transition: all 1s ease-in-out; width: 80px; height: 80px; 
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        #batu-paruh { position: absolute; font-size: 35px; opacity: 0; top: 35%; left: -15px; transition: opacity 0.2s; }
+        #air-minum { position: absolute; font-size: 30px; opacity: 0; top: 35%; left: -15px; transition: opacity 0.2s; }
+
+        /* 🔥 AWAN DIALOG GAGAK (KALIS STYLE.CSS UTAMA) 🔥 */
+        .dialog-khas-gagak {
+            position: absolute !important; 
+            bottom: 100% !important; 
+            left: 50% !important; 
+            width: max-content !important; 
+            max-width: 180px !important;
+            height: auto !important; 
+            padding: 10px 15px !important; 
+            background: #ffffff !important; 
+            color: #1c2833 !important;
+            border-radius: 12px !important; 
+            font-size: 13px !important; 
+            font-weight: bold !important; 
+            line-height: 1.4 !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important; 
+            border: 3px solid #00f3ff !important;
+            z-index: 40 !important; 
+            text-align: center !important; 
+            pointer-events: none !important;
+            box-sizing: border-box !important;
+            display: block !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            opacity: 1 !important; 
+            transform: translateX(-50%) scale(0);
+            transform-origin: bottom center;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        .dialog-khas-gagak::after {
+            content: '' !important; 
+            position: absolute !important; 
+            top: 100% !important; 
+            left: 50% !important; 
+            margin-left: -8px !important;
+            border-width: 9px !important; 
+            border-style: solid !important; 
+            border-color: #00f3ff transparent transparent transparent !important; 
+            display: block !important;
+        }
+        .buka-cakap-gagak { 
+            transform: translateX(-50%) scale(1) !important; 
+        }
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(5, 0, 17, 0.9); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom {
+            background: #1e272e; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; 
+            text-align: center; color: #fff; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); border: 2px solid #00f3ff;
+        }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #00f3ff; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #d2dae2; line-height: 1.5; }
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* CSS TAMBAHAN BUTANG DWI-PILIHAN */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+    
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Arahan<br><span style="font-size: 16px; color: #00f3ff;">(Misi 1A - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #00f3ff; color: #000; border-color: #00b8d4; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #00f3ff; color: #000; border-color: #00b8d4; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Bantu Sang Gagak minum air. Taip arahan tindakan mengikut urutan yang betul.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #00f3ff; font-family: monospace;">
+                <strong style="color: #00f3ff; font-family: sans-serif;">Senarai Kod Fungsi:</strong><br><br>
+                <span style="color: #fff;">gagak.ambil(batu)</span><br>
+                <span style="color: #fff;">gagak.masuk(tempayan)</span><br>
+                <span style="color: #fff;">gagak.minum(air)</span>
+            </div>
+
+            <input type="text" id="arahanInput" placeholder="Taip kod di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahan()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            
+            <button onclick="laksanaArahan()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00f3ff, #00b8d4); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);">JALANKAN KOD 🚀</button>
+            
+            <div id="maklumBalas" class="kotak-maklum-balas" style="background: rgba(0,0,0,0.4); border-left-color: #00f3ff; padding: 10px; font-size: 13px;">
+                Sistem sedia menerima arahan berurutan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-gagak-pintar">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.9); color: #2c3e50; border: 2px solid #00f3ff;">
+                    Gagak sedang berehat di atas dahan pokok...
+                </div>
+
+                <div id="gunung1" class="objek-latar">⛰️</div>
+                <div id="gunung2" class="objek-latar">⛰️</div>
+                <div id="gunung3" class="objek-latar">⛰️</div>
+                <div id="gunung4" class="objek-latar">⛰️</div>
+                <div id="awan1" class="objek-latar">☁️</div>
+                <div id="awan2" class="objek-latar">☁️</div>
+                <div id="matahari" class="objek-latar">☀️</div>
+                
+                <div id="tanah-rumput"></div>
+                <div id="pokok-gagak">🌳</div>
+                
+                <div id="batu1" class="batu-tanah">🪨</div>
+                <div id="batu2" class="batu-tanah">🪨</div>
+                <div id="batu3" class="batu-tanah">🪨</div>
+                
+                <div id="tempayan">🏺</div>
+                <div id="air-tempayan">💦</div> 
+                
+                <div id="gagak">
+                    <div id="dialogGagak" class="dialog-khas-gagak"></div>
+                    <span id="ikonGagak">
+    <img src="assets/picture/gagak.png" alt="Gagak" style="width: 45px; height: auto; transform: scaleX(-1);">
+</span>
+                    <span id="batu-paruh">🪨</span> 
+                    <span id="air-minum">💧</span> 
+                </div>
+                
+            </div>
+        </div>
+        
+    </div> 
+    
+    <!-- PANDUAN KUSTOM PRO -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+    🏆 <img src="assets/picture/gagak.png" style="width: 50px;"> 🧠
+</div>
+            <h2>Panduan Tindak Balas</h2>
+            <p style="text-align: left;">Pengaturcaraan memerlukan langkah logik satu persatu. Komputer tidak boleh melompat langkah untuk menyiapkan tugasan fizikal.</p>
+            <div style="background: rgba(0, 243, 255, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #00f3ff;">
+                <strong>Urutan Logik:</strong><br><br>
+                1. Mesti ambil batu dahulu.<br>
+                2. Masukkan batu ke dalam tempayan.<br>
+                3. Ulang langkah 1 & 2 sehingga air penuh (3 batu).<br>
+                4. Bila air membuak, taip kod minum!
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00f3ff; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN KUSTOM PRO -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 50px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+    🏆 <img src="assets/picture/gagak.png" style="width: 50px;"> 🧠
+</div>
+            <h2 style="color: #0be881;">Tahniah, Pengekod Muda!</h2>
+            <p>Sang Gagak berjaya menghilangkan dahaga berkat arahan algoritma bersiri anda yang sangat tepat!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom" style="border-color: #ff5e57; box-shadow: 0 0 30px rgba(255, 94, 87, 0.3);">
+            <div style="font-size: 60px;" id="ikon-kalah">❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Ralat!</h2>
+            <p id="pesan-kalah">Terdapat kesilapan pada logik kod arahan anda. Sila cuba lagi!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+
+    <script src="script-tahap1a.js"></script>
+</body>
+</html>

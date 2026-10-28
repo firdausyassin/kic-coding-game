@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 8D: Sinkronisasi Data</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA GAUNG SIBER */
+        .tema-gaung {
+            background: linear-gradient(to bottom, #0f2027 0%, #203a43 50%, #2c5364 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* MENARA SIBER */
+        .menara {
+            position: absolute; bottom: 0; width: 100px; height: 180px;
+            background: #2c3e50; border-top: 5px solid #00f3ff;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 -5px 15px rgba(0, 243, 255, 0.3);
+            z-index: 5;
+        }
+        #menara-a { left: 15%; }
+        #menara-b { right: 15%; }
+
+        /* JAMBATAN HOLOGRAM */
+        #jambatan {
+            position: absolute; bottom: 175px; left: calc(15% + 100px); 
+            height: 10px; width: 0; 
+            background: #00f3ff;
+            box-shadow: 0 0 20px #00f3ff, 0 0 40px #00f3ff;
+            z-index: 4; transition: width 1.5s ease-in-out;
+        }
+
+        /* ROVER */
+        #rover {
+            position: absolute; bottom: 185px; left: 16%; 
+            font-size: 60px; z-index: 20; margin: 0; line-height: 1;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.6));
+            transform: scaleX(-1); 
+            transition: left 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* KOTAK KUNCI (WARNA TEKS HITAM PEKAT) */
+        .kotak-kunci {
+            position: absolute; bottom: 260px; width: 80px; height: 50px;
+            background: rgba(0, 243, 255, 0.6); 
+            border: 3px solid #00f3ff; border-radius: 8px;
+            box-shadow: 0 0 15px #00f3ff, inset 0 0 10px #00f3ff;
+            display: flex; justify-content: center; align-items: center;
+            font-family: monospace; font-size: 22px; font-weight: 900;
+            color: #000; 
+            text-shadow: 1px 1px 0px #fff, -1px -1px 0px #fff, 1px -1px 0px #fff, -1px 1px 0px #fff; 
+            z-index: 10; transition: all 0.5s ease;
+        }
+        #kotak-a { left: calc(15% + 10px); }
+        #kotak-b { right: calc(15% + 10px); }
+
+        .label-kunci {
+            position: absolute; bottom: 235px; width: 100px; text-align: center;
+            font-family: monospace; font-weight: bold; color: #bdc3c7; font-size: 14px;
+        }
+        #label-a { left: 15%; }
+        #label-b { right: 15%; }
+
+        /* DIALOG ROBOT AI */
+        .awan-dialog {
+            position: absolute; top: 30px; left: 50%; 
+            width: 260px !important; height: fit-content !important; min-height: 40px !important;
+            display: block !important; transform: translateX(-50%) scale(0); transform-origin: top center;
+            background: rgba(15, 25, 40, 0.95) !important; color: #00f3ff !important; 
+            padding: 12px 15px !important; border-radius: 12px !important; 
+            font-size: 14px !important; font-weight: bold !important; line-height: 1.4 !important;
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3) !important; white-space: normal !important; 
+            word-wrap: break-word !important; text-align: center !important; 
+            border: 2px solid #00f3ff !important; z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; bottom: -12px; left: 50%; margin-left: -8px;
+            border-width: 9px; border-style: solid; border-color: #00f3ff transparent transparent transparent;
+        }
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) translateY(10px) !important; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Sinkronisasi<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 8D)</span></h2>
+                <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0;">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p style="margin-top: 10px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Bina jambatan hologram data dari menara <strong>kunci_a</strong> ke <strong>kunci_b</strong> dan pindahkan data tersebut ke dalam kunci B.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; border-left: 3px solid #00f3ff;">
+                <strong>Konsep Menyalin Data (Copy):</strong><br>
+                Anda boleh menyamakan nilai B dengan A menggunakan tanda sama dengan (<code>=</code>).<br><br>
+                <strong style="color: #00f3ff;">Arahan:</strong><br>
+                Untuk memastikan Data B dan Data A adalah sama, taipkan:<br>
+                <code>kunci_b = kunci_a</code>
+            </div>
+            
+            <textarea id="arahanInput" placeholder="Taip kod sinkronisasi di sini..." spellcheck="false" style="width: 100%; height: 60px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px; resize: none;"></textarea>
+            
+            <button onclick="laksanaArahanTahap8d()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #00f3ff, #0984e3); color: #000; font-weight: bold; box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);">SINKRONISASI DATA 🔄</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #00f3ff; padding: 10px; font-size: 13px;">
+                Arahan Diterima: Sinkronisasi data menari A ke menara B diperlukan!
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Gaung Siber</h2>
+            
+            <div id="ruangAnimasi" class="tema-gaung">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(15,25,40,0.9); color: #00f3ff; border: 2px solid #00f3ff; font-size: 14px;">
+                    Sistem: Membaca pangkalan data kunci...
+                </div>
+                
+                <div id="dialogSistem" class="awan-dialog"></div>
+                
+                <div id="menara-a" class="menara"></div>
+                <div id="menara-b" class="menara"></div>
+                
+                <div id="jambatan"></div>
+
+                <div id="kotak-a" class="kotak-kunci">0000</div>
+                <div id="label-a" class="label-kunci">kunci_a</div>
+
+                <div id="kotak-b" class="kotak-kunci">----</div>
+                <div id="label-b" class="label-kunci">kunci_b</div>
+
+                <div id="rover">🚙</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #00f3ff; box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);">
+            <h2 style="color: #00f3ff;">🔄 Pemindahan Data Variabel</h2>
+            <p style="color: #ecf0f1; font-size: 15px;">Dalam pengaturcaraan, anda boleh menyalin (copy) nilai dari satu pembolehubah ke pembolehubah yang lain!</p>
+            
+            <div style="background: rgba(0, 243, 255, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #fff; border-left: 4px solid #00f3ff;">
+                <strong>Bagaimana ia berfungsi?</strong><br><br>
+                Data di dalam <code>kunci_a</code> sedang bergerak terlalu pantas untuk ditaip secara manual. Untuk menyalin nilainya tepat pada masanya, gunakan kod ini:<br><br>
+                <code>kunci_b = kunci_a</code><br><br>
+                Komputer akan melihat nilai terkini di dalam <code>kunci_a</code> dan memasukkannya ke dalam <code>kunci_b</code> secara automatik!
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #00f3ff; color: #000; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal" style="background: #1a1a2e; border: 2px solid #2ecc71;">
+            <div class="ikon-menang">🚙📡</div>
+            <h2 style="color: #2ecc71;">Sinkronisasi Lengkap!</h2>
+            <p style="color: #ecf0f1;">Tahniah! Anda telah berjaya menyalin data antara dua pembolehubah berbeza tanpa perlu menaip nombor secara manual. Jambatan data telah dibina dan Rover selamat melintas!</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'" style="background: #2ecc71; color: #000; font-weight: bold;">KEMBALI KE MENU PANGKALAN</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap8d.js"></script>
+</body>
+</html>

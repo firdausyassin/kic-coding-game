@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 3A: Pertahanan Angkasa (While Loop)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="tema-permainan tema-angkasa-lepas">
+
+    <div class="container">
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Terminal Pertahanan</h2>
+                <button class="btn-info" onclick="bukaInfo()">ℹ️ Panduan Misi</button>
+            </div>
+            
+            <p>Amaran! Jumlah ancaman tidak diketahui dikesan pada radar. Logik `If` biasa tidak cukup pantas!</p>
+            <p style="color: #00f3ff;">Gunakan <strong>Gelung Bersyarat (While)</strong> untuk melepaskan tembakan berterusan selagi radar memaparkan "bahaya".</p>
+            <p>Format: <code>while (radar == "bahaya") { kapal.tembak() }</code></p>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod While di sini..." onkeydown="if(event.key === 'Enter') laksanaArahanAngkasa()">
+            <button onclick="laksanaArahanAngkasa()">LANCAR SISTEM 🚀</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas">
+                Sistem senjata sedia. Menunggu kod gelung automatik...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #00f3ff; text-align: center; margin-top:0; text-shadow: 0 0 10px #00f3ff;">Kanvas Galaksi</h2>
+            
+            <div id="ruangAnimasi">
+                <div class="teks-status" id="teksAnimasi" style="color: white; position: absolute; top: 15px; width: 100%; text-align: center; z-index: 10;">
+                    Status: Radar mengesan ancaman rawak...
+                </div>
+                
+                <div id="medan-asteroid">
+                    </div>
+                
+                <div id="laser-pancaran"></div>
+                
+                <div id="kapal-angkasa">
+                    <div id="dialogKapal" class="awan-dialog" style="bottom: 90px; left: -40px;"></div>
+                    <span>🛸</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalInfo" class="modal-sembunyi">
+        <div class="kandungan-modal kandungan-info" style="max-width: 550px; background-color: #0b0c10; border: 2px solid #00f3ff; box-shadow: 0 0 20px #00f3ff;">
+            <h2 style="color: #00f3ff;">♾️ Panduan Gelung While</h2>
+            <p style="color: #ecf0f1;">"While" bermaksud <strong>Selagi</strong>. Komputer akan mengulang arahan di dalam kurungan <code>{ }</code> beribu-ribu kali dalam satu saat, sehinggalah syarat dihentikan.</p>
+            
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p style="margin: 0; color: #f1c40f; font-weight: bold;">Salin kod automatik ini:</p>
+                <code style="color: #00ff66; font-size: 14px;">while (radar == "bahaya") { kapal.tembak() }</code>
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 10px; width: 100%;">AKTIFKAN SENJATA!</button>
+        </div>
+    </div>
+
+    <div id="modalKemenangan" class="modal-sembunyi">
+        <div class="kandungan-modal">
+            <div class="ikon-menang">🌌</div>
+            <h2>Ancaman Dimusnahkan!</h2>
+            <p>Anda telah menguasai sistem gelung (looping) paling berkuasa di dalam pengaturcaraan.</p>
+            <button class="butang-menu" onclick="window.location.href='index.html'">KEMBALI KE MENU</button>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-angkasa3a.js"></script>
+</body>
+</html>

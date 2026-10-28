@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 6B: Penjaga Zoo Pintar</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA ZOO / SAVANNAH */
+        .tema-zoo {
+            background: linear-gradient(to bottom, #87CEEB 0%, #e0f6ff 100%) !important;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 🔥 KELAS PAUSE GLOBAL 🔥 */
+        .paused * {
+            animation-play-state: paused !important;
+        }
+
+        /* TANAH RUMPUT SAVANNAH */
+        #tanah-zoo {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
+            background: linear-gradient(to bottom, #8bc34a, #558b2f);
+            border-top: 10px solid #7cb342; z-index: 5;
+        }
+
+        /* POKOK & PAGAR */
+        .objek-latar { position: absolute; z-index: 2; line-height: 1; margin: 0; }
+        #pokok1 { bottom: 120px; left: 5%; font-size: 180px; filter: drop-shadow(0 10px 5px rgba(0,0,0,0.2)); }
+        #pokok2 { bottom: 120px; right: 5%; font-size: 150px; filter: drop-shadow(0 10px 5px rgba(0,0,0,0.2)); }
+        
+        #pagar {
+            position: absolute; bottom: 110px; left: 0; width: 100%; height: 40px;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 40px, #8d6e63 40px, #8d6e63 50px);
+            border-top: 5px solid #795548; border-bottom: 5px solid #795548; z-index: 3; opacity: 0.8;
+        }
+
+        /* AWAN & MATAHARI */
+        .alam-semula-jadi { position: absolute; z-index: 1; pointer-events: none; }
+        #awan1 { top: 10%; left: 10%; font-size: 60px; animation: gerakAwan 30s linear infinite alternate; }
+        #awan2 { top: 25%; right: 20%; font-size: 80px; animation: gerakAwan 40s linear infinite alternate-reverse; }
+        #matahari { top: 5%; right: 10%; font-size: 70px; }
+        @keyframes gerakAwan { 0% { transform: translateX(0); } 100% { transform: translateX(50px); } }
+
+        /* KOTAK HAIWAN */
+        #kotak-haiwan {
+            position: absolute; bottom: 120px; left: -20%; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            transition: left 1.5s ease-out;
+        }
+        
+        #ikon-haiwan { 
+            font-size: 100px; line-height: 1; margin: 0; 
+            transition: transform 0.3s; 
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+            display: inline-block;
+            transform: scaleX(-1); /* Flip Muka Ke Kanan */
+        }
+        
+        .gembira { transform: scaleX(-1) scale(1.2) translateY(-20px) !important; }
+
+        /* MESIN MAKANAN */
+        #mesin-makanan {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            font-size: 70px; z-index: 15; line-height: 1; margin: 0;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
+        }
+
+        /* MAKANAN JATUH */
+        #makanan-jatuh {
+            position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+            font-size: 50px; z-index: 14; opacity: 0; line-height: 1; margin: 0;
+            transition: top 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53), opacity 0.3s;
+        }
+        .makanan-gugur { top: 200px !important; opacity: 1 !important; }
+
+        /* DIALOG MESIN AI */
+        .awan-dialog {
+            position: absolute; 
+            top: 90px; left: 55%; 
+            width: 220px !important; 
+            height: fit-content !important;
+            min-height: 40px !important;
+            display: block !important;
+            transform: scale(0); transform-origin: top left;
+            background: rgba(255, 255, 255, 0.95) !important; 
+            color: #2c3e50 !important; 
+            padding: 15px !important; 
+            border-radius: 15px !important; 
+            font-size: 14px !important; 
+            font-weight: bold !important; 
+            line-height: 1.5 !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important; 
+            white-space: normal !important; 
+            word-wrap: break-word !important; 
+            text-align: center !important; 
+            border: 3px solid #f39c12 !important; 
+            z-index: 40 !important; pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .awan-dialog::after {
+            content: ''; position: absolute; top: -12px; left: 20px;
+            border-width: 9px; border-style: solid; border-color: transparent transparent #f39c12 transparent;
+        }
+        .tunjuk-dialog { transform: scale(1) translateY(10px) !important; }
+
+        /* KOTAK MODAL KUSTOM PRO */
+        .modal-kustom-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(5, 0, 17, 0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .tunjuk-modal-kustom { display: flex; animation: fanaIn 0.3s ease-out forwards; }
+        .kandungan-modal-kustom { background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; text-align: center; color: #34495e; box-shadow: 0 0 30px rgba(243, 156, 18, 0.3); border: 2px solid #f39c12; }
+        .kandungan-modal-menang { box-shadow: 0 0 30px rgba(46, 204, 113, 0.4); border: 2px solid #2ecc71; }
+        .kandungan-modal-kalah { box-shadow: 0 0 30px rgba(231, 76, 60, 0.4); border: 2px solid #e74c3c; }
+        .kandungan-modal-kustom h2 { margin: 10px 0; font-size: 24px; font-weight: bold; color: #f39c12; }
+        .kandungan-modal-kustom p { margin: 10px 0 20px 0; font-size: 14px; color: #34495e; line-height: 1.5; white-space: normal;}
+        @keyframes fanaIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* BUTANG DWI-PILIHAN UNTUK KALAH DAN MENANG */
+        .kumpulan-butang { display: flex; gap: 10px; margin-top: 15px; }
+        .butang-menu.separuh { flex: 1; font-size: 13px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s;}
+        .butang-menu.separuh:hover { transform: scale(1.05); }
+        .butang-menu.kelabu { background: #7f8c8d; color: #fff; }
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h2 style="margin: 0; line-height: 1.2;">Terminal Bersyarat<br><span style="font-size: 16px; color: #bdc3c7;">(Misi 6B - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #f39c12; color: #fff; border-color: #d35400; font-weight: bold; padding: 5px 10px; margin: 0; flex-shrink: 0;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #f39c12; color: #fff; border-color: #d35400; font-weight: bold; padding: 5px 10px;">ℹ️ Panduan</button>
+                </div>
+            </div>
+            
+            <!-- Teks dipadatkan sedikit untuk memberi ruang -->
+            <p style="margin-top: 10px; margin-bottom: 8px; font-size: 13px; line-height: 1.3;">Bantu Mesin AI Zoo! Buktikan bahawa 1 formula cukup untuk 2 situasi menggunakan <strong>ELSE</strong>.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border-left: 3px solid #f39c12; line-height: 1.3;">
+                <strong style="color: #f39c12;">Senarai Tindakan Mesin:</strong><br>
+                <code>zoo.beri_daging()</code> | <code>zoo.beri_daun()</code><br>
+                <strong style="color: #f39c12;">Contoh Formula Sah:</strong><br>
+                <code style="color: #fff;">if(haiwan=="harimau"){</code><br>
+                <code style="color: #bdc3c7;">&nbsp;&nbsp;zoo.beri_daging()</code><br>
+                <code style="color: #fff;">}else{</code><br>
+                <code style="color: #bdc3c7;">&nbsp;&nbsp;zoo.beri_daun()</code><br>
+                <code style="color: #fff;">}</code>
+            </div>
+            
+            <!-- 🔥 TEXTAREA DIBESARKAN KE 175px 🔥 -->
+            <textarea id="arahanInput" placeholder="Taip kod if-else penuh di sini..." spellcheck="false" style="width: 100%; height: 175px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; resize: vertical; margin-bottom: 5px;"></textarea>
+            
+            <button onclick="laksanaArahanTahap6b()" style="margin-top: 5px; margin-bottom: 5px; background: linear-gradient(135deg, #f39c12, #d35400); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);">JALANKAN MESIN AI 🥩🌿</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #f39c12; padding: 8px; font-size: 12px;">
+                Sistem Zoo sedia. Menunggu haiwan masuk...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kandang Automatik</h2>
+            
+            <div id="ruangAnimasi" class="tema-zoo">
+                <div class="teks-status" id="teksAnimasi" style="background: rgba(255,255,255,0.9); color: #d35400; border: 2px solid #e67e22; z-index: 100;">
+                    Status: Pintu kandang dibuka...
+                </div>
+                
+                <div id="awan1" class="alam-semula-jadi">☁️</div>
+                <div id="awan2" class="alam-semula-jadi">☁️</div>
+                <div id="matahari" class="alam-semula-jadi">☀️</div>
+                
+                <div id="pokok1" class="objek-latar">🌳</div>
+                <div id="pokok2" class="objek-latar">🌴</div>
+                <div id="pagar"></div>
+                <div id="tanah-zoo"></div>
+
+                <div id="mesin-makanan">🛸</div>
+                <div id="dialogMesin" class="awan-dialog"></div>
+                <div id="makanan-jatuh">❓</div>
+                
+                <div id="kotak-haiwan">
+                    <span id="ikon-haiwan">❓</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PANDUAN -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🥩🌿</div>
+            <h2 style="color: #d35400;">Kuasa "ELSE" (Jika Tidak)</h2>
+            <p style="text-align: left;">Fungsi <code>ELSE</code> bertindak sebagai penangkap automatik (fallback) jika syarat <code>IF</code> adalah PALSU.</p>
+            
+            <div style="background: #fdf2e9; padding: 15px; border-radius: 8px; text-align: left; font-size: 14px; color: #333; border-left: 4px solid #f39c12;">
+                <strong>Bagaimana ia berfungsi?</strong><br>
+                Katakan skrin memaparkan 🦒 Zirafah, tetapi kod anda berbunyi:<br>
+                <code>if(haiwan=="harimau"){...</code><br><br>
+                Komputer akan menyoal: <i>"Adakah yang kat depan ni Harimau?"</i><br>
+                Oleh kerana ia <strong>PALSU</strong> (sebab itu Zirafah), komputer akan mengabaikan Daging dan terus <strong>melompat ke arahan ELSE</strong> untuk memberikan Daun!<br><br>
+                Ini membuktikan 1 kod sudah cukup untuk pelbagai situasi!
+            </div>
+            
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #f39c12; color: #fff; font-weight: bold;">SAYA FAHAM KONSEP INI</button>
+        </div>
+    </div>
+
+    <!-- MODAL KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🐅🦒</div>
+            <h2 style="color: #27ae60;">Sistem Cemerlang!</h2>
+            <p style="color: #34495e;">Tahniah Penjaga Zoo! Anda berjaya membuktikan kehebatan komputer. Satu blok logik `If-Else` sudah cukup efisien untuk mengenali dan menyelesaikan situasi pelbagai haiwan secara serentak!</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #2ecc71; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KALAH / RALAT -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;">⚠️❌</div>
+            <h2 style="color: #e74c3c;">Sistem Tergendala!</h2>
+            <p style="color: #34495e;" id="pesan-kalah-teks">Terdapat ralat sintaks atau masalah pada diet haiwan anda! Sila periksa semula urutan IF-ELSE.</p>
+            
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #e74c3c; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <script src="script-tahap6b.js"></script>
+</body>
+</html>

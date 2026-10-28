@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misi 4C: Sifir Meloncat</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* TEMA KOLAM TERATAI */
+        .tema-kolam {
+            background: linear-gradient(to bottom, #81ecec 0%, #00cec9 100%) !important;
+            overflow: hidden; position: relative;
+        }
+
+        #tebing-mula {
+            position: absolute; bottom: 0; left: 0; width: 80px; height: 100%;
+            background: #55efc4; border-right: 8px solid #00b894; z-index: 5;
+            border-radius: 0 50px 50px 0;
+        }
+
+        #denai-teratai {
+            position: absolute; bottom: 120px; left: 80px; width: calc(100% - 100px);
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 10px; z-index: 4;
+        }
+
+        .daun-teratai {
+            width: 45px; height: 15px; background: #27ae60; border-radius: 50%;
+            position: relative; box-shadow: inset -5px -2px 0 rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.3);
+            display: flex; justify-content: center;
+        }
+        
+        .daun-teratai::after {
+            content: attr(data-nombor); position: absolute; top: 20px;
+            font-size: 14px; font-weight: bold; color: #1e272e;
+            text-shadow: 1px 1px 0 #fff;
+        }
+
+        #objek-lalat {
+            position: absolute; top: -35px; font-size: 30px;
+            animation: lalatTerbang 0.5s ease-in-out infinite alternate;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+        }
+
+        @keyframes lalatTerbang { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+
+        /* KATAK KITA */
+        #katak-sifir {
+            position: absolute; bottom: 120px; left: 15px; font-size: 50px;
+            z-index: 10; transition: left 0.4s linear; 
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
+            transform-origin: bottom center;
+        }
+        
+        #ikonKatak { line-height: 1; margin: 0; display: inline-block; }
+
+        .animasi-lompat { animation: lompatKatak 0.4s ease-out; }
+        
+        @keyframes lompatKatak {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-60px) scaleY(1.2) scaleX(0.9); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .jatuh-air { animation: tenggelam 1s forwards !important; }
+        @keyframes tenggelam {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(50px) scale(0.8) rotate(45deg); opacity: 0.5; }
+            100% { transform: translateY(100px) scale(0) rotate(90deg); opacity: 0; }
+        }
+
+        .percikan-air {
+            position: absolute; width: 40px; height: 10px; background: rgba(255,255,255,0.8);
+            border-radius: 50%; opacity: 0; transform: scale(0);
+        }
+        .buat-percikan { animation: percik 0.6s ease-out forwards; }
+        @keyframes percik {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        /* 🔥 AWAN DIALOG GLOBAL (DINAMIK KIRI & KANAN) 🔥 */
+        .awan-dialog {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) scale(0); 
+            background: #ffffff; color: #1c2833; padding: 8px 12px; border-radius: 8px; 
+            font-size: 13px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 40; text-align: center; 
+            white-space: nowrap !important; min-width: max-content !important;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1); 
+            pointer-events: none; border: 2px solid #3498db; margin-bottom: 5px;
+        }
+        
+        .awan-dialog::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; 
+            border-width: 6px; border-style: solid; border-color: #3498db transparent transparent transparent;
+        }
+
+        /* Bunuh jarum putih sesat secara mutlak */
+        .awan-dialog::before { display: none !important; }
+
+        .tunjuk-dialog { transform: translateX(-50%) scale(1) !important; }
+
+        /* Dialog Kanan Katak (Panah ke kiri bawah) */
+        .dialog-kanan { left: 80%; transform: translateX(0) scale(0); transform-origin: bottom left; }
+        .dialog-kanan.tunjuk-dialog { transform: translateX(0) scale(1) !important; }
+        .dialog-kanan::after { left: 20%; }
+
+        /* Dialog Kiri Katak (Panah ke kanan bawah) */
+        .dialog-kiri { left: 20%; transform: translateX(-100%) scale(0); transform-origin: bottom right; }
+        .dialog-kiri.tunjuk-dialog { transform: translateX(-100%) scale(1) !important; }
+        .dialog-kiri::after { left: 80%; }
+        
+    </style>
+</head>
+<body class="tema-permainan">
+
+    <div class="container">
+        
+        <div class="panel-kiri">
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 5px;">
+                <h2 style="margin: 0; line-height: 1.2; font-size: 22px;">Terminal Pengulangan<br><span style="font-size: 13px; color: #3498db;">(Misi 4C - Zon 1)</span></h2>
+                
+                <div style="display: flex; gap: 4px;">
+                    <button class="btn-info" onclick="window.location.href='index.html'" style="background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 6px 8px; margin: 0; flex-shrink: 0; font-size: 12px;">🏠 Menu</button>
+                    <button class="btn-info" onclick="bukaInfo()" style="white-space: nowrap; flex-shrink: 0; margin: 0; background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold; padding: 6px 8px; font-size: 12px;">ℹ️ Panduan Misi</button>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4;">Bantu katak menangkap lalat di hujung kolam pada teratai <strong>Nombor 10</strong>.</p>
+            <p style="color: #f1c40f; font-weight: bold; font-size: 13px; line-height: 1.4;">Katak ini hanya pakar melompat <strong>gandaan 2</strong>. Arahkan katak melompat berulang kali menggunakan fungsi Loop.</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 3px solid #3498db; font-family: monospace;">
+                <strong style="color: #3498db; font-family: sans-serif;">Format Kod Berlapis (Sifir 2):</strong><br>
+                <span style="color: #fff; display: block; word-break: break-all; margin-top: 4px;">ulang(jumlah_gelung){katak.lompat(gandaan)}</span><br>
+                <strong style="color: #f1c40f; font-family: sans-serif;">Arahan Sasaran:</strong><br>
+                <span style="color: #fff;">ulang(?){katak.lompat(?)}</span>
+            </div>
+            
+            <input type="text" id="arahanInput" placeholder="Taip kod pengulangan di sini..." autocomplete="off" onkeydown="if(event.key === 'Enter') laksanaArahanTahap4c()" style="width: 100%; height: 50px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid #7f8c8d; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 15px; margin-bottom: 5px;">
+            <button onclick="laksanaArahanTahap4c()" style="margin-top: 5px; margin-bottom: 8px; background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);">MULA MELOMPAT 🐸</button>
+
+            <div class="kotak-maklum-balas" id="maklumBalas" style="background: rgba(0,0,0,0.4); border-left-color: #3498db; padding: 10px; font-size: 13px;">
+                Sistem ekologi kolam aktif. Menunggu arahan pengulangan...
+            </div>
+        </div>
+
+        <div class="panel-kanan">
+            <h2 style="color: #343442; text-align: center; margin-top: 1px; margin-bottom: 16px;">Kanvas Animasi</h2>
+            
+            <div id="ruangAnimasi" class="tema-kolam">
+                
+                <div id="teksAnimasi" class="teks-status" style="background: rgba(255,255,255,0.95); color: #2c3e50; border: 2px solid #3498db; z-index: 30;">
+                    Status: Katak sedia di tebing (Posisi 0).
+                </div>
+                
+                <div id="tebing-mula"></div>
+                
+                <div id="denai-teratai">
+                    <div class="daun-teratai" data-nombor="1"></div>
+                    <div class="daun-teratai" data-nombor="2"></div>
+                    <div class="daun-teratai" data-nombor="3"></div>
+                    <div class="daun-teratai" data-nombor="4"></div>
+                    <div class="daun-teratai" data-nombor="5"></div>
+                    <div class="daun-teratai" data-nombor="6"></div>
+                    <div class="daun-teratai" data-nombor="7"></div>
+                    <div class="daun-teratai" data-nombor="8"></div>
+                    <div class="daun-teratai" data-nombor="9"></div>
+                    <div class="daun-teratai" data-nombor="10">
+                        <div id="objek-lalat">🪰</div>
+                    </div>
+                </div>
+
+                <!-- 🔥 KATAK DAN DIALOGNYA 🔥 -->
+                <div id="katak-sifir">
+                    <div id="dialogKatak" class="awan-dialog"></div>
+                    <span id="ikonKatak">🐸</span>
+                    <div id="percikan" class="percikan-air"></div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- PANDUAN KUSTOM PRO -->
+    <div id="modalInfo" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom">
+            <div style="font-size: 50px;">🐸✖️</div>
+            <h2>Pendaraban Menggunakan Loop</h2>
+            <p style="text-align: left;">Sifir atau pendaraban pada asalnya adalah <strong>penambahan berulang</strong>. Dalam pengaturcaraan, kita mewakilinya menggunakan blok Loop (Gelung).</p>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #fff; border-left: 4px solid #3498db;">
+                <strong>Memecahkan Kod:</strong><br><br>
+                <code>ulang(A) { katak.lompat(B) }</code><br><br>
+                A = Berapa kali katak perlu melompat? (Kumpulan)<br>
+                B = Berapa langkah dalam satu lompatan? (Ahli)<br><br>
+                💡 Katak ini <strong>hanya boleh melompat sebanyak 2 tapak</strong> pada satu-satu masa (Sifir 2). Jadi sasaran anda adalah mencari nilai A yang betul untuk mencapai sasaran (10).
+            </div>
+            <button class="butang-menu" onclick="tutupInfo()" style="margin-top: 15px; width: 100%; background: #3498db; color: #fff; font-weight: bold;">SAYA FAHAM!</button>
+        </div>
+    </div>
+
+    <!-- KEMENANGAN -->
+    <div id="modalKemenangan" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-menang">
+            <div style="font-size: 60px;">🪰😍</div>
+            <h2 style="color: #0be881;">Tangkapan Sempurna!</h2>
+            <p>Tahniah! Anda telah membuktikan bahawa <strong>5 kali lompatan gandaan 2 adalah bersamaan dengan 10 (5 x 2 = 10)</strong>. Anda berjaya menguasai logik sifir melalui Loop!</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #0be881; color: #000; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RALAT KALAH KUSTOM PRO -->
+    <div id="modalKalah" class="modal-kustom-overlay">
+        <div class="kandungan-modal-kustom kandungan-modal-kalah">
+            <div style="font-size: 60px;" id="ikon-kalah">💦❌</div>
+            <h2 style="color: #ff5e57;" id="tajuk-kalah">Kiraan Melasar!</h2>
+            <p id="pesan-kalah">Ralat jumlah pengiraan pendaraban dikesan.</p>
+            <div class="kumpulan-butang">
+                <button class="butang-menu separuh" onclick="location.reload()" style="background: #ff5e57; color: #fff; font-weight: bold;">CUBA LAGI</button>
+                <button class="butang-menu separuh kelabu" onclick="window.location.href='index.html'" style="font-weight: bold;">MENU UTAMA</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bunyiBetul" src="assets/audio/betul.mp3"></audio>
+    <audio id="bunyiSalah" src="assets/audio/salah.mp3"></audio>
+    <audio id="bunyiMenang" src="assets/audio/menang.mp3"></audio>
+    
+    <!-- 🔥 JAVASCRIPT DISATUKAN (INLINE) 🔥 -->
+    <script>
+        let adakahTamat = false;
+        let adakahSibuk = false;
+        let pemasaDialog; 
+
+        const tunggu = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function mainBunyi(audioElemen, mulaMasa = 0) {
+            if (audioElemen) {
+                audioElemen.pause();
+                audioElemen.currentTime = mulaMasa;
+                let playPromise = audioElemen.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => { console.log("Bunyi disekat sementara."); });
+                }
+            }
+        }
+
+        // 🔥 FUNGSI DIALOG DINAMIK (Boleh panggil 'kiri' atau 'kanan') 🔥
+        function cakap(mesej, masa, posisi = "kanan") {
+            let kotakDialog = document.getElementById("dialogKatak");
+            if(kotakDialog) {
+                kotakDialog.innerHTML = mesej;
+                kotakDialog.className = "awan-dialog"; // Reset class
+                
+                if (posisi === "kanan") kotakDialog.classList.add("dialog-kanan");
+                else if (posisi === "kiri") kotakDialog.classList.add("dialog-kiri");
+                
+                kotakDialog.classList.add("tunjuk-dialog");
+                
+                clearTimeout(pemasaDialog); 
+                pemasaDialog = setTimeout(() => { 
+                    kotakDialog.classList.remove("tunjuk-dialog"); 
+                }, masa);
+            }
+        }
+
+        function dapatkanPosisiKiri(nombor) {
+            if (nombor === 0) return 15; // Kedudukan asal di tebing
+            
+            let daun = document.querySelector(`.daun-teratai[data-nombor="${nombor}"]`);
+            if (daun) {
+                // Denai mula dari left: 80px. Tolak sikit (-5px) supaya center.
+                return daun.offsetLeft + 80 - 5; 
+            }
+            
+            // Kalau terlajak nombor lebih dari 10 (Jatuh kolam)
+            let lastDaun = document.querySelector(`.daun-teratai[data-nombor="10"]`);
+            let extraJarak = (nombor - 10) * 45; 
+            return lastDaun.offsetLeft + 80 - 5 + extraJarak;
+        }
+
+        async function laksanaArahanTahap4c() {
+            let inputRaw = document.getElementById("arahanInput").value;
+            let inputBersih = inputRaw.replace(/\s+/g, '').toLowerCase();
+
+            let maklumBalas = document.getElementById("maklumBalas");
+            let teksAnimasi = document.getElementById("teksAnimasi");
+            let katak = document.getElementById("katak-sifir");
+            
+            let sfxBetul = document.getElementById("bunyiBetul");
+            let sfxSalah = document.getElementById("bunyiSalah");
+            let sfxMenang = document.getElementById("bunyiMenang");
+
+            if(adakahTamat) {
+                maklumBalas.innerHTML = "Ralat: Misi tamat. Sila muat semula (Cuba Lagi).";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+                return;
+            }
+
+            if(adakahSibuk) return;
+
+            // Regex tangkap arahan: ulang(kali){katak.lompat(gandaan)}
+            let match = inputBersih.match(/^ulang\((\d+)\)\{katak\.lompat\((\d+)\)\}$/);
+            
+            if(match) {
+                let kaliUlang = parseInt(match[1]);
+                let gandaan = parseInt(match[2]);
+
+                if(kaliUlang === 0 || gandaan === 0) {
+                    maklumBalas.innerHTML = "Ralat Geometri: Nilai sifar tidak akan menggerakkan katak!";
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    mainBunyi(sfxSalah);
+                    cakap("Nak suruh saya tidur je ke?", 2500, "kanan");
+                    return;
+                }
+
+                adakahSibuk = true;
+                maklumBalas.innerHTML = `Sistem: Katak melompat gandaan ${gandaan} sebanyak ${kaliUlang} kali...`;
+                maklumBalas.style.borderLeftColor = "#f1c40f";
+
+                let limitLompat = kaliUlang;
+                if(limitLompat > 15) limitLompat = 15; // Had keselamatan visual
+                
+                let posisiSemasa = 0;
+
+                // Dialog sebelum gerak (Tunjuk ke kanan)
+                cakap("Mari kita lompat!", 1500, "kanan");
+                await tunggu(1000);
+
+                for(let i = 1; i <= limitLompat; i++){
+                    posisiSemasa += gandaan;
+                    
+                    // Lompat ke daun seterusnya
+                    katak.style.left = dapatkanPosisiKiri(posisiSemasa) + "px";
+                    katak.classList.add("animasi-lompat");
+                    mainBunyi(sfxBetul);
+                    
+                    teksAnimasi.innerHTML = `Status: Lompatan ke-${i}. Posisi sekarang: ${posisiSemasa}`;
+                    
+                    await tunggu(400); // Masa animasi mendarat
+                    katak.classList.remove("animasi-lompat");
+                    await tunggu(100);
+                }
+
+                await tunggu(500);
+
+                // PENILAIAN EKSPERIMEN
+                if(posisiSemasa === 10) {
+                    // BERJAYA
+                    adakahTamat = true;
+                    
+                    document.getElementById("objek-lalat").style.display = "none";
+                    document.getElementById("ikonKatak").innerHTML = "😍"; // Katak Suka
+                    
+                    maklumBalas.innerHTML = "Berjaya: Katak mendapat lalat makanan!";
+                    maklumBalas.style.borderLeftColor = "#0be881";
+                    teksAnimasi.innerHTML = `Status: Katak mendarat di posisi 10. Lalat ditangkap!`;
+                    
+                    mainBunyi(sfxMenang);
+                    // Dialog bila dah sampai (Tunjuk ke kiri supaya tak potong skrin)
+                    cakap(`Nyam nyam! Sedapnya sifir ${gandaan}!`, 3000, "kiri");
+                    
+                    setTimeout(() => {
+                        document.getElementById("modalKemenangan").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+
+                } else if (posisiSemasa > 10) {
+                    // TERLAJAK
+                    adakahTamat = true;
+                    
+                    katak.classList.add("jatuh-air");
+                    document.getElementById("percikan").classList.add("buat-percikan");
+                    mainBunyi(sfxSalah);
+                    
+                    maklumBalas.innerHTML = `Gagal: Terlajak jauh ke posisi ${posisiSemasa}!`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Katak terlajak melompat dan tenggelam ke dalam kolam!";
+                    
+                    setTimeout(() => {
+                        document.getElementById("pesan-kalah").innerHTML = `Arahan anda: <strong>${kaliUlang} x ${gandaan} = ${posisiSemasa}</strong>. Katak terlajak dari posisi lalat (10) lalu terlepas ke dalam air! Kurangkan jumlah Loop anda.`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2000);
+                    
+                } else {
+                    // TAK SAMPAI
+                    adakahTamat = true;
+                    mainBunyi(sfxSalah);
+                    
+                    maklumBalas.innerHTML = `Gagal: Katak hanya tiba di posisi ${posisiSemasa}.`;
+                    maklumBalas.style.borderLeftColor = "#ff5e57";
+                    teksAnimasi.innerHTML = "Status: Katak berhenti berehat sebelum sampai ke destinasi.";
+                    
+                    // Dialog bila berhenti separuh jalan (Tunjuk ke kiri)
+                    cakap("Lalat jauh lagi... Tak cukup sifir!", 3000, "kiri");
+                    
+                    setTimeout(() => {
+                        document.getElementById("tajuk-kalah").innerHTML = "Kiraan Tergantung!";
+                        document.getElementById("pesan-kalah").innerHTML = `Katak berhenti di daun nombor <strong>${posisiSemasa}</strong>. Lalat berada di daun nombor 10. Tambahkan lagi bilangan Loop pengulangan anda!`;
+                        document.getElementById("modalKalah").classList.add("tunjuk-modal-kustom");
+                    }, 2500);
+                }
+
+            } else {
+                maklumBalas.innerHTML = "Ralat Sintaks: Guna format ulang(jumlah){katak.lompat(gandaan)}";
+                maklumBalas.style.borderLeftColor = "#ff5e57";
+                mainBunyi(sfxSalah);
+            }
+            
+            document.getElementById("arahanInput").value = "";
+        }
+
+        function bukaInfo() { document.getElementById('modalInfo').classList.add('tunjuk-modal-kustom'); }
+        function tutupInfo() { document.getElementById('modalInfo').classList.remove('tunjuk-modal-kustom'); }
+    </script>
+</body>
+</html>
